@@ -24,8 +24,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
-    compile files('libs/gson-2.7-javadoc.jar')
     compile('com.mapbox.mapboxsdk:mapbox-android-sdk:4.1.1@aar') {
         transitive = true
     }
+    compile 'com.google.android.gms:play-services-location:9.4.0'
 }

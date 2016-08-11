@@ -2,9 +2,11 @@ package com.example.parkhanee.mytravelapp;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.support.annotation.UiThread;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,9 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationServices;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,103 +27,108 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 
-public class NearbyD2Activity extends AppCompatActivity {
+public class NearbyD2Activity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     int radius;
     int cat;
     String strRadius;
-    String strCat ;
+    String strCat;
     TextView tv;
-    Button map;
-    Button setting;
+    Button mapBtn;
+    Button settingBtn;
 
-    LocationServices locationServices;
-    private static final int PERMISSIONS_LOCATION = 0;
-    String apiKey ;
-    Location myLocation=null;
+    String apiKey;
+    Location myLocation;
     URL apiREQ;
-    AsyncTask task;
+    // AsyncTask task;
+
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_d2);
         Intent intent = getIntent();
-        radius = intent.getIntExtra("radius",500);
-        cat = intent.getIntExtra("cat",-1);
+        radius = intent.getIntExtra("radius", 500);
+        cat = intent.getIntExtra("cat", -1);
         strRadius = intent.getStringExtra("strRadius");
         strCat = intent.getStringExtra("strCat");
 
         tv = (TextView) findViewById(R.id.textView4);
-        tv.setText(strCat+" | "+strRadius);
+        tv.setText(strCat + " | " + strRadius);
 
-        map = (Button) findViewById(R.id.button5);
-        setting = (Button) findViewById(R.id.button4);
-        locationServices = LocationServices.getLocationServices(NearbyD2Activity.this);
+        mapBtn = (Button) findViewById(R.id.button5);
+        settingBtn = (Button) findViewById(R.id.button4);
         apiKey = getString(R.string.travelApiKey);
 
-        map.setOnClickListener(new View.OnClickListener() {
+        mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(NearbyD2Activity.this,NearbyD3Activity.class);
-                i.putExtra("radius",radius);
-                i.putExtra("cat",cat);
+                Intent i = new Intent(NearbyD2Activity.this, NearbyD3Activity.class);
+                i.putExtra("radius", radius);
+                i.putExtra("cat", cat);
                 startActivity(i);
             }
         });
 
-        //toggleGps(true);
-        if (!locationServices.areLocationPermissionsGranted()) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(com.google.android.gms.location.LocationServices.API)
+                    .build();
         }
-        myLocation = locationServices.getLastLocation();
-        Double Lat = myLocation.getLatitude();
-        Toast.makeText(NearbyD2Activity.this, Double.toString(Lat), Toast.LENGTH_SHORT).show();
-        // Async task  getPOIInfo(myLocation);
-        task = new URLReader().execute(radius,cat);
+
+        
 
 
     }
 
-/*
-    @UiThread
-    public void toggleGps(boolean enableGps) { // set user location
-        if (enableGps) {
-            // Check if user has granted location permission
-            if (!locationServices.areLocationPermissionsGranted()) {
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
-            } else {
-                enableLocation(true);
-            }
-        } else {
-            enableLocation(false);
-        }
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
     }
 
-    private void enableLocation(boolean enabled) { // set user location
-        if (enabled) { //my location 켜기
-            locationServices.addLocationListener(new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    Toast.makeText(NearbyD2Activity.this, "onLocationChanged", Toast.LENGTH_SHORT).show();
-                    if (location != null) {
-                        myLocation = location;
-                        Double Lat = myLocation.getLatitude();
-                        Toast.makeText(NearbyD2Activity.this, Double.toString(Lat), Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(NearbyD2Activity.this,"location is null", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-        } else { //my location 끄기
-        }
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
-    */
+
+
+    @Override
+    public void onConnected(@Nullable Bundle connectionHint) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (myLocation != null) {
+            Toast.makeText(NearbyD2Activity.this, String.valueOf(myLocation.getLatitude())+String.valueOf(myLocation.getLongitude()), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+
 
     private class URLReader extends AsyncTask<Integer, JSONArray, Void> {
 
@@ -134,8 +140,6 @@ public class NearbyD2Activity extends AppCompatActivity {
             String  inputLine;
             String result="";
             BufferedReader in;
-
-
 
                 Double Lat = myLocation.getLatitude();
                 Double Lgt = myLocation.getLongitude();
