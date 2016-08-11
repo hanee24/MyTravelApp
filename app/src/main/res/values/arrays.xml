@@ -1,0 +1,65 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<resources>
+
+    <string-array name="distance_array_list">
+        <item>반경 500m</item>
+        <item>반경 750m</item>
+        <item>반경 1000m</item>
+        <item>반경 2000m</item>
+        <item>반경 3000m</item>
+    </string-array>
+
+    <string-array name="cat_array_list">
+        <item>전체</item>
+        <item>관광지</item>
+        <item>음식</item>
+        <item>숙박</item>
+        <item>행사|공연|축제</item>
+        <item>기타</item>
+       <!-- <item>여행코스</item> -->
+    </string-array>
+
+    <string-array name="Cat_ContentTypeId">
+        <item>null0</item>
+        <item>null1</item>
+        <item>null2</item>
+        <item>null3</item>
+        <item>null4</item>
+        <item>null5</item>
+        <item>null6</item>
+        <item>null7</item>
+        <item>null8</item>
+        <item>null9</item>
+        <item>null10</item>
+        <item>null11</item>
+        <item>관광지</item>
+        <item>null13</item>
+        <item>문화시설</item>
+        <item>행사|공연|축제</item>
+        <item>null16</item>
+        <item>null17</item>
+        <item>null18</item>
+        <item>null19</item>
+        <item>null20</item>
+        <item>null21</item>
+        <item>null22</item>
+        <item>null23</item>
+        <item>null24</item>
+        <item>여행코스</item>
+        <item>null26</item>
+        <item>null27</item>
+        <item>레포츠</item>
+        <item>null29 </item>
+        <item>null30</item>
+        <item>null31</item>
+        <item>숙박</item>
+        <item>null33</item>
+        <item>null34</item>
+        <item>null35</item>
+        <item>null36</item>
+        <item>null37</item>
+        <item>쇼핑</item>
+        <item>음식점</item>
+    </string-array>
+
+</resources>
