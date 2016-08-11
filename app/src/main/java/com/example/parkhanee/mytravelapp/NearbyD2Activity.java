@@ -11,7 +11,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,9 +43,12 @@ public class NearbyD2Activity extends AppCompatActivity implements
     String apiKey;
     Location myLocation;
     URL apiREQ;
-    // AsyncTask task;
+    AsyncTask task;
 
     GoogleApiClient mGoogleApiClient;
+
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,9 @@ public class NearbyD2Activity extends AppCompatActivity implements
         mapBtn = (Button) findViewById(R.id.button5);
         settingBtn = (Button) findViewById(R.id.button4);
         apiKey = getString(R.string.travelApiKey);
+        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        listView = (ListView) findViewById(R.id.listView);
+        listView.setAdapter(adapter);
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,8 +90,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     .build();
         }
 
-        
-
+        task = new URLReader().execute(radius,cat);
 
     }
 
@@ -135,23 +142,42 @@ public class NearbyD2Activity extends AppCompatActivity implements
         @Override
         protected Void doInBackground(Integer... params) {
 
+            int i=0;
             int radius = params[0];
             int cat = params[1];
+
             String  inputLine;
             String result="";
             BufferedReader in;
+
+            while (i==0) {
+                Location my = myLocation;
+                while (my == myLocation) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 Double Lat = myLocation.getLatitude();
                 Double Lgt = myLocation.getLongitude();
 
                 try {
-                    apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
+                    if (cat==-1){
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&contentTypeId=&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
+                    }else if (cat ==-2){
+                        //cat 여러개?
+                    }else{
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
+                    }
+
+
                     in = new BufferedReader(
                             new InputStreamReader(apiREQ.openStream()));
                     while ((inputLine = in.readLine()) != null)
                         result = inputLine;
                     in.close();
-                    Toast.makeText(NearbyD2Activity.this, "api request sent successfully", Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -168,21 +194,16 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
                 publishProgress(item);
+            }
             return null;
         }
 
         @Override
         protected void onProgressUpdate(JSONArray... values) {
-            Double Lat = myLocation.getLatitude();
-            Double Lgt = myLocation.getLongitude();
-
-
-                Toast.makeText(NearbyD2Activity.this, Double.toString(Lat)+Double.toString(Lgt), Toast.LENGTH_SHORT).show();
-
             JSONArray item = values[0];
-            System.out.println(item);
-
+            System.out.println("onProgressUpdate");
             try {
+                System.out.println("try");
                 for(int i=0; i < item.length(); i++){
                     JSONObject poi = item.getJSONObject(i);
                     String title = poi.getString("title");
@@ -197,7 +218,9 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     System.out.print(mapy+" ");
                     System.out.print(mapx+" ");
                     System.out.println(contentTypeId);
+                    //Get ListView HERE
 
+                    adapter.add(title);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
