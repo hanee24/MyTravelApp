@@ -15,8 +15,8 @@
         <item>음식</item>
         <item>숙박</item>
         <item>행사|공연|축제</item>
-        <item>기타</item>
-       <!-- <item>여행코스</item> -->
+       <!-- <item>기타</item>-->
+        <item>여행코스</item>
     </string-array>
 
     <string-array name="Cat_ContentTypeId">

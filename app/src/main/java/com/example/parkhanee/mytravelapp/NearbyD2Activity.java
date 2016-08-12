@@ -45,7 +45,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
     String apiKey;
     Location myLocation;
     URL apiREQ;
-    AsyncTask task;
+   // AsyncTask task;
 
     GoogleApiClient mGoogleApiClient;
 
@@ -94,7 +94,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     .build();
         }
 
-        task = new URLReader().execute(radius,cat);
+        new URLReader().execute(radius,cat);
 
     }
 
@@ -139,8 +139,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
     }
 
-
-
     private class URLReader extends AsyncTask<Integer, JSONObject, Void> {
 
         @Override
@@ -157,11 +155,10 @@ public class NearbyD2Activity extends AppCompatActivity implements
             }
         }
 
-
         @Override
         protected Void doInBackground(Integer... params) {
 
-            int i=0;
+            // int i=0;
             int radius = params[0];
             int cat = params[1];
 
@@ -185,11 +182,11 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
                 try {
                     if (cat==-1){
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&contentTypeId=&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }else if (cat ==-2){
                         //cat 여러개?
                     }else{
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }
 
 
@@ -201,8 +198,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
 
                 try {
                     JSONObject object = new JSONObject(result);
@@ -235,7 +230,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
             String img;
             try {
-                for(int i=0; i < item.length(); i++){
+                for(int i=0; i < item.length(); i++){ // null pointer error occurs here, when item is null !
                     JSONObject poi = item.getJSONObject(i);
                     String title = poi.getString("title");
                     String mapy = poi.getString("mapy");
@@ -248,7 +243,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                         img = "null";
                     }
                     int dist = poi.getInt("dist");
-                    int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array
+                    int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array ??
 
                     System.out.print(i+" "+title+" ");
                     System.out.print(mapy+" ");

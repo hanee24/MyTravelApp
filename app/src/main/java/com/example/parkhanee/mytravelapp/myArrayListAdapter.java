@@ -51,6 +51,7 @@ public class myArrayListAdapter extends BaseAdapter {
             holder.tvDist = (TextView) v.findViewById(R.id.dist);
             holder.tvCat = (TextView) v.findViewById(R.id.cat);
             holder.imageView = (ImageView) v.findViewById(R.id.imageView);
+            holder.tvNumber = (TextView) v.findViewById(R.id.number);
             v.setTag(holder);
         } else {
             holder = (ViewHolder) v.getTag(); // we call the view created before to not create a view in each time
@@ -59,6 +60,8 @@ public class myArrayListAdapter extends BaseAdapter {
         holder.tvTitle.setText(itemArrayList.get(position).getTitle());
         holder.tvDesc.setText(itemArrayList.get(position).getDesc());
         holder.tvDist.setText(String.valueOf(itemArrayList.get(position).getDist()));
+        holder.tvNumber.setText(String.valueOf(position+1));
+        //set category textView
         int cat = itemArrayList.get(position).getCat();
         String strCat="기타";
         switch (cat){
@@ -100,6 +103,7 @@ public class myArrayListAdapter extends BaseAdapter {
         TextView tvDist=null;
         TextView tvCat = null;
         ImageView imageView = null;
+        TextView tvNumber =null;
     }
 
     public void addItem(Item item){

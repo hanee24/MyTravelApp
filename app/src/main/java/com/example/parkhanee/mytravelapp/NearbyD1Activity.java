@@ -72,7 +72,7 @@ public class NearbyD1Activity extends AppCompatActivity {
                         break;
                     case 4 : cat=15;
                         break;
-                    case 5 : cat = 0; //기타
+                    case 5 : cat = 25;
                         break;
                     default:break;
                 }
