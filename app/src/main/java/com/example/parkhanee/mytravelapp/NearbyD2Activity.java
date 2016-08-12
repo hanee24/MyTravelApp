@@ -247,27 +247,33 @@ public class NearbyD2Activity extends AppCompatActivity implements
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            tvTotalCount.setText(totalCount);
+
             if (totalCount.equals("")){ //조건에 맞는 아이템 없음 -- 에러처리 하기
+                totalCount = "0";
                 btnLoadMore.setVisibility(View.GONE);
             }else{
                 int tc = Integer.parseInt(totalCount);
                 if (tc >12){ // totalCount 12 이상
                     btnLoadMore.setVisibility(View.VISIBLE);
                     if (tc/12 <= pageNo && tc%12==0){ //totalCount = 12개,24개, ...
+                        Toast.makeText(NearbyD2Activity.this, "1", Toast.LENGTH_SHORT).show();
                         btnLoadMore.setVisibility(View.GONE);
                     }else if(tc/12 < pageNo&& tc%12>0){ //totalCount = 15개, 27개, ...
+                        Toast.makeText(NearbyD2Activity.this, "2", Toast.LENGTH_SHORT).show();
                         btnLoadMore.setVisibility(View.GONE);
                     }
                 }else{ //totalCount 12 이하
+                    Toast.makeText(NearbyD2Activity.this, "3", Toast.LENGTH_SHORT).show();
                     btnLoadMore.setVisibility(View.GONE);
                 }
             }
-
+            tvTotalCount.setText(totalCount);
 
             String img;
             try {
-                if (itemObject == null) {
+                if (itemObject == null&&itemArray==null) {
+                    // exit asyncTask
+                }else if (itemArray!=null){
                     for(int i=0; i < itemArray.length(); i++){ // null pointer error occurs here, when item is null !
                         JSONObject poi = itemArray.getJSONObject(i);
                         String title = poi.getString("title");
