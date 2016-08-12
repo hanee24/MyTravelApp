@@ -80,7 +80,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
             }
         });
 
-
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
