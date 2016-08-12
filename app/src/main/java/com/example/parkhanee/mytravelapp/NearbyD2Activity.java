@@ -1,6 +1,7 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -50,6 +51,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
     private ListView listView;
     private myArrayListAdapter myAdapter;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
         tv = (TextView) findViewById(R.id.textView4);
         tv.setText(strCat + " | " + strRadius);
         tvTotalCount = (TextView) findViewById(R.id.totalCount);
+        dialog = new ProgressDialog(NearbyD2Activity.this);
 
         mapBtn = (Button) findViewById(R.id.button5);
         settingBtn = (Button) findViewById(R.id.button4);
@@ -141,6 +144,21 @@ public class NearbyD2Activity extends AppCompatActivity implements
     private class URLReader extends AsyncTask<Integer, JSONObject, Void> {
 
         @Override
+        protected void onPreExecute() {
+            dialog.setMessage("로딩중입니다");
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            myAdapter.notifyDataSetChanged();
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+
+
+        @Override
         protected Void doInBackground(Integer... params) {
 
             int i=0;
@@ -152,7 +170,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             BufferedReader in;
             JSONObject body=null;
 
-            while (i==0) {
+            //while (i==0) {    //AsyncTask runs once
                 Location my = myLocation;
                 while (my == myLocation) {
                     try {
@@ -194,7 +212,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
                 publishProgress(body);
-            }
+            //}
             return null;
         }
 
@@ -243,7 +261,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     //Set ListView Items here
                     String desc = "description";
                     myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist));
-                    myAdapter.notifyDataSetChanged();
 
                 }
             } catch (JSONException e) {
