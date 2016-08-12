@@ -48,7 +48,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
     GoogleApiClient mGoogleApiClient;
 
     private ListView listView;
-    private ArrayAdapter<String> adapter;
+    private myArrayListAdapter myAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +66,9 @@ public class NearbyD2Activity extends AppCompatActivity implements
         mapBtn = (Button) findViewById(R.id.button5);
         settingBtn = (Button) findViewById(R.id.button4);
         apiKey = getString(R.string.travelApiKey);
-        adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        myAdapter = new myArrayListAdapter(NearbyD2Activity.this);
         listView = (ListView) findViewById(R.id.listView);
-        listView.setAdapter(adapter);
+        listView.setAdapter(myAdapter);
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,9 +200,8 @@ public class NearbyD2Activity extends AppCompatActivity implements
         @Override
         protected void onProgressUpdate(JSONArray... values) {
             JSONArray item = values[0];
-            System.out.println("onProgressUpdate");
+            String img;
             try {
-                System.out.println("try");
                 for(int i=0; i < item.length(); i++){
                     JSONObject poi = item.getJSONObject(i);
                     String title = poi.getString("title");
@@ -210,16 +209,27 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     Double y = Double.parseDouble(mapy);
                     String mapx = poi.getString("mapx");
                     Double x = Double.parseDouble(mapx);
-                    //String img = poi.getString("firstimage2");
+                    if (poi.has("firstimage2")){
+                        img = poi.getString("firstimage2");
+                    }else{
+                        img = "null";
+                    }
+                    int dist = poi.getInt("dist");
                     int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array
 
-                    System.out.print(i+" "+title+" ");
+                    /*System.out.print(i+" "+title+" ");
                     System.out.print(mapy+" ");
                     System.out.print(mapx+" ");
+                    System.out.println(dist+" ");
                     System.out.println(contentTypeId);
-                    //Get ListView HERE
+                    System.out.println("img: "+img);
+                    */
 
-                    adapter.add(title);
+                    //Set ListView Items here
+                    String desc = "description";
+                    myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist));
+                    myAdapter.notifyDataSetChanged();
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
