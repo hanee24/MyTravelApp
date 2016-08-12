@@ -39,6 +39,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
     TextView tv;
     Button mapBtn;
     Button settingBtn;
+    TextView tvTotalCount;
 
     String apiKey;
     Location myLocation;
@@ -62,6 +63,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
         tv = (TextView) findViewById(R.id.textView4);
         tv.setText(strCat + " | " + strRadius);
+        tvTotalCount = (TextView) findViewById(R.id.totalCount);
 
         mapBtn = (Button) findViewById(R.id.button5);
         settingBtn = (Button) findViewById(R.id.button4);
@@ -136,7 +138,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
 
 
-    private class URLReader extends AsyncTask<Integer, JSONArray, Void> {
+    private class URLReader extends AsyncTask<Integer, JSONObject, Void> {
 
         @Override
         protected Void doInBackground(Integer... params) {
@@ -148,6 +150,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             String  inputLine;
             String result="";
             BufferedReader in;
+            JSONObject body=null;
 
             while (i==0) {
                 Location my = myLocation;
@@ -181,25 +184,37 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
 
-                JSONArray item = null;
+
 
                 try {
                     JSONObject object = new JSONObject(result);
                     JSONObject response = object.getJSONObject("response");
-                    JSONObject body = response.getJSONObject("body");
-                    JSONObject items = body.getJSONObject("items");
-                    item = items.getJSONArray("item");
+                    body = response.getJSONObject("body");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                publishProgress(item);
+                publishProgress(body);
             }
             return null;
         }
 
         @Override
-        protected void onProgressUpdate(JSONArray... values) {
-            JSONArray item = values[0];
+        protected void onProgressUpdate(JSONObject... values) {
+            JSONArray item = null;
+            JSONObject body = values[0];
+            String totalCount = "";
+
+
+            try {
+                JSONObject items = body.getJSONObject("items");
+                item = items.getJSONArray("item");
+                totalCount = body.getString("totalCount");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            tvTotalCount.setText(totalCount);
+
             String img;
             try {
                 for(int i=0; i < item.length(); i++){
@@ -217,13 +232,13 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     int dist = poi.getInt("dist");
                     int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array
 
-                    /*System.out.print(i+" "+title+" ");
+                    System.out.print(i+" "+title+" ");
                     System.out.print(mapy+" ");
                     System.out.print(mapx+" ");
                     System.out.println(dist+" ");
                     System.out.println(contentTypeId);
                     System.out.println("img: "+img);
-                    */
+
 
                     //Set ListView Items here
                     String desc = "description";

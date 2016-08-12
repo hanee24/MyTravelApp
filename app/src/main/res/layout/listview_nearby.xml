@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:visibility="visible">
 
     <TextView
         android:layout_width="wrap_content"
@@ -27,7 +28,8 @@
         android:layout_below="@+id/title"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:layout_alignLeft="@+id/title"/>
+        android:layout_alignLeft="@+id/title"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -72,12 +74,10 @@
         android:layout_toEndOf="@+id/dist"/>
 
     <ImageView
-        android:layout_width="60dp"
-        android:layout_height="50dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:id="@+id/imageView"
-        android:layout_alignTop="@+id/title"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="10dp"
         android:src="@drawable/compass"/>
 </RelativeLayout>

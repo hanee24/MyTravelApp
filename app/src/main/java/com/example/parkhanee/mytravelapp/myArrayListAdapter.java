@@ -6,8 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -83,8 +84,12 @@ public class myArrayListAdapter extends BaseAdapter {
                 break;
         }
         holder.tvCat.setText(strCat);
-
-        //set the photo here
+        String picture = itemArrayList.get(position).getPicture();
+        if (!picture.equals("null")){
+            Picasso.with(context).load(picture).into(holder.imageView); //set picture
+        }else{
+            holder.imageView.setImageDrawable(v.getResources().getDrawable(R.drawable.compass));
+        }
 
         return v;
     }
