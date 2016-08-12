@@ -12,7 +12,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,6 +51,8 @@ public class NearbyD2Activity extends AppCompatActivity implements
     private ListView listView;
     private myArrayListAdapter myAdapter;
     ProgressDialog dialog;
+    int pageNo = 0;
+    Button btnLoadMore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +65,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
         strCat = intent.getStringExtra("strCat");
 
         tv = (TextView) findViewById(R.id.textView4);
-        tv.setText(strCat + " | " + strRadius);
+        tv.setText(strCat + " • " + strRadius);
         tvTotalCount = (TextView) findViewById(R.id.totalCount);
         dialog = new ProgressDialog(NearbyD2Activity.this);
 
@@ -73,7 +74,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
         apiKey = getString(R.string.travelApiKey);
         myAdapter = new myArrayListAdapter(NearbyD2Activity.this);
         listView = (ListView) findViewById(R.id.listView);
-        listView.setAdapter(myAdapter);
+
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,8 +95,20 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     .build();
         }
 
+        btnLoadMore = new Button(this);
+        btnLoadMore.setText("더 불러오기");
+        listView.addFooterView(btnLoadMore);
+        listView.setAdapter(myAdapter);
+
         new URLReader().execute(radius,cat);
 
+        btnLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                // Starting a new async task
+                new URLReader().execute(radius,cat);
+            }
+        });
     }
 
     protected void onStart() {
@@ -144,6 +157,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
         @Override
         protected void onPreExecute() {
             dialog.setMessage("로딩중입니다");
+            dialog.setCanceledOnTouchOutside(false);
             dialog.show();
         }
 
@@ -153,11 +167,13 @@ public class NearbyD2Activity extends AppCompatActivity implements
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+
         }
 
         @Override
         protected Void doInBackground(Integer... params) {
 
+            pageNo = pageNo + 1;
             // int i=0;
             int radius = params[0];
             int cat = params[1];
@@ -168,6 +184,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             JSONObject body=null;
 
             //while (i==0) {    //AsyncTask runs once
+            if (pageNo==1){
                 Location my = myLocation;
                 while (my == myLocation) {
                     try {
@@ -176,17 +193,16 @@ public class NearbyD2Activity extends AppCompatActivity implements
                         e.printStackTrace();
                     }
                 }
+            }
 
                 Double Lat = myLocation.getLatitude();
                 Double Lgt = myLocation.getLongitude();
 
                 try {
                     if (cat==-1){
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
-                    }else if (cat ==-2){
-                        //cat 여러개?
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }else{
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo=1&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }
 
 
@@ -213,25 +229,74 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
         @Override
         protected void onProgressUpdate(JSONObject... values) {
-            JSONArray item = null;
+            JSONArray itemArray = null;
+            JSONObject itemObject = null;
             JSONObject body = values[0];
             String totalCount = "";
 
-
             try {
                 JSONObject items = body.getJSONObject("items");
-                item = items.getJSONArray("item");
+                Object item = items.get("item");
+                if (item instanceof JSONArray) {// It's an array
+                    itemArray = (JSONArray)item;
+                } else if (item instanceof JSONObject) {// It's an object
+                    itemObject = (JSONObject)item;
+                }
                 totalCount = body.getString("totalCount");
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             tvTotalCount.setText(totalCount);
+            if (totalCount.equals("")){ //조건에 맞는 아이템 없음 -- 에러처리 하기
+                btnLoadMore.setVisibility(View.GONE);
+            }else{
+                int tc = Integer.parseInt(totalCount);
+                if (tc >12){ // totalCount 12 이상
+                    btnLoadMore.setVisibility(View.VISIBLE);
+                    if (tc/12 <= pageNo && tc%12==0){ //totalCount = 12개,24개, ...
+                        btnLoadMore.setVisibility(View.GONE);
+                    }else if(tc/12 < pageNo&& tc%12>0){ //totalCount = 15개, 27개, ...
+                        btnLoadMore.setVisibility(View.GONE);
+                    }
+                }else{ //totalCount 12 이하
+                    btnLoadMore.setVisibility(View.GONE);
+                }
+            }
+
 
             String img;
             try {
-                for(int i=0; i < item.length(); i++){ // null pointer error occurs here, when item is null !
-                    JSONObject poi = item.getJSONObject(i);
+                if (itemObject == null) {
+                    for(int i=0; i < itemArray.length(); i++){ // null pointer error occurs here, when item is null !
+                        JSONObject poi = itemArray.getJSONObject(i);
+                        String title = poi.getString("title");
+                        String mapy = poi.getString("mapy");
+                        Double y = Double.parseDouble(mapy);
+                        String mapx = poi.getString("mapx");
+                        Double x = Double.parseDouble(mapx);
+                        if (poi.has("firstimage2")){
+                            img = poi.getString("firstimage2");
+                        }else{
+                            img = "null";
+                        }
+                        int dist = poi.getInt("dist");
+                        int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array ??
+
+                    /*ystem.out.print(i+" "+title+" ");
+                    System.out.print(mapy+" ");
+                    System.out.print(mapx+" ");
+                    System.out.println(dist+" ");
+                    System.out.println(contentTypeId);
+                    System.out.println("img: "+img);*/
+
+                        //Set ListView Items
+                        String desc = "description";
+                        myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist));
+
+                    }
+                } else {
+                    JSONObject poi = itemObject;
                     String title = poi.getString("title");
                     String mapy = poi.getString("mapy");
                     Double y = Double.parseDouble(mapy);
@@ -243,24 +308,19 @@ public class NearbyD2Activity extends AppCompatActivity implements
                         img = "null";
                     }
                     int dist = poi.getInt("dist");
-                    int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array ??
+                    int contentTypeId = poi.getInt("contenttypeid");
 
-                    System.out.print(i+" "+title+" ");
-                    System.out.print(mapy+" ");
-                    System.out.print(mapx+" ");
-                    System.out.println(dist+" ");
-                    System.out.println(contentTypeId);
-                    System.out.println("img: "+img);
-
-
-                    //Set ListView Items here
+                    //Set ListView Items
                     String desc = "description";
                     myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist));
-
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            System.out.println("pageNo : "+pageNo);
+            System.out.println("totalCount : "+totalCount);
         }
 
     }

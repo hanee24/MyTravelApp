@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" | "
+        android:text=" • "
         android:id="@+id/textView8"
         android:layout_alignTop="@+id/cat"
         android:layout_toRightOf="@+id/cat"
