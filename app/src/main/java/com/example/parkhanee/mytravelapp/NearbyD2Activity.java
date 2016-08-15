@@ -25,7 +25,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 
@@ -56,7 +58,14 @@ public class NearbyD2Activity extends AppCompatActivity implements
     Double Lat;
     Double Lgt;
 
-    String resultPassToMap = "";
+    //String resultPassToMap = "";
+
+    //arrayLists for passing poi data to MapActivity
+    ArrayList<String> titleArrayList = new ArrayList<>();
+    ArrayList<Integer> catArrayList = new ArrayList<>();
+    ArrayList<String> imgArrayList = new ArrayList<>();
+    ArrayList<String> yArrayList = new ArrayList<>();
+    ArrayList<String> xArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,14 +107,15 @@ public class NearbyD2Activity extends AppCompatActivity implements
         btnLoadMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                new URLReader().execute(radius,cat);
                 // Starting a new async task
-                try {
+               /* try {
                     resultPassToMap = new URLReader().execute(radius,cat).get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
     }
@@ -147,13 +157,26 @@ public class NearbyD2Activity extends AppCompatActivity implements
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    Intent i = new Intent(NearbyD2Activity.this, NearbyMapActivity.class);
-                    i.putExtra("radius", radius);
-                    i.putExtra("cat", cat);
-                    i.putExtra("Lat",Lat);
-                    i.putExtra("Lgt",Lgt);
-                    i.putExtra("result",resultPassToMap); //how do i know if the result is set?
-                    startActivity(i);
+                for (int i=0;i<myAdapter.getCount();i++){
+                    Item a = (Item)myAdapter.getItem(i);
+                    titleArrayList.add(i,a.getTitle());
+                    catArrayList.add(i,a.getCat());
+                    imgArrayList.add(i,a.getPicture());
+                    yArrayList.add(i,a.getMapy());
+                    xArrayList.add(i,a.getMapx());
+                }
+
+                Intent i = new Intent(NearbyD2Activity.this, NearbyMapActivity.class);
+                i.putExtra("radius", radius);
+                i.putExtra("cat", cat);
+                i.putExtra("Lat",Lat);  // my location
+                i.putExtra("Lgt",Lgt);
+                i.putExtra("title",titleArrayList);
+                i.putExtra("cat",catArrayList);
+                i.putExtra("img",imgArrayList);
+                i.putExtra("mapy",yArrayList);
+                i.putExtra("mapx",xArrayList);
+                startActivity(i);
             }
         });
 
@@ -309,7 +332,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
                         //Set ListView Items
                         String desc = "description";
-                        myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist));
+                        myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx));
 
                     }
                 } else {
@@ -329,7 +352,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
                     //Set ListView Items
                     String desc = "description";
-                    myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist));
+                    myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx));
                 }
 
             } catch (JSONException e) {

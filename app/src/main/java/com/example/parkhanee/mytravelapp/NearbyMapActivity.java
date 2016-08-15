@@ -17,13 +17,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class NearbyMapActivity extends AppCompatActivity {
     private MapView mapView;
     private MapboxMap map;
     private Double lat;
     private Double lgt;
-    private String result;
+    //private ArrayList<Item> itemArrayList = new ArrayList<>();
+    ArrayList<String> titleArrayList = new ArrayList<>();
+    ArrayList<Integer> catArrayList = new ArrayList<>();
+    ArrayList<String> imgArrayList = new ArrayList<>();
+    ArrayList<String> yArrayList = new ArrayList<>();
+    ArrayList<String> xArrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +42,13 @@ public class NearbyMapActivity extends AppCompatActivity {
         // This contains the MapView in XML and needs to be called after the account manager
         setContentView(R.layout.activity_nearby_map);
         Intent i = getIntent();
-        result = i.getStringExtra("result");
-        System.out.println("result"+result);
+        //get result here
+        //itemArrayList = i.getParcelableArrayListExtra("result");
+        titleArrayList = i.getStringArrayListExtra("title");
+        catArrayList = i.getIntegerArrayListExtra("cat");
+        imgArrayList = i.getStringArrayListExtra("img");
+        yArrayList = i.getStringArrayListExtra("mapy");
+        xArrayList = i.getStringArrayListExtra("mapx");
 
         lat = i.getDoubleExtra("Lat",0.0);
         lgt = i.getDoubleExtra("Lgt",0.0);
@@ -57,7 +69,15 @@ public class NearbyMapActivity extends AppCompatActivity {
                 map.addMarker(new MarkerOptions()
                         .position(new LatLng(lat,lgt))
                         .title("내 위치"));
-                new asyncTask().execute(result);
+                for (int i=0; i<titleArrayList.size(); i++){
+                    Double y = Double.parseDouble(yArrayList.get(i));
+                    Double x = Double.parseDouble(xArrayList.get(i));
+                    map.addMarker(new MarkerOptions()
+                    .position(new LatLng(y,x))
+                    .title(titleArrayList.get(i))
+                    .snippet(String.valueOf(catArrayList.get(i)))
+                    );
+                }
             }
         });
     }
@@ -92,7 +112,7 @@ public class NearbyMapActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
-
+/*
     private class asyncTask extends android.os.AsyncTask<String, JSONObject, Void> {
 
         @Override
@@ -168,4 +188,5 @@ public class NearbyMapActivity extends AppCompatActivity {
 
         }
     }
+    */
 }
