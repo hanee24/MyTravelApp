@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,6 +26,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 
 public class NearbyD2Activity extends AppCompatActivity implements
@@ -44,7 +44,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
     String apiKey;
     Location myLocation;
     URL apiREQ;
-   // AsyncTask task;
 
     GoogleApiClient mGoogleApiClient;
 
@@ -53,6 +52,11 @@ public class NearbyD2Activity extends AppCompatActivity implements
     ProgressDialog dialog;
     int pageNo = 0;
     Button btnLoadMore;
+
+    Double Lat;
+    Double Lgt;
+
+    String resultPassToMap = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,17 +79,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
         myAdapter = new myArrayListAdapter(NearbyD2Activity.this);
         listView = (ListView) findViewById(R.id.listView);
 
-
-        mapBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(NearbyD2Activity.this, NearbyD3Activity.class);
-                i.putExtra("radius", radius);
-                i.putExtra("cat", cat);
-                startActivity(i);
-            }
-        });
-
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -106,7 +99,13 @@ public class NearbyD2Activity extends AppCompatActivity implements
             @Override
             public void onClick(View arg0) {
                 // Starting a new async task
-                new URLReader().execute(radius,cat);
+                try {
+                    resultPassToMap = new URLReader().execute(radius,cat).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -136,9 +135,27 @@ public class NearbyD2Activity extends AppCompatActivity implements
         }
         myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        if (myLocation != null) {
+        /*if (myLocation != null) {
             Toast.makeText(NearbyD2Activity.this, String.valueOf(myLocation.getLatitude())+String.valueOf(myLocation.getLongitude()), Toast.LENGTH_SHORT).show();
-        }
+        }*/
+
+
+        Lat = myLocation.getLatitude();
+        Lgt = myLocation.getLongitude();
+
+
+        mapBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    Intent i = new Intent(NearbyD2Activity.this, NearbyMapActivity.class);
+                    i.putExtra("radius", radius);
+                    i.putExtra("cat", cat);
+                    i.putExtra("Lat",Lat);
+                    i.putExtra("Lgt",Lgt);
+                    i.putExtra("result",resultPassToMap); //how do i know if the result is set?
+                    startActivity(i);
+            }
+        });
 
     }
 
@@ -152,7 +169,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
     }
 
-    private class URLReader extends AsyncTask<Integer, JSONObject, Void> {
+    private class URLReader extends AsyncTask<Integer, JSONObject, String> {
 
         @Override
         protected void onPreExecute() {
@@ -162,16 +179,15 @@ public class NearbyD2Activity extends AppCompatActivity implements
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(String aVoid) {
             myAdapter.notifyDataSetChanged();
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-
         }
 
         @Override
-        protected Void doInBackground(Integer... params) {
+        protected String doInBackground(Integer... params) {
 
             pageNo = pageNo + 1;
             // int i=0;
@@ -183,7 +199,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             BufferedReader in;
             JSONObject body=null;
 
-            //while (i==0) {    //AsyncTask runs once
+            //AsyncTask runs once  // while (i==0) {
             if (pageNo==1){
                 Location my = myLocation;
                 while (my == myLocation) {
@@ -195,8 +211,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 }
             }
 
-                Double Lat = myLocation.getLatitude();
-                Double Lgt = myLocation.getLongitude();
 
                 try {
                     if (cat==-1){
@@ -224,13 +238,13 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 }
                 publishProgress(body);
             //}
-            return null;
+            return result;
         }
 
         @Override
         protected void onProgressUpdate(JSONObject... values) {
             JSONArray itemArray = null;
-            JSONObject itemObject = null;
+            JSONObject itemObject = null; //in case the result has only one item
             JSONObject body = values[0];
             String totalCount = "";
 
@@ -256,14 +270,11 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 if (tc >12){ // totalCount 12 이상
                     btnLoadMore.setVisibility(View.VISIBLE);
                     if (tc/12 <= pageNo && tc%12==0){ //totalCount = 12개,24개, ...
-                        Toast.makeText(NearbyD2Activity.this, "1", Toast.LENGTH_SHORT).show();
                         btnLoadMore.setVisibility(View.GONE);
                     }else if(tc/12 < pageNo&& tc%12>0){ //totalCount = 15개, 27개, ...
-                        Toast.makeText(NearbyD2Activity.this, "2", Toast.LENGTH_SHORT).show();
                         btnLoadMore.setVisibility(View.GONE);
                     }
                 }else{ //totalCount 12 이하
-                    Toast.makeText(NearbyD2Activity.this, "3", Toast.LENGTH_SHORT).show();
                     btnLoadMore.setVisibility(View.GONE);
                 }
             }
@@ -289,12 +300,12 @@ public class NearbyD2Activity extends AppCompatActivity implements
                         int dist = poi.getInt("dist");
                         int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array ??
 
-                    /*ystem.out.print(i+" "+title+" ");
-                    System.out.print(mapy+" ");
-                    System.out.print(mapx+" ");
-                    System.out.println(dist+" ");
-                    System.out.println(contentTypeId);
-                    System.out.println("img: "+img);*/
+                        /*ystem.out.print(i+" "+title+" ");
+                        System.out.print(mapy+" ");
+                        System.out.print(mapx+" ");
+                        System.out.println(dist+" ");
+                        System.out.println(contentTypeId);
+                        System.out.println("img: "+img);*/
 
                         //Set ListView Items
                         String desc = "description";
