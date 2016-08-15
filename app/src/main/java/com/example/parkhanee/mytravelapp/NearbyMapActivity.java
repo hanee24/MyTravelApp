@@ -3,15 +3,26 @@ package com.example.parkhanee.mytravelapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,18 +77,60 @@ public class NearbyMapActivity extends AppCompatActivity {
                         //.bearing(300)
                         //.tilt(30)
                         .build());
-                map.addMarker(new MarkerOptions()
+                map.addMarker(new MarkerOptions() //TODO: 내위치 마커 - 글씨없이 아이콘 쓰기
                         .position(new LatLng(lat,lgt))
                         .title("내 위치"));
                 for (int i=0; i<titleArrayList.size(); i++){
                     Double y = Double.parseDouble(yArrayList.get(i));
                     Double x = Double.parseDouble(xArrayList.get(i));
-                    map.addMarker(new MarkerOptions()
+                    map.addMarker(new MarkerViewOptions()
                     .position(new LatLng(y,x))
                     .title(titleArrayList.get(i))
-                    .snippet(String.valueOf(catArrayList.get(i)))
+                    //.snippet(String.valueOf(catArrayList.get(i))) //TODO: category에 따라 다른 marker icon사용
                     );
                 }
+                map.setInfoWindowAdapter(new MapboxMap.InfoWindowAdapter() {
+
+                    @Nullable
+                    @Override
+                    public View getInfoWindow(@NonNull Marker marker) {
+                        // container
+                        LinearLayout parent = new LinearLayout(NearbyMapActivity.this);
+                        parent.setLayoutParams(new LinearLayout.LayoutParams(
+                                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        parent.setOrientation(LinearLayout.VERTICAL);
+
+                        ImageView imageView = new ImageView(NearbyMapActivity.this);
+                        TextView tvTitle = new TextView(NearbyMapActivity.this);
+
+                        for (int i=0; i<titleArrayList.size(); i++){
+
+                            String img = imgArrayList.get(i);
+
+                            if (marker.getTitle().equals(titleArrayList.get(i))){
+                                if (!img.equals("null")){
+                                    Picasso.with(NearbyMapActivity.this).load(img).into(imageView);
+                                }else{
+                                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.compass));
+                                }
+                                tvTitle.setText(titleArrayList.get(i));
+                            }
+                        }
+
+                        tvTitle.setGravity(Gravity.CENTER_HORIZONTAL);
+                        tvTitle.setLayoutParams(new android.view.ViewGroup.LayoutParams(250,ViewGroup.LayoutParams.WRAP_CONTENT));
+                        tvTitle.setBackgroundColor(getResources().getColor(R.color.myWhite));
+
+                        // Set the size of the image
+                        imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(250, 180));
+
+                        // add the image view to the parent layout
+                        parent.addView(imageView);
+                        parent.addView(tvTitle);
+
+                        return parent;
+                    }
+                });
             }
         });
     }
@@ -112,81 +165,4 @@ public class NearbyMapActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
-/*
-    private class asyncTask extends android.os.AsyncTask<String, JSONObject, Void> {
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            String result = strings[0];
-            JSONObject body=null;
-            try {
-                JSONObject object = new JSONObject(result); //null
-                JSONObject response = object.getJSONObject("response");
-                body = response.getJSONObject("body");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            publishProgress(body);
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(JSONObject... values) {
-            JSONArray itemArray = null;
-            JSONObject itemObject = null;
-            JSONObject body = values[0];
-            int length = 0;
-
-            try {
-                JSONObject items = body.getJSONObject("items");
-                Object item = items.get("item");
-                if (item instanceof JSONArray) {// It's an array
-                    itemArray = (JSONArray)item;
-                } else if (item instanceof JSONObject) {// It's an object
-                    itemObject = (JSONObject)item;
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (itemArray==null){
-                length = 1;
-            }else{
-                length = itemArray.length();
-            }
-                for(int i=0; i < length; i++){
-                    String title="";
-                    String img="";
-                    Double y=0.0;
-                    Double x=0.0;
-                    int contentTypeId=0;
-
-                    try {
-                        JSONObject poi = itemArray.getJSONObject(i);
-                        title = poi.getString("title");
-                        String mapy = poi.getString("mapy");
-                        y = Double.parseDouble(mapy);
-                        String mapx = poi.getString("mapx");
-                        x = Double.parseDouble(mapx);
-                        if (poi.has("firstimage2")){
-                            img = poi.getString("firstimage2");
-                        }else{
-                            img = "null";
-                        }
-                        contentTypeId = poi.getInt("contenttypeid");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.out.println("title"+title);
-                    System.out.print("y,x = "+y); System.out.println(x);
-                    System.out.println("img "+img);
-                    map.addMarker(new MarkerOptions()
-                        .title(title)
-                        .position(new LatLng(y,x)));
-                }
-
-        }
-    }
-    */
 }
