@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -180,6 +181,17 @@ public class NearbyD2Activity extends AppCompatActivity implements
             }
         });
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Item a = (Item)myAdapter.getItem(i);
+                int contentId = a.getContentId();
+                Intent intent = new Intent(NearbyD2Activity.this,NearbyD3Activity.class);
+                intent.putExtra("contentId",contentId);
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -322,17 +334,11 @@ public class NearbyD2Activity extends AppCompatActivity implements
                         }
                         int dist = poi.getInt("dist");
                         int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array ??
-
-                        /*ystem.out.print(i+" "+title+" ");
-                        System.out.print(mapy+" ");
-                        System.out.print(mapx+" ");
-                        System.out.println(dist+" ");
-                        System.out.println(contentTypeId);
-                        System.out.println("img: "+img);*/
+                        int contentId = poi.getInt("contentid");
 
                         //Set ListView Items
                         String desc = "description";
-                        myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx));
+                        myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
 
                     }
                 } else {
@@ -349,10 +355,10 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     }
                     int dist = poi.getInt("dist");
                     int contentTypeId = poi.getInt("contenttypeid");
-
+                    int contentId = poi.getInt("contentid");
                     //Set ListView Items
                     String desc = "description";
-                    myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx));
+                    myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
                 }
 
             } catch (JSONException e) {

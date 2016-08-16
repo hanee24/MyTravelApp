@@ -10,9 +10,10 @@ public class Item {
     private String desc;
     private int dist;
     private String mapy, mapx;
+    private int contentId;
 
 
-    public Item(int cat,String title, String picture, String desc,int dist,String mapy,String mapx){
+    public Item(int cat,String title, String picture, String desc,int dist,String mapy,String mapx,int contentId){
         super();
         this.cat = cat;
         this.title = title;
@@ -21,6 +22,7 @@ public class Item {
         this.dist = dist;
         this.mapy = mapy;
         this.mapx = mapx;
+        this.contentId = contentId;
     }
 
     //getters and setters
@@ -51,6 +53,10 @@ public class Item {
 
     public String getMapx(){
         return mapx;
+    }
+
+    public int getContentId(){
+        return contentId;
     }
 
     public void setCat(int cat){

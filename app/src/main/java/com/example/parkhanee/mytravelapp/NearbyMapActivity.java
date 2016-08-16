@@ -24,10 +24,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 
@@ -36,7 +32,6 @@ public class NearbyMapActivity extends AppCompatActivity {
     private MapboxMap map;
     private Double lat;
     private Double lgt;
-    //private ArrayList<Item> itemArrayList = new ArrayList<>();
     ArrayList<String> titleArrayList = new ArrayList<>();
     ArrayList<Integer> catArrayList = new ArrayList<>();
     ArrayList<String> imgArrayList = new ArrayList<>();
@@ -86,7 +81,7 @@ public class NearbyMapActivity extends AppCompatActivity {
                     map.addMarker(new MarkerViewOptions()
                     .position(new LatLng(y,x))
                     .title(titleArrayList.get(i))
-                    //.snippet(String.valueOf(catArrayList.get(i))) //TODO: category에 따라 다른 marker icon사용
+                    //.snippet(String.valueOf(catArrayList.get(i))) //TODO: category에 따라 색깔이 다른 marker icon사용
                     );
                 }
                 map.setInfoWindowAdapter(new MapboxMap.InfoWindowAdapter() {
@@ -98,6 +93,7 @@ public class NearbyMapActivity extends AppCompatActivity {
                         LinearLayout parent = new LinearLayout(NearbyMapActivity.this);
                         parent.setLayoutParams(new LinearLayout.LayoutParams(
                                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        parent.setBackgroundColor(getResources().getColor(R.color.myWhite));
                         parent.setOrientation(LinearLayout.VERTICAL);
 
                         ImageView imageView = new ImageView(NearbyMapActivity.this);
@@ -118,11 +114,11 @@ public class NearbyMapActivity extends AppCompatActivity {
                         }
 
                         tvTitle.setGravity(Gravity.CENTER_HORIZONTAL);
-                        tvTitle.setLayoutParams(new android.view.ViewGroup.LayoutParams(250,ViewGroup.LayoutParams.WRAP_CONTENT));
+                        tvTitle.setLayoutParams(new android.view.ViewGroup.LayoutParams(300,ViewGroup.LayoutParams.WRAP_CONTENT));
                         tvTitle.setBackgroundColor(getResources().getColor(R.color.myWhite));
 
                         // Set the size of the image
-                        imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(250, 180));
+                        imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(300, 230));
 
                         // add the image view to the parent layout
                         parent.addView(imageView);
