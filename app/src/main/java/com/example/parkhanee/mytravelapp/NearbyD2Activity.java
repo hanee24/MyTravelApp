@@ -26,10 +26,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 
 public class NearbyD2Activity extends AppCompatActivity implements
@@ -186,8 +184,10 @@ public class NearbyD2Activity extends AppCompatActivity implements
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Item a = (Item)myAdapter.getItem(i);
                 int contentId = a.getContentId();
+                int cat = a.getCat();
                 Intent intent = new Intent(NearbyD2Activity.this,NearbyD3Activity.class);
                 intent.putExtra("contentId",contentId);
+                intent.putExtra("cat",cat);
                 startActivity(intent);
             }
         });
