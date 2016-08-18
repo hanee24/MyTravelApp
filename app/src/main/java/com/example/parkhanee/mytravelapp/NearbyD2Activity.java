@@ -185,9 +185,11 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 Item a = (Item)myAdapter.getItem(i);
                 int contentId = a.getContentId();
                 int cat = a.getCat();
+                int dist = a.getDist();
                 Intent intent = new Intent(NearbyD2Activity.this,NearbyD3Activity.class);
                 intent.putExtra("contentId",contentId);
                 intent.putExtra("cat",cat);
+                intent.putExtra("dist",dist);
                 startActivity(intent);
             }
         });
@@ -297,7 +299,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 e.printStackTrace();
             }
 
-            if (totalCount.equals("")){ //조건에 맞는 아이템 없음 -- 에러처리 하기
+            if (totalCount.equals("")){ //조건에 맞는 아이템 없음 --> 에러처리 하기
                 totalCount = "0";
                 btnLoadMore.setVisibility(View.GONE);
             }else{
@@ -337,7 +339,8 @@ public class NearbyD2Activity extends AppCompatActivity implements
                         int contentId = poi.getInt("contentid");
 
                         //Set ListView Items
-                        String desc = "description";
+                        String desc = "description"; //poi.getString("overview");
+                        //System.out.println(poi.toString());
                         myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
 
                     }
@@ -357,7 +360,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     int contentTypeId = poi.getInt("contenttypeid");
                     int contentId = poi.getInt("contentid");
                     //Set ListView Items
-                    String desc = "description";
+                    String desc = "description"; //poi.getString("overview");
                     myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
                 }
 

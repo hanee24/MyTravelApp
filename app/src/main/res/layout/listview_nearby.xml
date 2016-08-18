@@ -27,7 +27,7 @@
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
         android:layout_alignLeft="@+id/title"
-        />
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -39,7 +39,8 @@
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
         android:layout_alignLeft="@+id/title"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="7dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -57,9 +58,9 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="distance"
         android:id="@+id/dist"
-        android:layout_below="@+id/desc"
         android:layout_toRightOf="@+id/textView8"
-        android:layout_toEndOf="@+id/textView8"/>
+        android:layout_toEndOf="@+id/textView8"
+        android:layout_alignTop="@+id/cat"/>
 
     <TextView
         android:layout_width="wrap_content"

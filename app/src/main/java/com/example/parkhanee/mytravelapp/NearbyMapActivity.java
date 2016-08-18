@@ -127,6 +127,13 @@ public class NearbyMapActivity extends AppCompatActivity {
                         return parent;
                     }
                 });
+
+                map.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
+                    @Override
+                    public boolean onInfoWindowClick(@NonNull Marker marker) {
+                        return false;
+                    }
+                });
             }
         });
     }
