@@ -32,12 +32,12 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     URL imgREQ;
     ProgressDialog dialog;
     String imageYN = "Y"; //Y=콘텐츠이미지조회   //N=”음식점”타입의음식메뉴이미지
-    TextView tvTitle, tvCat, tvDist, tvOverview, tvTel, tvZipcode, tvAddr1; //, tvAddr2;
+    TextView tvTitle, tvCat, tvDist, tvOverview, tvTel, tvZipcode, tvAddr1;
     TextView tv_tel, tv_addr, tv_addr1; //additional views
     ViewPager mViewPager;
     PagerAdapter mPagerAdapter;
     int size=0;
-    ArrayList<String> textArrayList ;
+    ArrayList<String> imgArrayList ;
 
 
     @Override
@@ -104,18 +104,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         }
         tvCat.setText(strCat);
 
-        textArrayList = new ArrayList<>();
-        textArrayList.add("하나");
-        textArrayList.add("둘");
-        textArrayList.add("셋");
-        textArrayList.add("넷");
-        textArrayList.add("다섯");
-        
+        imgArrayList = new ArrayList<>();
+
         new asyncTask().execute();
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());//,size); // TODO: size should be initialized beforehand
-        mViewPager.setAdapter(mPagerAdapter);
+
     }
 
     private class myPagerAdapter extends FragmentStatePagerAdapter{
@@ -128,13 +121,12 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
         @Override
         public int getCount() {
-            return size;
+            return imgArrayList.size();
         }
 
         @Override
         public Fragment getItem(int position) {
-
-            return TextSlideFragment.newInstance(position,textArrayList);
+            return ImageSlideFragment.newInstance(position,imgArrayList);
         }
     }
 
@@ -162,7 +154,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
         @Override
         protected void onPreExecute() {
-            dialog.setMessage("잡시만 기다려주세요");
+            dialog.setMessage("잠시만 기다려주세요");
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
         }
@@ -245,55 +237,68 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
             }
             int tc = Integer.parseInt(totalCount);
-            for(int i=0; i<tc ; i++){
+
                 try {
                 JSONObject poi=null;
-                    if (tc == 1){
-                        poi = itemObject;
-                    }else if (itemArray.length()==tc){
-                        poi = itemArray.getJSONObject(i);
-                    }
-
-                    if (poi.has("title")){// if poi has "title" it's from apiREQ, else it's from imgREQ
-                        String title = poi.getString("title");
-                        String overview = poi.getString("overview");
-                        overview = overview.replace("<br>"," ");
-                        overview = overview.replace("<br />"," ");
-                        overview = overview.replace("&nbsp;"," ");
-                        if (poi.has("tel")){
-                            String tel = poi.getString("tel");
-                            tvTel.setText(tel);
-                        }else{
-                            tvTel.setText("표시할 전화번호가 없습니다");
-                            //tvTel.setVisibility(View.GONE);
-                            //tv_tel.setVisibility(View.GONE);
+                    for(int i=0; i<tc ; i++) {
+                        if (tc == 1) {
+                            poi = itemObject;
+                        } else if (itemArray.length() == tc) {
+                            poi = itemArray.getJSONObject(i);
                         }
-                        tvTitle.setText(title);
-                        tvOverview.setText(overview);
-                        if (poi.has("zipcode")){
-                            String zipcode = poi.getString("zipcode");
-                            String addr1 = poi.getString("addr1");
-                            if (poi.has("addr2")){
-                                addr1 += poi.getString("addr2");
+
+                        if (poi.has("title")) {// if poi has "title" it's from apiREQ, else it's from imgREQ
+
+                            String title = poi.getString("title");
+                            String overview = poi.getString("overview");
+                            overview = overview.replace("<br>", " ");
+                            overview = overview.replace("<br />", " ");
+                            overview = overview.replace("&nbsp;", " ");
+                            if (poi.has("tel")) {
+                                String tel = poi.getString("tel");
+                                tvTel.setText(tel);
+                            } else {
+                                tvTel.setText("표시할 전화번호가 없습니다");
+                                //tvTel.setVisibility(View.GONE);
+                                //tv_tel.setVisibility(View.GONE);
+                            }
+                            tvTitle.setText(title);
+                            tvOverview.setText(overview);
+                            if (poi.has("zipcode")) {
+                                String zipcode = poi.getString("zipcode");
+                                String addr1 = poi.getString("addr1");
+                                if (poi.has("addr2")) {
+                                    addr1 += poi.getString("addr2");
+                                }
+
+                                tvZipcode.setText(zipcode);
+                                tvAddr1.setText(addr1);
+                                //tvAddr2.setText(addr2);
+                            } else {
+                                tvZipcode.setVisibility(View.GONE);
+                                tvAddr1.setVisibility(View.GONE);
+                                tv_addr1.setVisibility(View.GONE);
+                                tv_addr.setText("주소 정보가 없습니다");
                             }
 
-                            tvZipcode.setText(zipcode);
-                            tvAddr1.setText(addr1);
-                            //tvAddr2.setText(addr2);
-                        }else{
-                            tvZipcode.setVisibility(View.GONE);
-                            //tvAddr2.setVisibility(View.GONE);
-                            tvAddr1.setVisibility(View.GONE);
-                            tv_addr1.setVisibility(View.GONE);
-                            tv_addr.setText("주소 정보가 없습니다");
-                        }
+                        } else {
 
+                            String url = poi.getString("originimgurl");
+                            System.out.println(url);
+                            imgArrayList.add(i, url);
+
+                        }
                     }
+
+                    mViewPager = (ViewPager) findViewById(R.id.pager);
+                    mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());// TODO: size should be initialized beforehand
+                    mViewPager.setAdapter(mPagerAdapter);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
+
 
 
 
