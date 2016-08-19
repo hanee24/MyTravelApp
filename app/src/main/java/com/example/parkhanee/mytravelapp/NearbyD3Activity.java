@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class NearbyD3Activity extends AppCompatActivity {
+public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
     int contentId=0;
     String apiKey;
@@ -106,19 +106,17 @@ public class NearbyD3Activity extends AppCompatActivity {
         new asyncTask().execute();
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
-       //mPagerAdapter = new myPagerAdapter(getSupportFragmentManager(),size); // TODO: size should be initialized beforehand
-        //mViewPager.setAdapter(mPagerAdapter);
+        mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());//,size); // TODO: size should be initialized beforehand
+        mViewPager.setAdapter(mPagerAdapter);
     }
 
     private class myPagerAdapter extends FragmentStatePagerAdapter{
-        private final int size;
+        private final int size=5;
 
-        public myPagerAdapter(FragmentManager fm, int size) {
+        public myPagerAdapter(FragmentManager fm) { //Add a parameter int size
             super(fm);
-            this.size = size;
+            //this.size = size;
         }
-
-
 
         @Override
         public int getCount() {
@@ -127,8 +125,8 @@ public class NearbyD3Activity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return null;
-
+            //return null;
+            return TextSlideFragment.newInstance(position);
               //  return ImageSlideFragment.newInstance(position);
 
 

@@ -9,6 +9,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     Button nearby ;
+    Button area;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +26,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        area = (Button) findViewById(R.id.button2);
+        area.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this,ViewPagerActivity.class);
+                startActivity(i);
+            }
+        });
     }
-
-
 
 }

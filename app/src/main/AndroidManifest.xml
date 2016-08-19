@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -26,6 +27,8 @@
         <activity android:name=".NearbyD3Activity">
         </activity>
         <activity android:name=".NearbyMapActivity">
+        </activity>
+        <activity android:name=".ViewPagerActivity">
         </activity>
     </application>
 
