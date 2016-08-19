@@ -3,6 +3,12 @@ package com.example.parkhanee.mytravelapp;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,8 +31,11 @@ public class NearbyD3Activity extends AppCompatActivity {
     URL imgREQ;
     ProgressDialog dialog;
     String imageYN = "Y"; //Y=콘텐츠이미지조회   //N=”음식점”타입의음식메뉴이미지
-    TextView tvTitle, tvCat, tvDist, tvOverview, tvTel, tvZipcode, tvAddr1, tvAddr2;
+    TextView tvTitle, tvCat, tvDist, tvOverview, tvTel, tvZipcode, tvAddr1; //, tvAddr2;
     TextView tv_tel, tv_addr, tv_addr1; //additional views
+    ViewPager mViewPager;
+    PagerAdapter mPagerAdapter;
+    int size=0;
 
 
 
@@ -64,7 +73,6 @@ public class NearbyD3Activity extends AppCompatActivity {
         tvTel = (TextView) findViewById(R.id.tel);
         tvZipcode = (TextView) findViewById(R.id.zipcode);
         tvAddr1 = (TextView) findViewById(R.id.addr1);
-        tvAddr2 = (TextView) findViewById(R.id.addr2);
         tv_tel = (TextView) findViewById(R.id.tv_tel);
         tv_addr = (TextView) findViewById(R.id.tv_addr);
         tv_addr1 = (TextView) findViewById(R.id.tv_addr1);
@@ -97,6 +105,34 @@ public class NearbyD3Activity extends AppCompatActivity {
 
         new asyncTask().execute();
 
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+       //mPagerAdapter = new myPagerAdapter(getSupportFragmentManager(),size); // TODO: size should be initialized beforehand
+        //mViewPager.setAdapter(mPagerAdapter);
+    }
+
+    private class myPagerAdapter extends FragmentStatePagerAdapter{
+        private final int size;
+
+        public myPagerAdapter(FragmentManager fm, int size) {
+            super(fm);
+            this.size = size;
+        }
+
+
+
+        @Override
+        public int getCount() {
+            return size;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return null;
+
+              //  return ImageSlideFragment.newInstance(position);
+
+
+        }
     }
 
     private class asyncTask extends AsyncTask<Void, JSONObject, Void>{
@@ -198,11 +234,9 @@ public class NearbyD3Activity extends AppCompatActivity {
                     if (poi.has("title")){// if poi has "title" it's from apiREQ, else it's from imgREQ
                         String title = poi.getString("title");
                         String overview = poi.getString("overview");
-                        //overview.replace("")
-                        //print overview
-                        System.out.println(overview);
-                        overview.replace("<br>"," ");
-                        System.out.println(overview);
+                        overview = overview.replace("<br>"," ");
+                        overview = overview.replace("<br />"," ");
+                        overview = overview.replace("&nbsp;"," ");
                         if (poi.has("tel")){
                             String tel = poi.getString("tel");
                             tvTel.setText(tel);
@@ -216,14 +250,16 @@ public class NearbyD3Activity extends AppCompatActivity {
                         if (poi.has("zipcode")){
                             String zipcode = poi.getString("zipcode");
                             String addr1 = poi.getString("addr1");
-                            String addr2 = poi.getString("addr2");
+                            if (poi.has("addr2")){
+                                addr1 += poi.getString("addr2");
+                            }
 
                             tvZipcode.setText(zipcode);
                             tvAddr1.setText(addr1);
-                            tvAddr2.setText(addr2);
+                            //tvAddr2.setText(addr2);
                         }else{
                             tvZipcode.setVisibility(View.GONE);
-                            tvAddr2.setVisibility(View.GONE);
+                            //tvAddr2.setVisibility(View.GONE);
                             tvAddr1.setVisibility(View.GONE);
                             tv_addr1.setVisibility(View.GONE);
                             tv_addr.setText("주소 정보가 없습니다");

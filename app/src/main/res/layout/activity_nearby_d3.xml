@@ -6,17 +6,22 @@
     android:layout_height="match_parent"
     tools:context="com.example.parkhanee.mytravelapp.NearbyD3Activity"
     android:orientation="vertical">
-
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </android.support.v4.view.ViewPager>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="400dp"
         android:id="@+id/scrollView"
-        android:layout_marginTop="200dp"
         >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -27,8 +32,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="10dp"/>
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -38,7 +42,7 @@
                 android:id="@+id/textView6"
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@+id/title"
-                android:layout_marginRight="16dp"/>
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -84,8 +88,8 @@
                 android:layout_alignLeft="@+id/title"
                 android:layout_alignStart="@+id/title"
                 android:layout_below="@+id/title"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="16dp"/>
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -158,16 +162,6 @@
                 android:layout_alignTop="@+id/addr1"
                 android:layout_toRightOf="@+id/addr1"
                 android:layout_toEndOf="@+id/addr1"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="addr2"
-                android:id="@+id/addr2"
-                android:layout_alignTop="@+id/textView14"
-                android:layout_toRightOf="@+id/textView14"
-                android:layout_toEndOf="@+id/textView14"/>
 
         </RelativeLayout>
     </ScrollView>
