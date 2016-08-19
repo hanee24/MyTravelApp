@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
-public class ViewPagerActivity extends FragmentActivity {
+public class TestViewPagerActivity extends FragmentActivity {
     private PagerAdapter mPagerAdapter;
 
     @Override
@@ -27,9 +27,9 @@ public class ViewPagerActivity extends FragmentActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            return TextSlideFragment.newInstance(position);
+            //return TextSlideFragment.newInstance(position;);
+            return null;
         }
-
 
         @Override
         public int getCount() {

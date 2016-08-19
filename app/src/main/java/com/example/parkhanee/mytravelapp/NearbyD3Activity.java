@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
@@ -36,7 +37,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     ViewPager mViewPager;
     PagerAdapter mPagerAdapter;
     int size=0;
-
+    ArrayList<String> textArrayList ;
 
 
     @Override
@@ -103,6 +104,13 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         }
         tvCat.setText(strCat);
 
+        textArrayList = new ArrayList<>();
+        textArrayList.add("하나");
+        textArrayList.add("둘");
+        textArrayList.add("셋");
+        textArrayList.add("넷");
+        textArrayList.add("다섯");
+        
         new asyncTask().execute();
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -125,11 +133,28 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
         @Override
         public Fragment getItem(int position) {
-            //return null;
-            return TextSlideFragment.newInstance(position);
-              //  return ImageSlideFragment.newInstance(position);
 
+            return TextSlideFragment.newInstance(position,textArrayList);
+        }
+    }
 
+    public void btnOnClick(View v){
+        int position;
+
+        switch( v.getId() ){
+            case R.id.previous://이전버튼 클릭
+
+                position=mViewPager.getCurrentItem();
+                mViewPager.setCurrentItem(position-1,true);
+
+                break;
+
+            case R.id.next://다음버튼 클릭
+
+                position=mViewPager.getCurrentItem();
+                mViewPager.setCurrentItem(position+1,true);
+
+                break;
         }
     }
 
