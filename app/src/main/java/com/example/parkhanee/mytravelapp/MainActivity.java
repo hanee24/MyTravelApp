@@ -30,10 +30,10 @@ public class MainActivity extends AppCompatActivity {
         area.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this,TestViewPagerActivity.class);
-                startActivity(i);
+
             }
         });
+
     }
 
 }

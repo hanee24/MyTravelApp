@@ -105,6 +105,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         tvCat.setText(strCat);
 
         imgArrayList = new ArrayList<>();
+        imgArrayList.add("null");
 
         new asyncTask().execute();
 
@@ -112,7 +113,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     }
 
     private class myPagerAdapter extends FragmentStatePagerAdapter{
-        private final int size=5;
+        //private final int size=5;
 
         public myPagerAdapter(FragmentManager fm) { //Add a parameter int size
             super(fm);
@@ -216,24 +217,37 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             JSONArray itemArray = null;
             JSONObject itemObject = null;
             String totalCount = "";
+            String strItems="";
+            Boolean isImage=false;
 
 
             try {
-                JSONObject items = body.getJSONObject("items");
-                Object item = items.get("item");
-                if (item instanceof JSONArray) {// It's an array
-                    itemArray = (JSONArray)item;
-                } else if (item instanceof JSONObject) {// It's an object
-                    itemObject = (JSONObject)item;
+                //org.json.JSONException: Value  at items of type java.lang.String cannot be converted to JSONObject //사진없을때 .
+                //JSONObject items = body.getJSONObject("items");
+                JSONObject items;
+                Object objectItems = body.get("items");
+                if (objectItems instanceof String){ //when there is no item == when there is no Image!
+                    strItems = (String) objectItems;
+                    isImage =  true;
+                    System.out.println("strItems" + strItems);
+                }else if(objectItems instanceof JSONObject) {
+                    items = (JSONObject) objectItems;
+
+                    Object item = items.get("item");
+                    if (item instanceof JSONArray) {// It's an array
+                        itemArray = (JSONArray) item;
+                    } else if (item instanceof JSONObject) {// It's an object
+                        itemObject = (JSONObject) item;
+                    }
+                    totalCount = body.getString("totalCount");
                 }
-                totalCount = body.getString("totalCount");
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             if (totalCount.equals("")){ //조건에 맞는 아이템 없음
-                totalCount = "0"; //TODO : ?
+                totalCount = "0"; //TODO : 이미지 정보가 없는건 괜찮은데 다른 상세정보가 없으면 안돼는데?
 
             }
             int tc = Integer.parseInt(totalCount);
@@ -282,17 +296,22 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             }
 
                         } else {
-
-                            String url = poi.getString("originimgurl");
-                            System.out.println(url);
-                            imgArrayList.add(i, url);
-
+                                if (imgArrayList.get(0)=="null"){
+                                    imgArrayList.clear(); //In order to prevent creating extra loading image at the end
+                                }
+                                String url = poi.getString("originimgurl");
+                                //System.out.println(url);
+                                imgArrayList.add(i, url);
+                                isImage=true;
                         }
                     }
 
-                    mViewPager = (ViewPager) findViewById(R.id.pager);
-                    mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());// TODO: size should be initialized beforehand
-                    mViewPager.setAdapter(mPagerAdapter);
+                    if (isImage){
+                        System.out.println("isImage==true");
+                        mViewPager = (ViewPager) findViewById(R.id.pager);
+                        mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());
+                        mViewPager.setAdapter(mPagerAdapter);
+                    }
 
 
                 } catch (JSONException e) {

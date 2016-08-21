@@ -36,6 +36,7 @@ public class ImageSlideFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mImageNum = getArguments().getInt(IMAGE_DATA_EXTRA);
         imgArrayList = getArguments().getStringArrayList("contents");
+        System.out.println("Fragment OnCreate");
     }
 
     @Nullable
@@ -43,19 +44,19 @@ public class ImageSlideFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_image_slide, container, false);
         imageView = (ImageView) rootView.findViewById(R.id.imageView2);
-        setImageView(rootView.getContext());
+        System.out.println("Fragment OnCreateView");
+        if (imgArrayList.get(0).equals("null")){
+            imageView.setImageResource(R.drawable.noimageavailable);
+            System.out.println("imgArrayList[0] == null");
+        }else{
+            setImageView(rootView.getContext());
+            System.out.println("imgArrayList");
+        }
         return rootView;
-        //return super.onCreateView(inflater, container, savedInstanceState); //??
     }
 
-   /* @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-       //TODO : set image on imageView with picasso
-
-    }*/
 
     private void setImageView(Context context){
         Picasso.with(context).load(imgArrayList.get(mImageNum)).into(imageView); //is this getting url image with UI Thread?
     }
-}
+} //480 320image

@@ -181,11 +181,12 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/leftarrow"
+        android:src="@drawable/white_leftarrow"
         android:layout_marginTop="85dp"
         android:background="#00ffffff"
         android:onClick="btnOnClick"
-        android:alpha="0.5"/>
+        android:alpha="0.5"
+        android:adjustViewBounds="false"/>
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -194,7 +195,7 @@
         android:layout_alignParentTop="false"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/rightarrow"
+        android:src="@drawable/white_rightarrow"
         android:layout_alignTop="@+id/previous"
         android:background="#00ffffff"
         android:onClick="btnOnClick"
