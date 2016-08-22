@@ -340,7 +340,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
 
                         //Set ListView Items
                         String desc = "description"; //poi.getString("overview");
-                        //System.out.println(poi.toString());
                         myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
 
                     }
@@ -367,9 +366,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("pageNo : "+pageNo);
-            System.out.println("totalCount : "+totalCount);
         }
 
     }
