@@ -1,7 +1,10 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.animation.ObjectAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -9,9 +12,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +43,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     int size=0;
     ArrayList<String> imgArrayList ;
     private ViewPagerIndicator indicator;
+    Intent callingIntent;
+    Button btnShowMore;
 
 
     @Override
@@ -79,6 +84,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         tv_tel = (TextView) findViewById(R.id.tv_tel);
         tv_addr = (TextView) findViewById(R.id.tv_addr);
         tv_addr1 = (TextView) findViewById(R.id.tv_addr1);
+        btnShowMore = (Button) findViewById(R.id.showMore);
 
         tvDist.setText(String.valueOf(dist));
         String strCat="기타";
@@ -186,6 +192,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+            cutTextView(tvOverview);
         }
 
         @Override
@@ -226,21 +233,14 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
         @Override
         protected void onProgressUpdate(JSONObject... values) { // it gets both imgREQ and apiREQ
-            JSONObject header = values[0];
+            //JSONObject header = values[0];
             JSONObject body = values[1];
-
-           /* String h = header.toString();
-            String b = body.toString();
-
-            System.out.println("header : "+h);
-            System.out.println("body : "+b); */
 
             JSONArray itemArray = null;
             JSONObject itemObject = null;
             String totalCount = "";
             String strItems="";
             Boolean isImage=false;
-
 
             try {
                 //org.json.JSONException: Value  at items of type java.lang.String cannot be converted to JSONObject //사진없을때 .
@@ -290,8 +290,17 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             overview = overview.replace("<br />", " ");
                             overview = overview.replace("&nbsp;", " ");
                             if (poi.has("tel")) {
+                                //TODO : add making a call intent to the text button?
                                 String tel = poi.getString("tel");
+                                callingIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+tel));
                                 tvTel.setText(tel);
+                                tvTel.setTextColor(Color.BLUE);
+                                    tvTel.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            call();
+                                        }
+                                    });
                             } else {
                                 tvTel.setText("표시할 전화번호가 없습니다");
                                 //tvTel.setVisibility(View.GONE);
@@ -334,10 +343,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
-
         }
     }
 
@@ -349,6 +354,22 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         int size = imgArrayList.size();
         if (size>1){
             indicator.createDot(size);
+        }
+    }
+
+    private void call(){
+        // if calling intent has initialized,
+        startActivity(callingIntent);
+    }
+
+    private void cutTextView(TextView view){
+        int lines = view.getLineCount();
+        Toast.makeText(NearbyD3Activity.this, "lines "+String.valueOf(lines), Toast.LENGTH_SHORT).show();
+        if (lines > 6){
+            btnShowMore.setVisibility(View.VISIBLE);
+
+        }else{
+            btnShowMore.setVisibility(View.GONE);
         }
     }
 }

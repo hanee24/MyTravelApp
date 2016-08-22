@@ -50,7 +50,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_toLeftOf="@+id/cat"/>
+                android:layout_toLeftOf="@+id/cat"
+                android:layout_marginTop="5dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -115,10 +116,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="tel : "
                 android:id="@+id/tv_tel"
-                android:layout_below="@+id/overview"
+                android:layout_below="@+id/showMore"
                 android:layout_alignLeft="@+id/overview"
                 android:layout_alignStart="@+id/overview"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="20dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -180,6 +181,18 @@
                 android:layout_alignTop="@+id/addr1"
                 android:layout_toRightOf="@+id/addr1"
                 android:layout_toEndOf="@+id/addr1"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="더보기"
+                android:id="@+id/showMore"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/overview"
+                android:layout_alignParentEnd="true"
+                android:background="@color/accent_material_dark"
+                android:visibility="gone"/>
 
         </RelativeLayout>
     </ScrollView>
