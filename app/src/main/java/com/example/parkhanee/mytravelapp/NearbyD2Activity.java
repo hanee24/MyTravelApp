@@ -286,7 +286,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             String totalCount = "";
 
             try {
-                JSONObject items = body.getJSONObject("items"); //TODO: solve nullpointer error
+                JSONObject items = body.getJSONObject("items"); //TODO: occurs null pointer error when it takes longer time to load ?왜..
                 Object item = items.get("item");
                 if (item instanceof JSONArray) {// It's an array
                     itemArray = (JSONArray)item;

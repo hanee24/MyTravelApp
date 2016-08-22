@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +39,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     PagerAdapter mPagerAdapter;
     int size=0;
     ArrayList<String> imgArrayList ;
+    private ViewPagerIndicator indicator;
 
 
     @Override
@@ -107,6 +109,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         imgArrayList = new ArrayList<>();
         imgArrayList.add("null");
 
+        indicator = (ViewPagerIndicator) findViewById(R.id.indicator);
+
         new asyncTask().execute();
 
 
@@ -150,6 +154,23 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 break;
         }
     }
+
+    private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            indicator.selectDot(position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
 
     private class asyncTask extends AsyncTask<Void, JSONObject, Void>{
 
@@ -307,12 +328,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                     }
 
                     if (isImage){
-                        System.out.println("isImage==true");
-                        mViewPager = (ViewPager) findViewById(R.id.pager);
-                        mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());
-                        mViewPager.setAdapter(mPagerAdapter);
+                        initViewPager();
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -321,6 +338,17 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
 
 
+        }
+    }
+
+    private void initViewPager(){
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(mOnPageChangeListener);
+        int size = imgArrayList.size();
+        if (size>1){
+            indicator.createDot(size);
         }
     }
 }
