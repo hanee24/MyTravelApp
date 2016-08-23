@@ -118,7 +118,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         tvCat.setText(strCat);
 
         imgArrayList = new ArrayList<>();
-        imgArrayList.add("null");
+        imgArrayList.add(0,"null");
 
         indicator = (ViewPagerIndicator) findViewById(R.id.indicator);
 
@@ -154,15 +154,14 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
                 position=mViewPager.getCurrentItem();
                 mViewPager.setCurrentItem(position-1,true);
-
                 break;
 
             case R.id.next://pager 다음버튼 클릭
 
                 position=mViewPager.getCurrentItem();
                 mViewPager.setCurrentItem(position+1,true);
-
                 break;
+
             case R.id.showMore:
                 SetOverviewDisplay(tvOverview);
                 isShowFull = true; //더보기 눌렀으니까 이제 full overview 보여야지
@@ -186,6 +185,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
         }
     };
+
 
     private class asyncTask extends AsyncTask<Void, JSONObject, Void>{
 
@@ -247,7 +247,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             JSONArray itemArray = null;
             JSONObject itemObject = null;
             String totalCount = "";
-            String strItems="";
+            //String strItems="";
             Boolean isImage=false;
 
             try {
@@ -255,20 +255,22 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 //JSONObject items = body.getJSONObject("items");
                 JSONObject items;
                 Object objectItems = body.get("items");
-                if (objectItems instanceof String){ //when there is no item == when there is no Image!
-                    strItems = (String) objectItems;
+                totalCount = body.getString("totalCount");
+                if (objectItems instanceof String){ //조건에 맞는 아이템 없음 //when there is no item == when there is no Image!
+                    //strItems = (String) objectItems;
                     isImage =  true;
-                    System.out.println("strItems" + strItems);
+                    //TODO : api요청 하나더 해서 firstImage받기
+
+
                 }else if(objectItems instanceof JSONObject) {
                     items = (JSONObject) objectItems;
-
                     Object item = items.get("item");
+
                     if (item instanceof JSONArray) {// It's an array
                         itemArray = (JSONArray) item;
                     } else if (item instanceof JSONObject) {// It's an object
                         itemObject = (JSONObject) item;
                     }
-                    totalCount = body.getString("totalCount");
                 }
 
             } catch (JSONException e) {
@@ -276,8 +278,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             }
 
             if (totalCount.equals("")){ //조건에 맞는 아이템 없음
-                totalCount = "0"; //TODO : 이미지 정보가 없는건 괜찮은데 다른 상세정보가 없으면 안돼는데?
-
+                totalCount = "0"; //TODO : 이미지 정보가 없는건 괜찮은데 다른 상세정보가 없으면 안돼는데? 이거 예외처리?
             }
             int tc = Integer.parseInt(totalCount);
 
@@ -315,7 +316,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             }
                             tvTitle.setText(title);
 
-                            //TODO : overview textview 처리
+                            //overview textview 처리
                             //count char
                             int charOverview = overview.length();
                             Toast.makeText(NearbyD3Activity.this, "char : "+String.valueOf(charOverview), Toast.LENGTH_SHORT).show();
@@ -348,13 +349,19 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                 tv_addr.setText("주소 정보가 없습니다");
                             }
 
+                            //first image
+                            if (poi.has("firstimage")){
+                                String url = poi.getString("firstimage");
+                                imgArrayList.add(0,url);
+                            }
                         } else {
-                                if (imgArrayList.get(0)=="null"){
+                                if (imgArrayList.get(0).equals("null")){
                                     imgArrayList.clear(); //In order to prevent creating extra loading image at the end
                                 }
                                 String url = poi.getString("originimgurl");
                                 //System.out.println(url);
-                                imgArrayList.add(i, url);
+                                int count = imgArrayList.size();
+                                imgArrayList.add(count+i, url); //TODO : is it right to put "count+i" ?
                                 isImage=true;
                         }
                     }
@@ -369,21 +376,24 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         }
     }
 
+
     private void initViewPager(){
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(mOnPageChangeListener);
         int size = imgArrayList.size();
-        if (size>1){
+        if (size>1){ //TODO firstimage 하나 받아와서 사진개수 하나일때 처리
             indicator.createDot(size);
         }
     }
+
 
     private void call(){
         // if calling intent has initialized,
         startActivity(callingIntent);
     }
+
 
     private void SetOverviewDisplay(TextView view){ //not really efficient to have parameter of the view ?? <- this method is only for overview text
         if (isShowFull){
@@ -394,4 +404,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             btnShowMore.setVisibility(View.VISIBLE);
         }
     }
+
+
 }
