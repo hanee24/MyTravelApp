@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by parkhanee on 2016. 8. 19..
  */
-public class ImageSlideFragment extends Fragment {
+public class ImageSlideFragment extends Fragment { //480 320image
     private ImageView imageView;
     private int mImageNum;
     private static final String IMAGE_DATA_EXTRA ="resId";
@@ -42,15 +43,15 @@ public class ImageSlideFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_image_slide, container, false);
         imageView = (ImageView) rootView.findViewById(R.id.imageView2);
-        System.out.println("Fragment OnCreateView");
-        if (imgArrayList.get(0).equals("null")){
+
+
+        if (imgArrayList.get(0).equals("null")){ //when there is no image
             imageView.setImageResource(R.drawable.noimageavailable);
-            System.out.println("imgArrayList[0] == null");
         }else{
             setImageView(rootView.getContext());
-            System.out.println("imgArrayList");
         }
         return rootView;
     }
@@ -59,4 +60,4 @@ public class ImageSlideFragment extends Fragment {
     private void setImageView(Context context){
         Picasso.with(context).load(imgArrayList.get(mImageNum)).into(imageView); //is this getting url image with UI Thread?
     }
-} //480 320image
+}

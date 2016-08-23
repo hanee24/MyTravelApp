@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -259,8 +260,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 if (objectItems instanceof String){ //조건에 맞는 아이템 없음 //when there is no item == when there is no Image!
                     //strItems = (String) objectItems;
                     isImage =  true;
-                    //TODO : api요청 하나더 해서 firstImage받기
-
 
                 }else if(objectItems instanceof JSONObject) {
                     items = (JSONObject) objectItems;
@@ -351,6 +350,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
                             //first image
                             if (poi.has("firstimage")){
+                                imgArrayList.clear();//In order to prevent creating extra loading image at the end
                                 String url = poi.getString("firstimage");
                                 imgArrayList.add(0,url);
                             }
@@ -359,14 +359,16 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                     imgArrayList.clear(); //In order to prevent creating extra loading image at the end
                                 }
                                 String url = poi.getString("originimgurl");
-                                //System.out.println(url);
                                 int count = imgArrayList.size();
-                                imgArrayList.add(count+i, url); //TODO : is it right to put "count+i" ?
+                                imgArrayList.add(url);
                                 isImage=true;
                         }
                     }
 
                     if (isImage){
+                        if (imgArrayList.size()==1){
+                            SetArrowsVisibilityGONE();
+                        }
                         initViewPager();
                     }
 
@@ -383,7 +385,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(mOnPageChangeListener);
         int size = imgArrayList.size();
-        if (size>1){ //TODO firstimage 하나 받아와서 사진개수 하나일때 처리
+        if (size>1){
             indicator.createDot(size);
         }
     }
@@ -405,5 +407,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         }
     }
 
+    private void SetArrowsVisibilityGONE(){
+        ImageButton previous = (ImageButton) findViewById(R.id.previous);
+        ImageButton next = (ImageButton) findViewById(R.id.next);
+        previous.setVisibility(View.GONE);
+        next.setVisibility(View.GONE);
+    }
 
 }
