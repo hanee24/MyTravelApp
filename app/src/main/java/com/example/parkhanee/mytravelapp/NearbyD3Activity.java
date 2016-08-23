@@ -38,13 +38,18 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     String imageYN = "Y"; //Y=콘텐츠이미지조회   //N=”음식점”타입의음식메뉴이미지
     TextView tvTitle, tvCat, tvDist, tvOverview, tvTel, tvZipcode, tvAddr1;
     TextView tv_tel, tv_addr, tv_addr1; //additional views
+
     ViewPager mViewPager;
     PagerAdapter mPagerAdapter;
     int size=0;
     ArrayList<String> imgArrayList ;
     private ViewPagerIndicator indicator;
+
     Intent callingIntent;
     Button btnShowMore;
+    private String shortOverview;
+    private String fullOverview;
+    private Boolean isShowFull;
 
 
     @Override
@@ -145,18 +150,22 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         int position;
 
         switch( v.getId() ){
-            case R.id.previous://이전버튼 클릭
+            case R.id.previous://pager 이전버튼 클릭
 
                 position=mViewPager.getCurrentItem();
                 mViewPager.setCurrentItem(position-1,true);
 
                 break;
 
-            case R.id.next://다음버튼 클릭
+            case R.id.next://pager 다음버튼 클릭
 
                 position=mViewPager.getCurrentItem();
                 mViewPager.setCurrentItem(position+1,true);
 
+                break;
+            case R.id.showMore:
+                SetOverviewDisplay(tvOverview);
+                isShowFull = true; //더보기 눌렀으니까 이제 full overview 보여야지
                 break;
         }
     }
@@ -192,7 +201,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
-            cutTextView(tvOverview);
         }
 
         @Override
@@ -290,7 +298,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             overview = overview.replace("<br />", " ");
                             overview = overview.replace("&nbsp;", " ");
                             if (poi.has("tel")) {
-                                //TODO : add making a call intent to the text button?
                                 String tel = poi.getString("tel");
                                 callingIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+tel));
                                 tvTel.setText(tel);
@@ -307,7 +314,23 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                 //tv_tel.setVisibility(View.GONE);
                             }
                             tvTitle.setText(title);
-                            tvOverview.setText(overview);
+
+                            //TODO : overview textview 처리
+                            //count char
+                            int charOverview = overview.length();
+                            Toast.makeText(NearbyD3Activity.this, "char : "+String.valueOf(charOverview), Toast.LENGTH_SHORT).show();
+                            //set showfull boolean
+                            fullOverview = overview;
+                            isShowFull = charOverview <= 200;
+                            //if not showfull, get short overview
+                            if (!isShowFull){
+                                //get first 200 chars from overview
+                                shortOverview = fullOverview.substring(0,200);
+                            }
+                            //set overviews
+                            SetOverviewDisplay(tvOverview);
+
+
                             if (poi.has("zipcode")) {
                                 String zipcode = poi.getString("zipcode");
                                 String addr1 = poi.getString("addr1");
@@ -362,14 +385,13 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         startActivity(callingIntent);
     }
 
-    private void cutTextView(TextView view){
-        int lines = view.getLineCount();
-        Toast.makeText(NearbyD3Activity.this, "lines "+String.valueOf(lines), Toast.LENGTH_SHORT).show();
-        if (lines > 6){
-            btnShowMore.setVisibility(View.VISIBLE);
-
-        }else{
+    private void SetOverviewDisplay(TextView view){ //not really efficient to have parameter of the view ?? <- this method is only for overview text
+        if (isShowFull){
+            view.setText(fullOverview);
             btnShowMore.setVisibility(View.GONE);
+        }else{
+            view.setText(shortOverview);
+            btnShowMore.setVisibility(View.VISIBLE);
         }
     }
 }

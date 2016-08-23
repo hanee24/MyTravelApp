@@ -192,7 +192,8 @@
                 android:layout_below="@+id/overview"
                 android:layout_alignParentEnd="true"
                 android:background="@color/accent_material_dark"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:onClick="btnOnClick"/>
 
         </RelativeLayout>
     </ScrollView>
