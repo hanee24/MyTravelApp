@@ -147,7 +147,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="zipcode"
                 android:id="@+id/zipcode"
-                android:layout_below="@+id/tv_tel"
+                android:layout_below="@+id/tel"
                 android:layout_toRightOf="@+id/tv_addr"
                 android:layout_toEndOf="@+id/tv_addr"
                 android:layout_marginBottom="10dp"/>
@@ -194,6 +194,56 @@
                 android:background="@color/accent_material_dark"
                 android:visibility="gone"
                 android:onClick="btnOnClick"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="homepage"
+                android:id="@+id/homepage"
+                android:layout_below="@+id/addr1"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="false"
+                android:layout_alignLeft="@+id/tv_addr"
+                android:layout_marginBottom="15dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="수정일 : "
+                android:id="@+id/tv_modified"
+                android:layout_alignLeft="@+id/homepage"
+                android:layout_below="@+id/homepage"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="등록일 : "
+                android:id="@+id/tv_created"
+                android:layout_alignLeft="@+id/tv_modified"
+                android:layout_below="@+id/tv_modified"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="modifiedtime"
+                android:id="@+id/modifiedtime"
+                android:layout_toRightOf="@+id/tv_modified"
+                android:layout_toEndOf="@+id/tv_modified"
+                android:layout_alignTop="@+id/tv_modified"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="createdtime"
+                android:id="@+id/createdtime"
+                android:layout_alignTop="@+id/tv_created"
+                android:layout_toRightOf="@+id/tv_created"
+                android:layout_toEndOf="@+id/tv_created"/>
 
         </RelativeLayout>
     </ScrollView>

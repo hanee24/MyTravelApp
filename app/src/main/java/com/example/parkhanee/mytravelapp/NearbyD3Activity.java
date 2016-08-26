@@ -1,6 +1,5 @@
 package com.example.parkhanee.mytravelapp;
 
-import android.animation.ObjectAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -38,7 +37,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     ProgressDialog dialog;
     String imageYN = "Y"; //Y=콘텐츠이미지조회   //N=”음식점”타입의음식메뉴이미지
     TextView tvTitle, tvCat, tvDist, tvOverview, tvTel, tvZipcode, tvAddr1;
-    TextView tv_tel, tv_addr, tv_addr1; //additional views
+    TextView tv_tel, tv_addr, tv_addr1, tvM, tvC; //additional views
+    TextView tvHomepage, tvModified, tvCreated ;
 
     ViewPager mViewPager;
     PagerAdapter mPagerAdapter;
@@ -51,6 +51,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     private String shortOverview;
     private String fullOverview;
     private Boolean isShowFull;
+
+    Boolean isImage=false;
 
 
     @Override
@@ -91,6 +93,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         tv_addr = (TextView) findViewById(R.id.tv_addr);
         tv_addr1 = (TextView) findViewById(R.id.tv_addr1);
         btnShowMore = (Button) findViewById(R.id.showMore);
+        tvHomepage = (TextView) findViewById(R.id.homepage);
+        tvModified = (TextView) findViewById(R.id.modifiedtime);
+        tvCreated = (TextView) findViewById(R.id.createdtime);
+        tvM = (TextView) findViewById(R.id.tv_modified);
+        tvC = (TextView) findViewById(R.id.tv_created);
 
         tvDist.setText(String.valueOf(dist));
         String strCat="기타";
@@ -215,8 +222,10 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 URL request;
                 if (a==0){
                     request = apiREQ;
+                    //isImage=false;
                 }else{
                     request = imgREQ;
+                    //isImage=true;
                 }
                 try {
                     in = new BufferedReader(new InputStreamReader(request.openStream()));
@@ -245,11 +254,15 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             //JSONObject header = values[0];
             JSONObject body = values[1];
 
+            System.out.println("body "+body.toString());
+
+
             JSONArray itemArray = null;
             JSONObject itemObject = null;
             String totalCount = "";
+            String numOfRows="";
             //String strItems="";
-            Boolean isImage=false;
+
 
             try {
                 //org.json.JSONException: Value  at items of type java.lang.String cannot be converted to JSONObject //사진없을때 .
@@ -257,10 +270,10 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 JSONObject items;
                 Object objectItems = body.get("items");
                 totalCount = body.getString("totalCount");
+                numOfRows = body.getString("numOfRows");
                 if (objectItems instanceof String){ //조건에 맞는 아이템 없음 //when there is no item == when there is no Image!
                     //strItems = (String) objectItems;
-                    isImage =  true;
-
+                    isImage=true;
                 }else if(objectItems instanceof JSONObject) {
                     items = (JSONObject) objectItems;
                     Object item = items.get("item");
@@ -281,14 +294,32 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             }
             int tc = Integer.parseInt(totalCount);
 
+            if (isImage){ //when there are more images than numOfRows, discard redundant images
+                if (numOfRows.equals("")){
+                    numOfRows="0";
+                }
+                int rows = Integer.parseInt(numOfRows);
+                if (tc>rows){
+                    tc = rows;
+                }
+            }
+
                 try {
-                JSONObject poi=null;
+                JSONObject poi;
                     for(int i=0; i<tc ; i++) {
                         if (tc == 1) {
                             poi = itemObject;
+                            System.out.println("tc==1; "+poi);
                         } else if (itemArray.length() == tc) {
                             poi = itemArray.getJSONObject(i);
+                            System.out.println("poi "+isImage.toString()+poi);
+                        }else{
+                            poi = itemArray.getJSONObject(i);
+                            System.out.println("else "+isImage.toString()+poi);
                         }
+
+                        //String pp = poi.toString();
+                        //System.out.println("pp"  + pp);
 
                         if (poi.has("title")) {// if poi has "title" it's from apiREQ, else it's from imgREQ
 
@@ -318,7 +349,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             //overview textview 처리
                             //count char
                             int charOverview = overview.length();
-                            Toast.makeText(NearbyD3Activity.this, "char : "+String.valueOf(charOverview), Toast.LENGTH_SHORT).show();
                             //set showfull boolean
                             fullOverview = overview;
                             isShowFull = charOverview <= 200;
@@ -348,6 +378,36 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                 tv_addr.setText("주소 정보가 없습니다");
                             }
 
+                            //homepage
+                            if (poi.has("homepage")){
+                                String hp = poi.getString("homepage");
+                                tvHomepage.setText(hp);
+                            }else{
+                                tvHomepage.setVisibility(View.GONE);
+                            }
+                            if (poi.has("createdtime")){
+                                String ct = poi.getString("createdtime");
+                                String year = ct.substring(0,4);
+                                String month = ct.substring(4,6);
+                                String day = ct.substring(6,8);
+                                String aa = year+"-"+month+"-"+day;
+                                tvCreated.setText(aa);
+                            }else{
+                                tvCreated.setVisibility(View.GONE);
+                                tvC.setVisibility(View.GONE);
+                            }
+                            if (poi.has("modifiedtime")){
+                                String mt = poi.getString("modifiedtime");
+                                String year = mt.substring(0,4);
+                                String month = mt.substring(4,6);
+                                String day = mt.substring(6,8);
+                                String aa = year+"-"+month+"-"+day;
+                                tvModified.setText(aa);
+                            }else {
+                                tvM.setVisibility(View.GONE);
+                                tvModified.setVisibility(View.GONE);
+                            }
+
                             //first image
                             if (poi.has("firstimage")){
                                 imgArrayList.clear();//In order to prevent creating extra loading image at the end
@@ -355,19 +415,20 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                 imgArrayList.add(0,url);
                             }
                         } else {
-                                if (imgArrayList.get(0).equals("null")){
-                                    imgArrayList.clear(); //In order to prevent creating extra loading image at the end
-                                }
-                                String url = poi.getString("originimgurl");
-                                int count = imgArrayList.size();
-                                imgArrayList.add(url);
-                                isImage=true;
+                            if (imgArrayList.get(0).equals("null")){
+                                imgArrayList.clear(); //In order to prevent creating extra loading image at the end
+                            }
+                            String url = poi.getString("originimgurl");
+                            imgArrayList.add(url);
+                            isImage=true;
                         }
                     }
 
                     if (isImage){
+                        SetArrowsVisibility(true);
                         if (imgArrayList.size()==1){
-                            SetArrowsVisibilityGONE();
+                            System.out.println("imgArrayList.size == 1");
+                            SetArrowsVisibility(false);
                         }
                         initViewPager();
                     }
@@ -407,11 +468,17 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         }
     }
 
-    private void SetArrowsVisibilityGONE(){
+    private void SetArrowsVisibility(Boolean show){
         ImageButton previous = (ImageButton) findViewById(R.id.previous);
         ImageButton next = (ImageButton) findViewById(R.id.next);
-        previous.setVisibility(View.GONE);
-        next.setVisibility(View.GONE);
+        if (show){
+            previous.setVisibility(View.VISIBLE);
+            next.setVisibility(View.VISIBLE);
+        }else{
+            previous.setVisibility(View.GONE);
+            next.setVisibility(View.GONE);
+        }
+
     }
 
 }
