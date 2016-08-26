@@ -3,12 +3,7 @@ package com.example.parkhanee.mytravelapp;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,9 +12,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,11 +19,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 
 
-public class NearbyD2Activity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class NearbyD2Activity extends AppCompatActivity  {
 
     int radius;
     int cat;
@@ -43,10 +33,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
     TextView tvTotalCount;
 
     String apiKey;
-    Location myLocation;
     URL apiREQ;
-
-    GoogleApiClient mGoogleApiClient;
 
     private ListView listView;
     private myArrayListAdapter myAdapter;
@@ -54,17 +41,8 @@ public class NearbyD2Activity extends AppCompatActivity implements
     int pageNo = 0;
     Button btnLoadMore;
 
-    Double Lat;
-    Double Lgt;
-
-    //String resultPassToMap = "";
-
-    //arrayLists for passing poi data to MapActivity
-    ArrayList<String> titleArrayList = new ArrayList<>();
-    ArrayList<Integer> catArrayList = new ArrayList<>();
-    ArrayList<String> imgArrayList = new ArrayList<>();
-    ArrayList<String> yArrayList = new ArrayList<>();
-    ArrayList<String> xArrayList = new ArrayList<>();
+    Double lat;
+    Double lgt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +53,9 @@ public class NearbyD2Activity extends AppCompatActivity implements
         cat = intent.getIntExtra("cat", -1);
         strRadius = intent.getStringExtra("strRadius");
         strCat = intent.getStringExtra("strCat");
+        lgt = intent.getDoubleExtra("lgt",0.0);
+        lat = intent.getDoubleExtra("lat",0.0);
+
 
         tv = (TextView) findViewById(R.id.textView4);
         tv.setText(strCat + " • " + strRadius);
@@ -87,15 +68,6 @@ public class NearbyD2Activity extends AppCompatActivity implements
         myAdapter = new myArrayListAdapter(NearbyD2Activity.this);
         listView = (ListView) findViewById(R.id.listView);
 
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(com.google.android.gms.location.LocationServices.API)
-                    .build();
-        }
-
         btnLoadMore = new Button(this);
         btnLoadMore.setText("더 불러오기");
         listView.addFooterView(btnLoadMore);
@@ -107,74 +79,18 @@ public class NearbyD2Activity extends AppCompatActivity implements
             @Override
             public void onClick(View arg0) {
                 new URLReader().execute(radius,cat);
-                // Starting a new async task
-               /* try {
-                    resultPassToMap = new URLReader().execute(radius,cat).get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }*/
             }
         });
-    }
-
-    protected void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-
-    @Override
-    public void onConnected(@Nullable Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        /*if (myLocation != null) {
-            Toast.makeText(NearbyD2Activity.this, String.valueOf(myLocation.getLatitude())+String.valueOf(myLocation.getLongitude()), Toast.LENGTH_SHORT).show();
-        }*/
-
-
-        Lat = myLocation.getLatitude();
-        Lgt = myLocation.getLongitude();
-
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (int i=0;i<myAdapter.getCount();i++){
-                    Item a = (Item)myAdapter.getItem(i);
-                    titleArrayList.add(i,a.getTitle());
-                    catArrayList.add(i,a.getCat());
-                    imgArrayList.add(i,a.getPicture());
-                    yArrayList.add(i,a.getMapy());
-                    xArrayList.add(i,a.getMapx());
-                }
 
                 Intent i = new Intent(NearbyD2Activity.this, NearbyMapActivity.class);
                 i.putExtra("radius", radius);
                 i.putExtra("cat", cat);
-                i.putExtra("Lat",Lat);  // my location
-                i.putExtra("Lgt",Lgt);
-                i.putExtra("title",titleArrayList);
-                i.putExtra("cat",catArrayList);
-                i.putExtra("img",imgArrayList);
-                i.putExtra("mapy",yArrayList);
-                i.putExtra("mapx",xArrayList);
+                i.putExtra("lat",lat);  // my location
+                i.putExtra("lgt",lgt);
                 startActivity(i);
             }
         });
@@ -193,18 +109,8 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 startActivity(intent);
             }
         });
-
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 
     private class URLReader extends AsyncTask<Integer, JSONObject, String> {
 
@@ -236,26 +142,12 @@ public class NearbyD2Activity extends AppCompatActivity implements
             BufferedReader in;
             JSONObject body=null;
 
-            //AsyncTask runs once  // while (i==0) {
-            if (pageNo==1){
-                Location my = myLocation;
-                while (my == myLocation) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-
                 try {
                     if (cat==-1){
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + lgt + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }else{
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + Lgt + "&mapY=" + Lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + lgt + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }
-
 
                     in = new BufferedReader(
                             new InputStreamReader(apiREQ.openStream()));
@@ -278,6 +170,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             return result;
         }
 
+
         @Override
         protected void onProgressUpdate(JSONObject... values) {
             JSONArray itemArray = null;
@@ -286,7 +179,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
             String totalCount = "";
 
             try {
-                JSONObject items = body.getJSONObject("items"); //TODO: occurs null pointer error when it takes longer time to load ?왜..
+                JSONObject items = body.getJSONObject("items"); //TODO: occurs null pointer error here, when it takes longer time to load ?왜..
                 Object item = items.get("item");
                 if (item instanceof JSONArray) {// It's an array
                     itemArray = (JSONArray)item;
@@ -322,7 +215,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                 if (itemObject == null&&itemArray==null) {
                     // exit asyncTask
                 }else if (itemArray!=null){
-                    for(int i=0; i < itemArray.length(); i++){ // null pointer error occurs here, when item is null !
+                    for(int i=0; i < itemArray.length(); i++){
                         JSONObject poi = itemArray.getJSONObject(i);
                         String title = poi.getString("title");
                         String mapy = poi.getString("mapy");
@@ -335,11 +228,11 @@ public class NearbyD2Activity extends AppCompatActivity implements
                             img = "null";
                         }
                         int dist = poi.getInt("dist");
-                        int contentTypeId = poi.getInt("contenttypeid"); // Needs "contentTypeId-Name" Array ??
+                        int contentTypeId = poi.getInt("contenttypeid");
                         int contentId = poi.getInt("contentid");
 
                         //Set ListView Items
-                        String desc = "description"; //poi.getString("overview");
+                        String desc = "description";
                         myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
 
                     }
@@ -359,7 +252,7 @@ public class NearbyD2Activity extends AppCompatActivity implements
                     int contentTypeId = poi.getInt("contenttypeid");
                     int contentId = poi.getInt("contentid");
                     //Set ListView Items
-                    String desc = "description"; //poi.getString("overview");
+                    String desc = "description";
                     myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
                 }
 

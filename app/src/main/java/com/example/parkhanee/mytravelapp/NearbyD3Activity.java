@@ -73,8 +73,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         if (cat==39){
             imageYN = "N";
         }
-
-        System.out.println("contentId : "+contentId);
         //get api
         apiKey = getString(R.string.travelApiKey);
         try {
@@ -258,10 +256,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         protected void onProgressUpdate(JSONObject... values) { // it gets both imgREQ and apiREQ
             //JSONObject header = values[0];
             JSONObject body = values[1];
-
-            System.out.println("body "+body.toString());
-
-
             JSONArray itemArray = null;
             JSONObject itemObject = null;
             String totalCount = "";
@@ -450,7 +444,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                     if (isImage){
                         SetArrowsVisibility(true);
                         if (imgArrayList.size()==1){
-                            System.out.println("imgArrayList.size == 1");
                             SetArrowsVisibility(false);
                         }
                         initViewPager();
@@ -476,7 +469,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
 
     private void call(){
-        // if calling intent has initialized,
+        // if calling intent has been initialized,
         startActivity(callingIntent);
     }
 

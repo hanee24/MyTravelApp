@@ -28,6 +28,10 @@ public class NearbyD1Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_d1);
 
+        Intent a = getIntent();
+        final Double lat = a.getDoubleExtra("lat",0.0);
+        final Double lgt = a.getDoubleExtra("lgt",0.0);
+
         okay = (Button) findViewById(R.id.button3);
         spinnerRadius = (Spinner) findViewById(R.id.spinner);
         spinnerCat = (Spinner) findViewById(R.id.spinner2);
@@ -93,6 +97,8 @@ public class NearbyD1Activity extends AppCompatActivity {
                 i.putExtra("cat",cat);
                 i.putExtra("strRadius",strRadius);
                 i.putExtra("strCat",strCat);
+                i.putExtra("lgt",lgt);
+                i.putExtra("lat",lat);
                 startActivity(i);
             }
         });
