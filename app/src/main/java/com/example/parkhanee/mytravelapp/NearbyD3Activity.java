@@ -21,6 +21,11 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -340,9 +345,9 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                         }
                                     });
                             } else {
-                                tvTel.setText("표시할 전화번호가 없습니다");
-                                //tvTel.setVisibility(View.GONE);
-                                //tv_tel.setVisibility(View.GONE);
+                                //tvTel.setText("표시할 전화번호가 없습니다");
+                                tvTel.setVisibility(View.GONE);
+                                tv_tel.setVisibility(View.GONE);
                             }
                             tvTitle.setText(title);
 
@@ -380,8 +385,26 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
                             //homepage
                             if (poi.has("homepage")){
+
                                 String hp = poi.getString("homepage");
-                                tvHomepage.setText(hp);
+                                Document doc = Jsoup.parse(hp);
+
+                                Element link = doc.getElementsByTag("a").first();
+
+                                final String linkHref = link.attr("href"); //href attr of the aTag
+                                String linkText = link.text();
+
+                                tvHomepage.setText(linkText); //set text for homepage textview
+                                tvHomepage.setTextColor(Color.BLUE);
+                                tvHomepage.setOnClickListener(new View.OnClickListener() { //set onClick method for the textview
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        intent.setData(Uri.parse(linkHref));
+                                        startActivity(intent);
+                                    }
+                                });
+
                             }else{
                                 tvHomepage.setVisibility(View.GONE);
                             }

@@ -107,8 +107,7 @@
                 android:layout_alignLeft="@+id/title"
                 android:layout_alignStart="@+id/title"
                 android:layout_below="@+id/title"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginBottom="20dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -119,7 +118,7 @@
                 android:layout_below="@+id/showMore"
                 android:layout_alignLeft="@+id/overview"
                 android:layout_alignStart="@+id/overview"
-                android:layout_marginTop="20dp"/>
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -147,10 +146,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="zipcode"
                 android:id="@+id/zipcode"
-                android:layout_below="@+id/tel"
                 android:layout_toRightOf="@+id/tv_addr"
                 android:layout_toEndOf="@+id/tv_addr"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginBottom="10dp"
+                android:layout_alignTop="@+id/tv_addr"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -193,7 +192,8 @@
                 android:layout_alignParentEnd="true"
                 android:background="@color/accent_material_dark"
                 android:visibility="gone"
-                android:onClick="btnOnClick"/>
+                android:onClick="btnOnClick"
+                android:layout_marginBottom="30dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
