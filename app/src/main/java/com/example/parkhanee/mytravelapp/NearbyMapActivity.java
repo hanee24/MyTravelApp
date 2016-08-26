@@ -3,10 +3,12 @@ package com.example.parkhanee.mytravelapp;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
@@ -48,6 +51,7 @@ public class NearbyMapActivity extends AppCompatActivity {
     ArrayList<Integer> catArrayList = new ArrayList<>();
     ArrayList<String> yArrayList = new ArrayList<>();
     ArrayList<String> xArrayList = new ArrayList<>();
+    ArrayList<Integer> distArrayList = new ArrayList<>();
     String apiKey;
     URL apiREQ;
     ProgressDialog dialog;
@@ -74,7 +78,12 @@ public class NearbyMapActivity extends AppCompatActivity {
         apiKey = getString(R.string.travelApiKey);
 
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState); // null
+        mapView.onCreate(savedInstanceState);
+        // Create an Icon object for the marker to use  // this process takes too long time.....
+        /*IconFactory iconFactory = IconFactory.getInstance(NearbyMapActivity.this);
+        Drawable iconDrawable = ContextCompat.getDrawable(NearbyMapActivity.this, R.drawable.purple_marker);
+        iconDrawable.setBounds(0,0,10,10);
+        final Icon icon = iconFactory.fromDrawable(iconDrawable);*/
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -86,15 +95,19 @@ public class NearbyMapActivity extends AppCompatActivity {
                         .target(new LatLng(lat,lgt))
                         .zoom(13)   //.bearing(300)//.tilt(30)
                         .build());
-                map.addMarker(new MarkerOptions() //TODO: 내위치 마커 - 글씨없이 아이콘 쓰기
+                map.addMarker(new MarkerOptions()
                         .position(new LatLng(lat,lgt))
-                        .title("내 위치"));
+                        .title("내 위치")
+                        //.icon(icon)
+                );
 
                 //TODO: category에 따라 색깔이 다른 marker icon사용
 
                 map.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
                     @Override
                     public boolean onInfoWindowClick(@NonNull Marker marker) {
+                        int id = (int)marker.getId();
+                        //TODO make onclick method to go to NearbyD3Activity
                         return false;
                     }
                 });
@@ -175,7 +188,8 @@ public class NearbyMapActivity extends AppCompatActivity {
                     map.addMarker(new MarkerViewOptions()
                             .position(new LatLng(y,x))
                             .title(titleArrayList.get(i))
-                            .snippet(category));
+                            .snippet(category)
+                    );
 
                 }
                 if (dialog.isShowing()) {
@@ -257,25 +271,29 @@ public class NearbyMapActivity extends AppCompatActivity {
                         String mapy = poi.getString("mapy");
                         String mapx = poi.getString("mapx");
                         int contentTypeId = poi.getInt("contenttypeid");
+                        int dist = poi.getInt("dist");
 
                         //set array-lists of poi
                         titleArrayList.add(title);
                         yArrayList.add(mapy);
                         xArrayList.add(mapx);
                         catArrayList.add(contentTypeId);
+                        distArrayList.add(dist);
                     }
-                }else if (itemObject!=null){
+                }else if (itemObject!=null){ //when there is only one item
                     JSONObject poi = itemObject;
                     String title = poi.getString("title");
                     String mapy = poi.getString("mapy");
                     String mapx = poi.getString("mapx");
                     int contentTypeId = poi.getInt("contenttypeid");
+                    int dist = poi.getInt("dist");
 
                     //set array-lists of poi
                     titleArrayList.add(title);
                     yArrayList.add(mapy);
                     xArrayList.add(mapx);
                     catArrayList.add(contentTypeId);
+                    distArrayList.add(dist);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

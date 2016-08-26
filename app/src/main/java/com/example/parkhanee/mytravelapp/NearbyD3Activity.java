@@ -327,6 +327,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             overview = overview.replace("<br>", " ");
                             overview = overview.replace("<br />", " ");
                             overview = overview.replace("&nbsp;", " ");
+                            overview = overview.replace("&lt;", " ");
+                            overview = overview.replace("&gt;", " ");
                             if (poi.has("tel")) {
                                 String tel = poi.getString("tel");
                                 callingIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+tel));
@@ -339,7 +341,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                         }
                                     });
                             } else {
-                                //tvTel.setText("표시할 전화번호가 없습니다");
                                 tvTel.setVisibility(View.GONE);
                                 tv_tel.setVisibility(View.GONE);
                             }
