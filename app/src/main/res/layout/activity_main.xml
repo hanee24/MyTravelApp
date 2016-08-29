@@ -34,7 +34,6 @@
         android:layout_gravity="center_horizontal"
         android:textSize="30dp"
         android:nestedScrollingEnabled="false"
-        android:onClick="nearbySearchClicked"
         android:layout_marginBottom="20dp"/>
 
     <Button
@@ -44,6 +43,5 @@
         android:id="@+id/button2"
         android:layout_gravity="center_horizontal"
         android:textSize="30dp"
-        android:onClick="areaSearchClicked"
         android:layout_marginBottom="40dp"/>
 </LinearLayout>

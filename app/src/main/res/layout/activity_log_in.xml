@@ -10,4 +10,61 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.parkhanee.mytravelapp.LogInActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Log In"
+        android:id="@+id/textView9"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="90dp"/>
+
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/id"
+        android:layout_below="@+id/textView9"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="59dp"
+        />
+
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/pasword"
+        android:layout_below="@+id/id"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ID"
+        android:id="@+id/textView12"
+        android:layout_above="@+id/pasword"
+        android:layout_toLeftOf="@+id/id"
+        android:layout_toStartOf="@+id/id"
+        android:layout_marginRight="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PWD"
+        android:id="@+id/textView13"
+        android:layout_alignBottom="@+id/pasword"
+        android:layout_toLeftOf="@+id/pasword"
+        android:layout_toStartOf="@+id/pasword"
+        android:layout_marginRight="10dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="확인"
+        android:id="@+id/okay"
+        android:layout_below="@+id/pasword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="51dp"/>
+
 </RelativeLayout>
