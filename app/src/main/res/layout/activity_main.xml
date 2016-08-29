@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="내 위치"
+        android:text="내 위치를 찾는 중입니다.."
         android:id="@+id/textView2"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"/>
@@ -29,7 +29,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="주변 탐색"
+        android:text="관광지 검색"
         android:id="@+id/button"
         android:layout_gravity="center_horizontal"
         android:textSize="30dp"
@@ -40,7 +40,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="지역 검색"
+        android:text="여행 폴더"
         android:id="@+id/button2"
         android:layout_gravity="center_horizontal"
         android:textSize="30dp"

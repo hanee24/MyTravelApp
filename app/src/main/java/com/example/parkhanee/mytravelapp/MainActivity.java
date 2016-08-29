@@ -31,8 +31,8 @@ import java.net.URLConnection;
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    Button nearby ;
-    Button area;
+    Button btn_search ;
+    Button btn_folder;
     TextView location;
 
     GoogleApiClient mGoogleApiClient;
@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        nearby = (Button) findViewById(R.id.button);
-        area = (Button) findViewById(R.id.button2);
+        btn_search = (Button) findViewById(R.id.button);
+        btn_folder = (Button) findViewById(R.id.button2);
         location = (TextView) findViewById(R.id.textView2);
 
         // Create an instance of GoogleAPIClient.
@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements
                     .addApi(com.google.android.gms.location.LocationServices.API)
                     .build();
         }
+
     }
 
     @Override
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements
         //String url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=37.4841774,126.9727024&language=ko&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194" ;
         new getGeoCode().execute(url);
 
-        nearby.setOnClickListener(new View.OnClickListener() {
+        btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this,NearbyD1Activity.class);
@@ -97,10 +98,11 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        area.setOnClickListener(new View.OnClickListener() {
+        btn_folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent i = new Intent(MainActivity.this,LogInActivity.class);
+                startActivity(i);
             }
         });
     }
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements
                 e.printStackTrace();
             }
 
-            System.out.println("jsonString"+jsonString);
+            // System.out.println("jsonString"+jsonString);
 
             try {
                 JSONObject object = new JSONObject(jsonString);
@@ -161,7 +163,10 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(String s) {
-            location.setText(s);
+            //split S , get second, third, forth words..
+            String[] str = s.split(" ");
+            String ss = str[1]+" "+str[2]+" "+str[3];
+            location.setText(ss);
         }
     }
 
