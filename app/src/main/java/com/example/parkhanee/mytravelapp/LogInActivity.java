@@ -1,6 +1,7 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class LogInActivity extends AppCompatActivity {
 
     Button btn_okay;
+    Button btn_signin;
     private static final String DEBUG_TAG = "HttpExample";
     HashMap<String, String> postDataParams;
 
@@ -52,9 +54,18 @@ public class LogInActivity extends AppCompatActivity {
 
             }
         });
+
+        btn_signin = (Button) findViewById(R.id.signin);
+        btn_signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent aa = new Intent(LogInActivity.this,SignInActivity.class);
+                startActivity(aa);
+            }
+        });
     }
 
-    public void myClickHandler(View view) { // check if the network has connected   //TODO add this to MyTravelApp ..
+    public void myClickHandler(View view) { // check if the network has connected   //TODO : add this to all the activities which need network connection
         String stringUrl = "http://hanea8199.vps.phps.kr/test/logintest.php";
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -79,7 +90,8 @@ public class LogInActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            System.out.println("result"+s);
+            System.out.println("result "+s);
+            Toast.makeText(LogInActivity.this, s, Toast.LENGTH_SHORT).show();
         }
 
         private String downloadUrl(String myurl) throws IOException {

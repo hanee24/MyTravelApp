@@ -163,10 +163,10 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(String s) {
-            //split S , get second, third, forth words..
+            //split "s" , get second, third, forth words
             String[] str = s.split(" ");
             String ss = str[1]+" "+str[2]+" "+str[3];
-            location.setText(ss);
+            location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
         }
     }
 

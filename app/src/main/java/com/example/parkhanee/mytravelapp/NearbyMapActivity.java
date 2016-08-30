@@ -107,7 +107,7 @@ public class NearbyMapActivity extends AppCompatActivity {
                     @Override
                     public boolean onInfoWindowClick(@NonNull Marker marker) {
                         int id = (int)marker.getId();
-                        //TODO make onclick method to go to NearbyD3Activity
+                        //TODO : make onclick method to go to NearbyD3Activity
                         return false;
                     }
                 });
