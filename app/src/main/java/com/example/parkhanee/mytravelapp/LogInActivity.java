@@ -1,10 +1,12 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -66,7 +71,7 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void myClickHandler(View view) { // check if the network has connected   //TODO : add this to all the activities which need network connection
-        String stringUrl = "http://hanea8199.vps.phps.kr/test/logintest.php";
+        String stringUrl = "http://hanea8199.vps.phps.kr/login.php";
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -90,8 +95,41 @@ public class LogInActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            System.out.println("result "+s);
-            Toast.makeText(LogInActivity.this, s, Toast.LENGTH_SHORT).show();
+
+            int resultCode=99;
+            String resultMsg="";
+            String msg;
+            try{
+                JSONObject result = new JSONObject(s);
+                resultCode = result.getInt("resultCode");
+                //resultMsg = result.getString("resultMsg");
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+            if (resultCode==00){ //result is Okay
+                msg = "로그인 되었습니다";
+                AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);
+                builder.setMessage(msg)
+                        .setCancelable(false)
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent aa = new Intent(LogInActivity.this,MainActivity.class);
+                                startActivity(aa);
+                                finish();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }else{ // error occurred
+                switch (resultCode){
+                    case 14 : msg = "회원정보를 확인해 주세요";
+                        break;
+                    default: msg = "unknown error";
+                        break;
+                }
+                Toast.makeText(LogInActivity.this,msg, Toast.LENGTH_SHORT).show();
+            }
         }
 
         private String downloadUrl(String myurl) throws IOException {
