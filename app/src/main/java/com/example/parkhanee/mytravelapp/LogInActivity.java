@@ -31,7 +31,7 @@ public class LogInActivity extends AppCompatActivity {
 
     Button btn_okay;
     Button btn_signin;
-    private static final String DEBUG_TAG = "HttpExample";
+    private static final String DEBUG_TAG = "LogInActivity";
     HashMap<String, String> postDataParams;
 
     @Override
