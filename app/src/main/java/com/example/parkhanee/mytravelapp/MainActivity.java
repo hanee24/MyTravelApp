@@ -1,6 +1,7 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,13 +9,18 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -57,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements
                     .addApi(com.google.android.gms.location.LocationServices.API)
                     .build();
         }
-
     }
 
     @Override
@@ -101,8 +106,32 @@ public class MainActivity extends AppCompatActivity implements
         btn_folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this,LogInActivity.class);
-                startActivity(i);
+               // FacebookSdk.sdkInitialize(MainActivity.this);
+               // AccessToken token = AccessToken.getCurrentAccessToken();
+                //String userId = token.getUserId();
+                //Toast.makeText(MainActivity.this, userId, Toast.LENGTH_SHORT).show();
+
+                Boolean ifLoggedIn=false; //TODO : 이렇게 말고 세션유지
+                //로그인 했는지 확인
+
+                if (ifLoggedIn){
+                    // 여행 폴더로 가기
+                }else{
+                    AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                    adb.setTitle("로그인이 필요한 서비스 입니다");
+                    adb.setIcon(android.R.drawable.ic_dialog_alert);
+                    adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i = new Intent(MainActivity.this,LogInActivity.class);
+                            startActivity(i);
+                        } });
+                    adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        } });
+                    adb.show();
+                }
+
             }
         });
     }

@@ -1,12 +1,15 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -17,44 +20,39 @@ import com.facebook.login.widget.LoginButton;
 /**
  * Created by parkhanee on 2016. 8. 31..
  */
-public class FbLoginButtonFragment extends Fragment{
+public class FbLoginFragment extends Fragment{
     CallbackManager callbackManager;
     LoginButton loginButton;
-    static FbLoginButtonFragment newInstance (){
-        final FbLoginButtonFragment fragment = new FbLoginButtonFragment();
-        final Bundle args = new Bundle();
-        //args.putInt("sf",3);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) { //get arguments and set them as private variables
         super.onCreate(savedInstanceState);
-        //get arguments and set them as private variables
+
+        FacebookSdk.sdkInitialize(getContext());
+        callbackManager = CallbackManager.Factory.create(); //create a callback manager to handle login responses
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_fb_login_button, container, false);
 
-        //return rootView;
-        View view = inflater.inflate(R.layout.fragment_fb_login_button, container, false);
+        View view = inflater.inflate(R.layout.fragment_fb_login, container, false);
+        loginButton = (LoginButton) view.findViewById(R.id.login_button); //TODO : put it in onCREATE or OnCreateView?>??
 
-        loginButton = (LoginButton) view.findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email");
-        // If using in a fragment
+        //loginButton.setReadPermissions("email");
+        // You can customize the properties of Login button
+        //includes LoginBehavior, DefaultAudience, ToolTipPopup.Style and permissions on the LoginButton
+
         loginButton.setFragment(this);
-        // Other app specific specialization
-        FacebookSdk.sdkInitialize(getContext());
-        callbackManager = CallbackManager.Factory.create();
+
 
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // App code
+                AccessToken token = loginResult.getAccessToken();
+                String userId = token.getUserId();
+                Toast.makeText(getContext(), "logged in : "+userId, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -68,5 +66,11 @@ public class FbLoginButtonFragment extends Fragment{
             }
         });
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
