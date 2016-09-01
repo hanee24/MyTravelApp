@@ -1,8 +1,11 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -13,14 +16,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
-import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -40,20 +42,35 @@ public class MainActivity extends AppCompatActivity implements
     Button btn_search ;
     Button btn_folder;
     TextView location;
+    Button btn_login;
 
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
     Double lat;
     Double lgt;
 
+    Boolean ifLogged=false;
+    SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String userIdKey = "userId";
+    public static final String ifLoggedKey = "ifLogged"; // "y", "n"
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //hide facebook login fragment
+        View a = findViewById(R.id.fragment2);
+        a.setVisibility(View.GONE);
+
+
         btn_search = (Button) findViewById(R.id.button);
         btn_folder = (Button) findViewById(R.id.button2);
         location = (TextView) findViewById(R.id.textView2);
+        btn_login = (Button) findViewById(R.id.button8);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -62,6 +79,65 @@ public class MainActivity extends AppCompatActivity implements
                     .addOnConnectionFailedListener(this)
                     .addApi(com.google.android.gms.location.LocationServices.API)
                     .build();
+        }
+
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+
+        Intent intent = getIntent();
+        Boolean ifNewlyLogged = intent.getBooleanExtra("ifNewlyLogged",false);
+        Boolean ifFbLogged = intent.getBooleanExtra("ifFbLogged",false);
+
+        if (ifNewlyLogged){ //방금 로그인함
+
+
+            String savedId="";
+            if (ifFbLogged){ //페이스북 로그인
+                //get user info
+                //AccessToken token = FbLoginFragment.getCurrentAccessToken();
+                Profile profile = FbLoginFragment.getCurrentProfile();
+                savedId = profile.getName();
+                System.out.println("newly fb login");
+            }else{ //일반로그인
+                //get user info through intent from LoginActivity
+                savedId = intent.getStringExtra("userId");
+                System.out.println("newly login");
+            }
+
+            //save user info on shared preference
+            if (savedId.equals("")){
+                //TODO error ???
+                System.out.println("no saved id");
+            }else {
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putString(userIdKey, savedId);
+                editor.putString(ifLoggedKey, "y");
+                editor.commit();
+                System.out.println("sp save");
+                ifLogged = true;
+            }
+
+        }else{ // !ifNewlyLogged
+
+            //sp에서 로그인정보 가져와서 set ifLogged
+            String IfLoggedSP = sharedpreferences.getString(ifLoggedKey,"n");
+            ifLogged = !IfLoggedSP.equals("n");
+            String userIdSP = sharedpreferences.getString(userIdKey,null);
+            Toast.makeText(MainActivity.this, "sp "+userIdSP, Toast.LENGTH_SHORT).show();
+            System.out.println("already logged in");
+
+        }
+
+        if (ifLogged){
+            btn_login.setVisibility(View.GONE);
+
+        }else { //set login button onClick method
+            btn_login.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(MainActivity.this,LogInActivity.class);
+                    startActivity(i);
+                }
+            });
         }
     }
 
@@ -106,17 +182,9 @@ public class MainActivity extends AppCompatActivity implements
         btn_folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // FacebookSdk.sdkInitialize(MainActivity.this);
-               // AccessToken token = AccessToken.getCurrentAccessToken();
-                //String userId = token.getUserId();
-                //Toast.makeText(MainActivity.this, userId, Toast.LENGTH_SHORT).show();
-
-                Boolean ifLoggedIn=false; //TODO : 이렇게 말고 세션유지
-                //로그인 했는지 확인
-
-                if (ifLoggedIn){
-                    // 여행 폴더로 가기
-                }else{
+                if (ifLogged){
+                    //TODO : go to travel folder activity
+                }else {
                     AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
                     adb.setTitle("로그인이 필요한 서비스 입니다");
                     adb.setIcon(android.R.drawable.ic_dialog_alert);

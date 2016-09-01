@@ -41,6 +41,7 @@ public class LogInActivity extends AppCompatActivity {
     Button btn_signin;
     private static final String DEBUG_TAG = "LogInActivity";
     HashMap<String, String> postDataParams;
+    EditText et_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +119,12 @@ public class LogInActivity extends AppCompatActivity {
                         .setCancelable(false)
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                //TODO : get id from id edittext !
+                                et_id = (EditText) findViewById(R.id.id);
+                                String userId = et_id.getText().toString();
                                 Intent aa = new Intent(LogInActivity.this,MainActivity.class);
+                                aa.putExtra("userId",userId);
+                                aa.putExtra("ifNewlyLogged",true);
                                 startActivity(aa);
                                 finish();
                             }

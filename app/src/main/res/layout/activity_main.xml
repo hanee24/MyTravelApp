@@ -27,6 +27,15 @@
         android:gravity="center_vertical"/>
 
     <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="로그인"
+        android:id="@+id/button8"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="관광지 검색"
@@ -44,4 +53,10 @@
         android:layout_gravity="center_horizontal"
         android:textSize="30dp"
         android:layout_marginBottom="40dp"/>
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.example.parkhanee.mytravelapp.FbLoginFragment"
+        android:id="@+id/fragment2"
+        tools:layout="@layout/fragment_fb_login"/>
 </LinearLayout>

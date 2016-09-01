@@ -4,7 +4,5 @@
     <string name="travelApiKey">EhbtW6DbKWT%2BdDTSXCMIK0gvNEvTNh66inoT47CrOANRMxpY4K2wYdsrMH0LLKSg0isRPVIcIq99swJ2RJdMKg%3D%3D</string>
     <string name="accessToken">pk.eyJ1IjoiaGFuZWUiLCJhIjoiY2lyYzB6Z3hhMDE4Mmc3bTNjMjYyNXl4biJ9.WyVfkt1NspbDHnGCkucgSw</string>
     <string name="facebook_app_id">588753471304328</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fb_login_protocol_scheme">fb588753471304328</string>
 </resources>
