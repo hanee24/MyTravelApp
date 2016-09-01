@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
-import com.facebook.internal.LoginAuthorizationType;
+import com.facebook.FacebookSdk;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,6 +57,7 @@ public class LogInActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String id = ((EditText) findViewById(R.id.id)).getText().toString();
                 String password = ((EditText) findViewById(R.id.pasword)).getText().toString();
+
                 postDataParams.put("id", id);
                 postDataParams.put("password", password);
 
@@ -114,17 +115,18 @@ public class LogInActivity extends AppCompatActivity {
 
             if (resultCode==00){ //result is Okay
                 msg = "로그인 되었습니다";
+                et_id = (EditText) findViewById(R.id.id);
+                MainActivity.login(et_id.getText().toString());
                 AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);
                 builder.setMessage(msg)
                         .setCancelable(false)
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                //TODO : get id from id edittext !
-                                et_id = (EditText) findViewById(R.id.id);
                                 String userId = et_id.getText().toString();
                                 Intent aa = new Intent(LogInActivity.this,MainActivity.class);
                                 aa.putExtra("userId",userId);
                                 aa.putExtra("ifNewlyLogged",true);
+                                aa.putExtra("ifFbLogged",false);
                                 startActivity(aa);
                                 finish();
                             }
@@ -133,7 +135,9 @@ public class LogInActivity extends AppCompatActivity {
                 alert.show();
             }else{ // error occurred
                 switch (resultCode){
-                    case 14 : msg = "회원정보를 확인해 주세요";
+                    case 14 : msg = "로그인 정보가 바르지 않습니다";
+                        break;
+                    case 11: msg = "모든 정보를 입력해 주세요";
                         break;
                     default: msg = "unknown error";
                         break;

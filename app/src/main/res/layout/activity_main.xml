@@ -20,20 +20,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="로그인 정보"
+        android:id="@+id/textView18"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="날씨"
         android:textSize="50dp"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
         android:gravity="center_vertical"/>
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="로그인"
-        android:id="@+id/button8"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"/>
 
     <Button
         android:layout_width="wrap_content"

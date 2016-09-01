@@ -19,6 +19,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -77,26 +78,6 @@ public class FbLoginFragment extends Fragment{
         return view;
     }
 
-   /* private CallbackManager mCallbackManager;
-    private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
-        @Override
-        public void onSuccess(LoginResult loginResult) {
-            //TODO, implement onSuccess
-            String userId = loginResult.getAccessToken().getUserId();
-            Toast.makeText(getContext(), userId, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onCancel() {
-            //TODO, implement onCancel
-        }
-
-        @Override
-        public void onError(FacebookException e) {
-            //TODO, implement onError inorder to handle the errors
-        }
-    };*/
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         loginButton = (LoginButton) view.findViewById(R.id.login_button); //TODO : put it in onCREATE or OnCreateView?>??
@@ -112,10 +93,13 @@ public class FbLoginFragment extends Fragment{
             @Override
             public void onSuccess(LoginResult loginResult) { //when the user newly logged in
                 // App code
-                //TODO : send boolean to Main activity , 메인에서 회우너정보 SP에 저장하게
+                String string = loginResult.getAccessToken().getUserId();
+                MainActivity.login(string);
+                MainActivity.ifFbLogged=true;
+                //send boolean to Main activity , to save user info into shared preference in Main Activity
                 Intent a = new Intent(getContext(),MainActivity.class);
                 a.putExtra("ifNewlyLogged",true);
-                a.putExtra("ifbLogged",true);
+                a.putExtra("ifFbLogged",true);
                 startActivity(a);
             }
 
@@ -132,7 +116,7 @@ public class FbLoginFragment extends Fragment{
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) { //얘가 없으면 로그인 하고나서 로그인 버튼이 "로그아웃"으로 바뀌지 않으ㅁ //it pass the result to the CallbackManager
+    public void onActivityResult(int requestCode, int resultCode, Intent data) { //얘가 없으면 로그인 하고나서 로그인 버튼이 "로그아웃"으로 바뀌지 않으ㅁ //it passes the result to the CallbackManager
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }

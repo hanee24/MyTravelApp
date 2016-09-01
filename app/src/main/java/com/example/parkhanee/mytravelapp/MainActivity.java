@@ -21,8 +21,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
 import com.facebook.AccessToken;
 import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -32,7 +34,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -42,24 +43,24 @@ public class MainActivity extends AppCompatActivity implements
     Button btn_search ;
     Button btn_folder;
     TextView location;
-    Button btn_login;
+    TextView tv_login;
 
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
     Double lat;
     Double lgt;
 
-    Boolean ifLogged=false;
-    SharedPreferences sharedpreferences;
+    public static Boolean ifLogged=false;
+    public static SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
     public static final String userIdKey = "userId";
     public static final String ifLoggedKey = "ifLogged"; // "y", "n"
-
-
+    public static Boolean ifFbLogged=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_main);
 
         //hide facebook login fragment
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements
         btn_search = (Button) findViewById(R.id.button);
         btn_folder = (Button) findViewById(R.id.button2);
         location = (TextView) findViewById(R.id.textView2);
-        btn_login = (Button) findViewById(R.id.button8);
+        tv_login = (TextView) findViewById(R.id.textView18);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -81,63 +82,65 @@ public class MainActivity extends AppCompatActivity implements
                     .build();
         }
 
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE) ;
 
         Intent intent = getIntent();
-        Boolean ifNewlyLogged = intent.getBooleanExtra("ifNewlyLogged",false);
+        Boolean ifNewlyLogged = intent.getBooleanExtra("ifNewlyLogged",false); //final ? ?
         Boolean ifFbLogged = intent.getBooleanExtra("ifFbLogged",false);
+        String userIdFromLogInActivity = intent.getStringExtra("userId"); //TODO : not necessary?
 
-        if (ifNewlyLogged){ //방금 로그인함
-
-
-            String savedId="";
-            if (ifFbLogged){ //페이스북 로그인
-                //get user info
-                //AccessToken token = FbLoginFragment.getCurrentAccessToken();
-                Profile profile = FbLoginFragment.getCurrentProfile();
-                savedId = profile.getName();
-                System.out.println("newly fb login");
-            }else{ //일반로그인
-                //get user info through intent from LoginActivity
-                savedId = intent.getStringExtra("userId");
-                System.out.println("newly login");
-            }
-
-            //save user info on shared preference
-            if (savedId.equals("")){
-                //TODO error ???
-                System.out.println("no saved id");
-            }else {
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putString(userIdKey, savedId);
-                editor.putString(ifLoggedKey, "y");
-                editor.commit();
-                System.out.println("sp save");
-                ifLogged = true;
-            }
-
-        }else{ // !ifNewlyLogged
-
-            //sp에서 로그인정보 가져와서 set ifLogged
-            String IfLoggedSP = sharedpreferences.getString(ifLoggedKey,"n");
-            ifLogged = !IfLoggedSP.equals("n");
-            String userIdSP = sharedpreferences.getString(userIdKey,null);
-            Toast.makeText(MainActivity.this, "sp "+userIdSP, Toast.LENGTH_SHORT).show();
-            System.out.println("already logged in");
-
+        //set Boolean islogged
+        //if logged, set login info on textview
+        //else, set
+        if (ifLogged){
+            tv_login.setText(getLoginId());
+        }else {
+            tv_login.setText("로그인 해주세요");
         }
 
-        if (ifLogged){
-            btn_login.setVisibility(View.GONE);
-
-        }else { //set login button onClick method
-            btn_login.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        tv_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ifLogged){ //log out onClick
+                    logout();
+                    Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
+                    tv_login.setText("로그인 해주세요");
+                }else { //log in onClick
                     Intent i = new Intent(MainActivity.this,LogInActivity.class);
                     startActivity(i);
                 }
-            });
+            }
+        });
+
+    }
+    
+    public static String getLoginId(){
+        String str = sharedpreferences.getString(userIdKey,null);
+        return str;
+    }
+
+    public static Boolean getifLogged(){
+        String str = sharedpreferences.getString(ifLoggedKey,"n");
+        return !str.equals("n");
+    }
+
+    public static void login(String id){
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString(userIdKey, id);
+        editor.putString(ifLoggedKey, "y");
+        editor.commit();
+        ifLogged = true;
+    }
+
+    public static void logout(){ //removeLoginInfoFromSharedPreference
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.remove(userIdKey);
+        editor.remove(ifLoggedKey);
+        editor.commit();
+        ifLogged = false;
+        if (ifFbLogged){
+            LoginManager.getInstance().logOut(); // facebook logout !!
+            ifFbLogged=false;
         }
     }
 
@@ -263,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements
             //split "s" , get second, third, forth words
             String[] str = s.split(" ");
             String ss = str[1]+" "+str[2]+" "+str[3];
-            location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
+           // location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
         }
     }
 
