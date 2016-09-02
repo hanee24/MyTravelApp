@@ -54,8 +54,10 @@ public class MainActivity extends AppCompatActivity implements
     public static SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
     public static final String userIdKey = "userId";
-    public static final String ifLoggedKey = "ifLogged"; // "y", "n"
+    public static final String isFBKey = "isFB"; // "y", "n"
     public static Boolean ifFbLogged=false;
+    public static String fbName="";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +65,16 @@ public class MainActivity extends AppCompatActivity implements
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_main);
 
+        if (ifFbLogged){
+            //Profile profile = FbLoginFragment.getCurrentProfile();
+            //String name = profile.getName(); //
+            String name = "fb";
+            login(name,true);
+        }
+
         //hide facebook login fragment
         View a = findViewById(R.id.fragment2);
         a.setVisibility(View.GONE);
-
 
         btn_search = (Button) findViewById(R.id.button);
         btn_folder = (Button) findViewById(R.id.button2);
@@ -84,16 +92,16 @@ public class MainActivity extends AppCompatActivity implements
 
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE) ;
 
-        Intent intent = getIntent();
-        Boolean ifNewlyLogged = intent.getBooleanExtra("ifNewlyLogged",false); //final ? ?
-        Boolean ifFbLogged = intent.getBooleanExtra("ifFbLogged",false);
-        String userIdFromLogInActivity = intent.getStringExtra("userId"); //TODO : not necessary?
-
         //set Boolean islogged
         //if logged, set login info on textview
         //else, set
         if (ifLogged){
             tv_login.setText(getLoginId());
+
+            if (getisFB()){ //여기에 안하면 방금로그인했을때면 ifFbLogged == true 라서 여기다 해줘야함
+                Toast.makeText(MainActivity.this, "FB", Toast.LENGTH_SHORT).show();
+                ifFbLogged=true;
+            }
         }else {
             tv_login.setText("로그인 해주세요");
         }
@@ -113,35 +121,40 @@ public class MainActivity extends AppCompatActivity implements
         });
 
     }
-    
+
     public static String getLoginId(){
         String str = sharedpreferences.getString(userIdKey,null);
         return str;
     }
 
-    public static Boolean getifLogged(){
-        String str = sharedpreferences.getString(ifLoggedKey,"n");
-        return !str.equals("n");
+    public static Boolean getisFB(){ // is it needed ???
+        String str = sharedpreferences.getString(isFBKey,"n");
+        return str.equals("y");
     }
 
-    public static void login(String id){
+    public static void login(String id,Boolean isFB){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString(userIdKey, id);
-        editor.putString(ifLoggedKey, "y");
+        if (isFB){
+            editor.putString(isFBKey,"y"); //FB login
+        }else{
+            editor.putString(isFBKey, "n");
+        }
+
         editor.commit();
         ifLogged = true;
     }
 
     public static void logout(){ //removeLoginInfoFromSharedPreference
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.remove(userIdKey);
-        editor.remove(ifLoggedKey);
-        editor.commit();
-        ifLogged = false;
-        if (ifFbLogged){
+        if (getisFB()){
             LoginManager.getInstance().logOut(); // facebook logout !!
             ifFbLogged=false;
         }
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.remove(userIdKey);
+        editor.remove(isFBKey);
+        editor.commit();
+        ifLogged = false;
     }
 
     @Override
@@ -266,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements
             //split "s" , get second, third, forth words
             String[] str = s.split(" ");
             String ss = str[1]+" "+str[2]+" "+str[3];
-           // location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
+            location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
         }
     }
 

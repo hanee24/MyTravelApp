@@ -116,17 +116,13 @@ public class LogInActivity extends AppCompatActivity {
             if (resultCode==00){ //result is Okay
                 msg = "로그인 되었습니다";
                 et_id = (EditText) findViewById(R.id.id);
-                MainActivity.login(et_id.getText().toString());
+                MainActivity.login(et_id.getText().toString(),false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);
                 builder.setMessage(msg)
                         .setCancelable(false)
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                String userId = et_id.getText().toString();
                                 Intent aa = new Intent(LogInActivity.this,MainActivity.class);
-                                aa.putExtra("userId",userId);
-                                aa.putExtra("ifNewlyLogged",true);
-                                aa.putExtra("ifFbLogged",false);
                                 startActivity(aa);
                                 finish();
                             }

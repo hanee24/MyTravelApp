@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,18 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
 
 /**
  * Created by parkhanee on 2016. 8. 31..
@@ -94,12 +102,10 @@ public class FbLoginFragment extends Fragment{
             public void onSuccess(LoginResult loginResult) { //when the user newly logged in
                 // App code
                 String string = loginResult.getAccessToken().getUserId();
-                MainActivity.login(string);
+                //MainActivity.login(string);
                 MainActivity.ifFbLogged=true;
                 //send boolean to Main activity , to save user info into shared preference in Main Activity
                 Intent a = new Intent(getContext(),MainActivity.class);
-                a.putExtra("ifNewlyLogged",true);
-                a.putExtra("ifFbLogged",true);
                 startActivity(a);
             }
 
@@ -114,6 +120,44 @@ public class FbLoginFragment extends Fragment{
             }
         });
     }
+
+    FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+
+            Log.v("profile track", (DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(loginResult.getAccessToken().getExpires())));
+            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(JSONObject object, GraphResponse response) {
+                            try {
+                                Log.v("profile track","onCompleted");
+
+                                String name = object.getString("name");
+                                String email = object.getString("email");
+                                String id = object.getString("id");
+                                Toast.makeText(getContext(), name + " " + " " + email + " " + id, Toast.LENGTH_SHORT).show();
+                                Log.v("profile track","name + \" \" + \" \" + email + \" \" + id");
+
+                    /*write  your code  that is to be executed after successful login*/
+
+
+                            } catch (JSONException ex) {
+                                ex.printStackTrace();
+                                Log.v("profile track","json exception");
+                            }
+                        }
+                    });
+        }
+
+        @Override
+        public void onCancel() {
+        }
+
+        @Override
+        public void onError(FacebookException e) {
+        }
+    };
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) { //얘가 없으면 로그인 하고나서 로그인 버튼이 "로그아웃"으로 바뀌지 않으ㅁ //it passes the result to the CallbackManager
