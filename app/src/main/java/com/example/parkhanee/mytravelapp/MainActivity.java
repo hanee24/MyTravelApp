@@ -91,16 +91,9 @@ public class MainActivity extends AppCompatActivity implements
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         System.out.println("Main Resume");
 
-       /* Intent i = getIntent(); // test
-        String n = i.getStringExtra("name");
-        System.out.println(n.isEmpty());*/
-
         Bundle extras = getIntent().getExtras();
-        Intent intent = getIntent();
-        System.out.println(intent);
-        System.out.println(extras);
         if (extras!=null){
-            Boolean is = extras.getBoolean("newlyLogged",false); //TODO 왜 애가 안오지.
+            Boolean is = extras.getBoolean("newlyLogged",false);
             System.out.println(is);
             String name = extras.getString("name");
             System.out.println(name);
@@ -109,14 +102,10 @@ public class MainActivity extends AppCompatActivity implements
             login(name,true);
         }
 
-       if (ifFbLogged){ //when newly logged with FB, get name from profile and save it in SP
-
-        }
-
         String fb = sharedpreferences.getString(isFBKey,"");
         switch (fb){ //ifLogged랑 ifFbLogged는 mainActivity Create할 때 마다 매번 새로 만들어지는 변수들이므로 SP에서 매번 동기화 필요
             case "y": ifLogged=true; ifFbLogged=true;
-                System.out.println("Main case1");
+                System.out.println("Main case1") ;
                 break;
             case "n" : ifLogged=true; ifFbLogged=false;
                 System.out.println("Main case2");

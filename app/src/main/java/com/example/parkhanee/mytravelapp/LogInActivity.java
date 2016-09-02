@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
-import com.facebook.FacebookSdk;
 
 import org.json.JSONException;
 import org.json.JSONObject;

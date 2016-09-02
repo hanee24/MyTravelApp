@@ -33,9 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SignInActivity extends AppCompatActivity {
-    EditText et_id;
-    EditText et_pwd;
-    EditText et_confirm;
     HashMap<String, String> postDataParams;
     private static final String DEBUG_TAG = "SignInActivity";
 
