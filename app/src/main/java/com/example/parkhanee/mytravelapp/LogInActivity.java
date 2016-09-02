@@ -135,6 +135,7 @@ public class LogInActivity extends AppCompatActivity {
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent aa = new Intent(LogInActivity.this,MainActivity.class);
+                                aa.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(aa);
                                 finish();
                             }

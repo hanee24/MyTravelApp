@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +44,11 @@ public class MainActivity extends AppCompatActivity implements
     Button btn_search ;
     Button btn_folder;
     TextView location;
+
+    //test
+    TextView tv_username;
     TextView tv_login;
+    ImageView iv_icon;
 
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
@@ -73,7 +78,9 @@ public class MainActivity extends AppCompatActivity implements
         btn_search = (Button) findViewById(R.id.button);
         btn_folder = (Button) findViewById(R.id.button2);
         location = (TextView) findViewById(R.id.textView2);
-        tv_login = (TextView) findViewById(R.id.textView18);
+        tv_username = (TextView) findViewById(R.id.tv_test);
+        tv_login = (TextView) findViewById(R.id.tv_test2);
+        iv_icon = (ImageView) findViewById(R.id.icon);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -91,7 +98,10 @@ public class MainActivity extends AppCompatActivity implements
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         System.out.println("Main Resume");
 
+        Intent a = getIntent();
+        System.out.println(a);
         Bundle extras = getIntent().getExtras();
+        System.out.println(extras);
         if (extras!=null){
             Boolean is = extras.getBoolean("newlyLogged",false);
             System.out.println(is);
@@ -119,11 +129,20 @@ public class MainActivity extends AppCompatActivity implements
         //if logged, set login info on textview
         //else, set
         if (ifLogged){ //TODO set ifLogged when just logged in from fb
-            tv_login.setText(getLoginId());
+            tv_login.setText("로그아웃");
+            tv_username.setText(getLoginId());
             System.out.println("Main ifLogged");
+            iv_icon.setVisibility(View.VISIBLE);
+            if (ifFbLogged){
+                iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
+            }else {
+                iv_icon.setImageResource(android.R.drawable.sym_def_app_icon);
+            }
         }else {
+            iv_icon.setVisibility(View.GONE);
             System.out.println("Main ! ifLogged");
-            tv_login.setText("로그인 해주세요");
+            tv_login.setText("로그인");
+            tv_username.setText("My Travel App");
         }
 
         tv_login.setOnClickListener(new View.OnClickListener() {
@@ -132,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements
                 if (ifLogged){ //log out onClick
                     logout();
                     Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
-                    tv_login.setText("로그인 해주세요");
+                    tv_login.setText("로그인");
+                    tv_username.setText("My Travel App");
+                    iv_icon.setVisibility(View.GONE);
                 }else { //log in onClick
                     Intent i = new Intent(MainActivity.this,LogInActivity.class);
                     startActivity(i);

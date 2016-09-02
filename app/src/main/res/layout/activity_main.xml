@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.example.parkhanee.mytravelapp.MainActivity"
     android:weightSum="1"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:visibility="visible">
 
     <TextView
         android:layout_width="wrap_content"
@@ -15,14 +16,32 @@
         android:text="내 위치를 찾는 중입니다.."
         android:id="@+id/textView2"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="15dp"/>
+
+    <ImageView
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:id="@+id/icon"
+        android:layout_gravity="center_horizontal"
+        android:src="@android:drawable/sym_def_app_icon"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="로그인 정보"
-        android:id="@+id/textView18"
+        android:text="My Travel App"
+        android:id="@+id/tv_test"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="로그인"
+        android:id="@+id/tv_test2"
         android:layout_gravity="center_horizontal"/>
 
     <TextView
