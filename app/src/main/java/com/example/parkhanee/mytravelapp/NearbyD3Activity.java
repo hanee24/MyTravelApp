@@ -175,7 +175,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
             case R.id.showMore:
                 SetOverviewDisplay(tvOverview);
-                isShowFull = true; //더보기 눌렀으니까 이제 full overview 보여야지
+                isShowFull = true; //더보기 눌렀으니까 이제 full overview 보여야
                 break;
         }
     }
@@ -196,7 +196,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
         }
     };
-
 
     private class asyncTask extends AsyncTask<Void, JSONObject, Void>{
 

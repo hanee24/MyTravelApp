@@ -1,5 +1,6 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,6 +43,7 @@ public class LogInActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "LogInActivity";
     HashMap<String, String> postDataParams;
     EditText et_id;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class LogInActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(LogInActivity.this);
         setContentView(R.layout.activity_log_in);
 
+        dialog = new ProgressDialog(LogInActivity.this);
         btn_okay = (Button) findViewById(R.id.okay);
         postDataParams = new HashMap<>();
 
@@ -77,6 +80,11 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void myClickHandler(View view) { // check if the network has connected   //TODO : add this to all the activities which need network connection
+        //TODO create progress dialog
+        dialog.setMessage("잠시만 기다려주세요");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
         String stringUrl = "http://hanea8199.vps.phps.kr/login.php";
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -111,6 +119,11 @@ public class LogInActivity extends AppCompatActivity {
                 //resultMsg = result.getString("resultMsg");
             }catch (JSONException e){
                 e.printStackTrace();
+            }
+
+            //TODO close progress dialog
+            if (dialog.isShowing()) {
+                dialog.dismiss();
             }
 
             if (resultCode==00){ //result is Okay

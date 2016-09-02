@@ -41,6 +41,9 @@ public class FbLoginFragment extends Fragment{
     private ProfileTracker profileTracker;
     private AccessTokenTracker tokenTracker;
     LoginButton loginButton;
+    static Profile profile;
+    static Boolean profileHasSet=false;
+    SharedPreferences SP;
 
 
     @Override
@@ -58,9 +61,13 @@ public class FbLoginFragment extends Fragment{
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
                 if (newProfile != null) {
-                    //TODO the user has logged out
+                    //TODO the user has logged out ?????????
+                    profile = newProfile; // what if there is no newProfile but old one
+                    profileHasSet=true;
                 } else {
                     //TODO the user may have logged in or changed some of his profile settings
+                    profile = oldProfile;
+                    profileHasSet=true;
                 }
             }
         };
@@ -68,15 +75,6 @@ public class FbLoginFragment extends Fragment{
         tokenTracker.startTracking();
     }
 
-    public static AccessToken getCurrentAccessToken(){
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        return token;
-    }
-
-    public static Profile getCurrentProfile(){
-        Profile profile = Profile.getCurrentProfile();
-        return profile;
-    }
 
     @Nullable
     @Override
@@ -88,7 +86,7 @@ public class FbLoginFragment extends Fragment{
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        loginButton = (LoginButton) view.findViewById(R.id.login_button); //TODO : put it in onCREATE or OnCreateView?>??
+        loginButton = (LoginButton) view.findViewById(R.id.login_button);
 
         //TODO: get some more permissions from the user
         //loginButton.setReadPermissions("user_friends");
@@ -100,13 +98,33 @@ public class FbLoginFragment extends Fragment{
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) { //when the user newly logged in
-                // App code
-                String string = loginResult.getAccessToken().getUserId();
+                //String string = loginResult.getAccessToken().getUserId();
                 //MainActivity.login(string);
-                MainActivity.ifFbLogged=true;
-                //send boolean to Main activity , to save user info into shared preference in Main Activity
-                Intent a = new Intent(getContext(),MainActivity.class);
-                startActivity(a);
+                //loginResult.getAccessToken();
+
+                while (!profileHasSet){ // wait til profile has set
+                    //TODO : it may causes ANR. make it Asynchronous
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("waiting profile.. ");
+                }
+                System.out.println(profile);
+                String name = profile.getName();
+                System.out.println(name);
+
+
+                //MainActivity.login(name,true);
+                //MainActivity.ifFbLogged=true;
+                Intent a = new Intent(getActivity(),MainActivity.class);
+                a.putExtra("name",name);
+                a.putExtra("newlyLogged",true);
+                a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //TODO : not sure if it's correct to use this flag
+                System.out.println(a);
+                System.out.println(getActivity());
+                getActivity().startActivity(a);
             }
 
             @Override

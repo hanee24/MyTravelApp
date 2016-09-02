@@ -50,12 +50,13 @@ public class MainActivity extends AppCompatActivity implements
     Double lat;
     Double lgt;
 
-    public static Boolean ifLogged=false;
+    public static Boolean ifLogged;
+    public static Boolean ifFbLogged=false;
+
     public static SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
     public static final String userIdKey = "userId";
     public static final String isFBKey = "isFB"; // "y", "n"
-    public static Boolean ifFbLogged=false;
     public static String fbName="";
 
 
@@ -64,13 +65,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_main);
-
-        if (ifFbLogged){
-            //Profile profile = FbLoginFragment.getCurrentProfile();
-            //String name = profile.getName(); //
-            String name = "fb";
-            login(name,true);
-        }
 
         //hide facebook login fragment
         View a = findViewById(R.id.fragment2);
@@ -89,20 +83,57 @@ public class MainActivity extends AppCompatActivity implements
                     .addApi(com.google.android.gms.location.LocationServices.API)
                     .build();
         }
+    }
 
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE) ;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        System.out.println("Main Resume");
+
+       /* Intent i = getIntent(); // test
+        String n = i.getStringExtra("name");
+        System.out.println(n.isEmpty());*/
+
+        Bundle extras = getIntent().getExtras();
+        Intent intent = getIntent();
+        System.out.println(intent);
+        System.out.println(extras);
+        if (extras!=null){
+            Boolean is = extras.getBoolean("newlyLogged",false); //TODO 왜 애가 안오지.
+            System.out.println(is);
+            String name = extras.getString("name");
+            System.out.println(name);
+            System.out.println("Main ifFbLogged");
+            //String name = "fb";
+            login(name,true);
+        }
+
+       if (ifFbLogged){ //when newly logged with FB, get name from profile and save it in SP
+
+        }
+
+        String fb = sharedpreferences.getString(isFBKey,"");
+        switch (fb){ //ifLogged랑 ifFbLogged는 mainActivity Create할 때 마다 매번 새로 만들어지는 변수들이므로 SP에서 매번 동기화 필요
+            case "y": ifLogged=true; ifFbLogged=true;
+                System.out.println("Main case1");
+                break;
+            case "n" : ifLogged=true; ifFbLogged=false;
+                System.out.println("Main case2");
+                break;
+            default: ifLogged= false; ifFbLogged=false;
+                System.out.println("Main case3");
+                break;
+        }
 
         //set Boolean islogged
         //if logged, set login info on textview
         //else, set
-        if (ifLogged){
+        if (ifLogged){ //TODO set ifLogged when just logged in from fb
             tv_login.setText(getLoginId());
-
-            if (getisFB()){ //여기에 안하면 방금로그인했을때면 ifFbLogged == true 라서 여기다 해줘야함
-                Toast.makeText(MainActivity.this, "FB", Toast.LENGTH_SHORT).show();
-                ifFbLogged=true;
-            }
+            System.out.println("Main ifLogged");
         }else {
+            System.out.println("Main ! ifLogged");
             tv_login.setText("로그인 해주세요");
         }
 
@@ -119,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         });
+
 
     }
 
@@ -264,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             try {
-                JSONObject item = results.getJSONObject(0); //NullPointerException
+                JSONObject item = results.getJSONObject(0); //NullPointerException when network doesn't work well?
                 formatted_address = item.getString("formatted_address");
 
             } catch (JSONException e) {
