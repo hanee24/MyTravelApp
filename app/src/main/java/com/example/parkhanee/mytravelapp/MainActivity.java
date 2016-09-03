@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.facebook.FacebookSdk;
 import com.facebook.AccessToken;
 import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -111,7 +112,10 @@ public class MainActivity extends AppCompatActivity implements
 //            System.out.println(name);
 //            System.out.println("Main ifFbLogged");
 //            //String name = "fb";
-            //TODO execute AsyncTask to get Profile
+
+            // execute AsyncTask to get Profile
+            new getProfile().execute(); //TODO 발표할때 이 한줄만 주석처리하면 똑같은가
+
             String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
             login(name,true);
         }
@@ -329,7 +333,67 @@ public class MainActivity extends AppCompatActivity implements
             location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
         }
     }
-    
+
+    private class getProfile extends AsyncTask<Void,Void,String>{
+        myProfile myProfile = new myProfile();
+        ProfileTracker tracker;
+        @Override
+        protected void onPostExecute(String s) {
+            if (tracker!=null){
+                tracker.stopTracking();
+            }
+            login(myProfile.getName(),true);
+            tv_username.setText(myProfile.getName());
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            Profile profile = Profile.getCurrentProfile();
+            if (profile!=null){
+                myProfile.setName(profile.getName());
+            }else {
+
+                tracker = new ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                        if (currentProfile != null) { //the user may have logged in or changed some of his profile settings
+                            myProfile.setName(currentProfile.getName());
+                        } else {
+                            myProfile.setName(oldProfile.getName());
+                        }
+                    }
+                };
+                tracker.startTracking();
+
+                while (!myProfile.profileHasSet()){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("waiting profile.. ");
+                }
+            }
+            return myProfile.getName();
+        }
+
+        private class myProfile {
+            String name;
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public Boolean profileHasSet(){
+                return name!=null;
+            }
+        }
+    }
 
 
 
