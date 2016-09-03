@@ -19,30 +19,39 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="15dp"/>
 
-    <ImageView
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:id="@+id/icon"
-        android:layout_gravity="center_horizontal"
-        android:src="@android:drawable/sym_def_app_icon"
-        android:visibility="gone"/>
-
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="My Travel App"
-        android:id="@+id/tv_test"
         android:layout_gravity="center_horizontal"
-        />
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="로그인"
-        android:id="@+id/tv_test2"
-        android:layout_gravity="center_horizontal"/>
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:id="@+id/icon"
+            android:src="@android:drawable/sym_def_app_icon"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="My Travel App"
+            android:id="@+id/tv_test"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="로그인"
+            android:id="@+id/tv_test2"
+            />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"

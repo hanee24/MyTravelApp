@@ -58,7 +58,7 @@ public class FbLoginFragment extends Fragment{
     private AccessTokenTracker tokenTracker;
     LoginButton loginButton;
     static Profile profile;
-    static Boolean profileHasSet=false;
+    public static Boolean profileHasSet=false;
 
     HashMap<String, String> postDataParams;
     private static final String DEBUG_TAG = "FbLoginFragment";
