@@ -118,16 +118,17 @@ public class FbLoginFragment extends Fragment{
                 //MainActivity.login(string);
                 //loginResult.getAccessToken();
 
-                while (!profileHasSet){ // wait til profile has set
-                    //TODO : it may causes ANR. make it Asynchronous
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("waiting profile.. ");
-                }
-                String name = profile.getName();
+//                while (!profileHasSet){ // wait til profile has set
+//                    //TODO : it may causes ANR. make it Asynchronous
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println("waiting profile.. ");
+//                }
+//                String name = profile.getName();
+                String name = "temp name";
 
                 //send userInfo to server
                 putDataIntoParams(loginResult,profile);
@@ -163,7 +164,8 @@ public class FbLoginFragment extends Fragment{
     public void putDataIntoParams(LoginResult result,Profile profile){
         String user_id = result.getAccessToken().getUserId();
         postDataParams.put("user_id",user_id);
-        String user_name = profile.getName();
+//        String user_name = profile.getName();
+        String user_name = "temp name";
         postDataParams.put("user_name",user_name);
     }
 

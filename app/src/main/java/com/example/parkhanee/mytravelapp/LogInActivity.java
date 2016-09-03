@@ -79,10 +79,7 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void myClickHandler(View view) { // check if the network has connected   //TODO : add this to all the activities which need network connection
-        //TODO create progress dialog
-        dialog.setMessage("잠시만 기다려주세요");
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+
 
         String stringUrl = "http://hanea8199.vps.phps.kr/login.php";
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -97,6 +94,16 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            //create progress dialog
+            dialog.setMessage("잠시만 기다려주세요");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
+        }
+
         @Override
         protected String doInBackground(String... urls) {
             try {
@@ -120,7 +127,7 @@ public class LogInActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            //TODO close progress dialog
+            //close progress dialog
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }

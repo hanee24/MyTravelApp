@@ -102,15 +102,20 @@ public class MainActivity extends AppCompatActivity implements
         System.out.println(a);
         Bundle extras = getIntent().getExtras();
         System.out.println(extras);
-        if (extras!=null){
-            Boolean is = extras.getBoolean("newlyLogged",false);
-            System.out.println(is);
-            String name = extras.getString("name");
-            System.out.println(name);
-            System.out.println("Main ifFbLogged");
-            //String name = "fb";
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken!=null){ //if 페북로그인 되어있으면
+
+//            Boolean is = extras.getBoolean("newlyLogged",false);
+//            System.out.println(is);
+//            String name = extras.getString("name");
+//            System.out.println(name);
+//            System.out.println("Main ifFbLogged");
+//            //String name = "fb";
+            //TODO execute AsyncTask to get Profile
+            String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
             login(name,true);
         }
+
 
         String fb = sharedpreferences.getString(isFBKey,"");
         switch (fb){ //ifLogged랑 ifFbLogged는 mainActivity Create할 때 마다 매번 새로 만들어지는 변수들이므로 SP에서 매번 동기화 필요
@@ -324,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements
             location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
         }
     }
-
+    
 
 
 
