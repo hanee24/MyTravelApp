@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/search"
+           android:title="@string/string_search">
+        <item
+            android:id="@+id/nearby"
+            android:checked="false"
+            android:title="@string/string_nearby"/>
+        <item
+            android:id="@+id/area"
+            android:checked="false"
+            android:title="@string/string_area"/>
+    </group>
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/my"
+        android:title="@string/string_my">
+        <item
+            android:id="@+id/folder"
+            android:checked="false"
+            android:title="@string/string_folder"/>
+        <item
+            android:id="@+id/poi"
+            android:checked="false"
+            android:title="@string/string_poi"/>
+        <item
+            android:id="@+id/map"
+            android:checked="false"
+            android:title="@string/string_map"/>
+    </group>
+
+</menu>
