@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="내 위치를 찾는 중입니다.."
+        android:id="@+id/textView2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="날씨"
+        android:textSize="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textView2"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="관광지 검색"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal"
+        android:textSize="30dp"
+        android:nestedScrollingEnabled="false"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="여행 폴더"
+        android:id="@+id/button2"
+        android:layout_gravity="center_horizontal"
+        android:textSize="30dp"
+        android:layout_marginBottom="40dp"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"/>
+
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.example.parkhanee.mytravelapp.FbLoginFragment"
+        android:id="@+id/fragment_fb"
+        tools:layout="@layout/fragment_fb_login"/>
+</RelativeLayout>

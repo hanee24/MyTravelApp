@@ -11,10 +11,15 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,22 +44,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity {
 
-    Button btn_search ;
-    Button btn_folder;
-    TextView location;
-
-    //test
-    TextView tv_username;
-    TextView tv_login;
-    ImageView iv_icon;
-
-    GoogleApiClient mGoogleApiClient;
-    Location myLocation;
-    Double lat;
-    Double lgt;
 
     public static Boolean ifLogged;
     public static Boolean ifFbLogged=false;
@@ -65,32 +56,79 @@ public class MainActivity extends AppCompatActivity implements
     public static final String isFBKey = "isFB"; // "y", "n"
     public static String fbName="";
 
+    //navigation view
+    private Toolbar toolbar;
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(MainActivity.this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_temp);
 
-        //hide facebook login fragment
-        View a = findViewById(R.id.fragment2);
-        a.setVisibility(View.GONE);
 
-        btn_search = (Button) findViewById(R.id.button);
-        btn_folder = (Button) findViewById(R.id.button2);
-        location = (TextView) findViewById(R.id.textView2);
-        tv_username = (TextView) findViewById(R.id.tv_test);
-        tv_login = (TextView) findViewById(R.id.tv_test2);
-        iv_icon = (ImageView) findViewById(R.id.icon);
 
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(com.google.android.gms.location.LocationServices.API)
-                    .build();
-        }
+        // Initializing Toolbar and setting it as the actionbar
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+
+        //Initializing NavigationView
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                //Checking if the item is in checked state or not, if not make it in checked state
+                if(menuItem.isChecked()) menuItem.setChecked(false);
+                else menuItem.setChecked(true);
+
+                //Closing drawer on item click
+                drawerLayout.closeDrawers();
+
+                switch (menuItem.getItemId()){
+                    case R.id.nearby :
+                        Toast.makeText(getApplicationContext(),"nearby Selected",Toast.LENGTH_SHORT).show();
+                        MainContentFragment fragment = new MainContentFragment();
+                        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.frame,fragment);
+                        fragmentTransaction.commit();
+                        return true;
+                    case R.id.area:
+                        Toast.makeText(MainActivity.this, "area clicked", Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.folder:
+                        Toast.makeText(MainActivity.this, "folder clicked", Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.poi:
+                        return true;
+                    case R.id.map:
+                        return true;
+                    default:
+                        Toast.makeText(MainActivity.this, "something is wrong..", Toast.LENGTH_SHORT).show();
+                        return true;
+                }
+            }
+        });
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.app_name,R.string.string_map){
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                //TODO add code
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                //TODO add code
+            }
+        };
+        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+
+
     }
 
     @Override
@@ -103,22 +141,16 @@ public class MainActivity extends AppCompatActivity implements
         System.out.println(a);
         Bundle extras = getIntent().getExtras();
         System.out.println(extras);
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken!=null){ //if 페북로그인 되어있으면
 
-//            Boolean is = extras.getBoolean("newlyLogged",false);
-//            System.out.println(is);
-//            String name = extras.getString("name");
-//            System.out.println(name);
-//            System.out.println("Main ifFbLogged");
-//            //String name = "fb";
-
-            // execute AsyncTask to get Profile
-            new getProfile().execute(); //TODO 발표할때 이 한줄만 주석처리하면 똑같은가
-
-            String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
-            login(name,true);
-        }
+//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//        if (accessToken!=null){ //if 페북로그인 되어있으면
+//
+//            // execute AsyncTask to get Profile
+//            new getProfile().execute(); //TODO 발표할때 이 한줄만 주석처리하면 똑같은가
+//
+//            String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
+//            login(name,true);
+//        }
 
 
         String fb = sharedpreferences.getString(isFBKey,"");
@@ -137,38 +169,38 @@ public class MainActivity extends AppCompatActivity implements
         //set Boolean islogged
         //if logged, set login info on textview
         //else, set
-        if (ifLogged){ //TODO set ifLogged when just logged in from fb
-            tv_login.setText("로그아웃");
-            tv_username.setText(getLoginId());
-            System.out.println("Main ifLogged");
-            iv_icon.setVisibility(View.VISIBLE);
-            if (ifFbLogged){
-                iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
-            }else {
-                iv_icon.setImageResource(android.R.drawable.sym_def_app_icon);
-            }
-        }else {
-            iv_icon.setVisibility(View.GONE);
-            System.out.println("Main ! ifLogged");
-            tv_login.setText("로그인");
-            tv_username.setText("My Travel App");
-        }
-
-        tv_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ifLogged){ //log out onClick
-                    logout();
-                    Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
-                    tv_login.setText("로그인");
-                    tv_username.setText("My Travel App");
-                    iv_icon.setVisibility(View.GONE);
-                }else { //log in onClick
-                    Intent i = new Intent(MainActivity.this,LogInActivity.class);
-                    startActivity(i);
-                }
-            }
-        });
+//        if (ifLogged){ //TODO set ifLogged when just logged in from fb
+//            tv_login.setText("로그아웃");
+//            tv_username.setText(getLoginId());
+//            System.out.println("Main ifLogged");
+//            iv_icon.setVisibility(View.VISIBLE);
+//            if (ifFbLogged){
+//                iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
+//            }else {
+//                iv_icon.setImageResource(android.R.drawable.sym_def_app_icon);
+//            }
+//        }else {
+//            iv_icon.setVisibility(View.GONE);
+//            System.out.println("Main ! ifLogged");
+//            tv_login.setText("로그인");
+//            tv_username.setText("My Travel App");
+//        }
+//
+//        tv_login.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (ifLogged){ //log out onClick
+//                    logout();
+//                    Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
+//                    tv_login.setText("로그인");
+//                    tv_username.setText("My Travel App");
+//                    iv_icon.setVisibility(View.GONE);
+//                }else { //log in onClick
+//                    Intent i = new Intent(MainActivity.this,LogInActivity.class);
+//                    startActivity(i);
+//                }
+//            }
+//        });
 
 
     }
@@ -208,192 +240,70 @@ public class MainActivity extends AppCompatActivity implements
         ifLogged = false;
     }
 
-    @Override
-    protected void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
 
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
 
-    @Override
-    public void onConnected(@Nullable Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
 
-        lat = myLocation.getLatitude();
-        lgt = myLocation.getLongitude();
-        String Lat = String.valueOf(lat);
-        String Lgt = String.valueOf(lgt);
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lgt+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
-        //String url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=37.4841774,126.9727024&language=ko&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194" ;
-        new getGeoCode().execute(url);
 
-        btn_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this,NearbyD1Activity.class);
-                i.putExtra("lat",lat);
-                i.putExtra("lgt",lgt);
-                startActivity(i);
-            }
-        });
-
-        btn_folder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ifLogged){
-                    //TODO : go to travel folder activity
-                }else {
-                    AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
-                    adb.setTitle("로그인이 필요한 서비스 입니다");
-                    adb.setIcon(android.R.drawable.ic_dialog_alert);
-                    adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent(MainActivity.this,LogInActivity.class);
-                            startActivity(i);
-                        } });
-                    adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        } });
-                    adb.show();
-                }
-
-            }
-        });
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    private class getGeoCode extends AsyncTask<String,Void,String>{
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String strUrl = strings[0];
-
-            JSONArray results=null;
-            String formatted_address=null;
-
-            String buf;
-            String jsonString ="";
-            try {
-                URL url = new URL(strUrl);
-                URLConnection conn = url.openConnection();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
-                while((buf=br.readLine())!=null){
-                    jsonString +=buf;
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // System.out.println("jsonString"+jsonString);
-
-            try {
-                JSONObject object = new JSONObject(jsonString);
-                //JSONObject response = object.getJSONObject("response");
-                results = object.getJSONArray("results");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                JSONObject item = results.getJSONObject(0); //NullPointerException when network doesn't work well?
-                formatted_address = item.getString("formatted_address");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return formatted_address;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            //split "s" , get second, third, forth words
-            String[] str = s.split(" ");
-            String ss = str[1]+" "+str[2]+" "+str[3];
-            location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
-        }
-    }
-
-    private class getProfile extends AsyncTask<Void,Void,String>{
-        myProfile myProfile = new myProfile();
-        ProfileTracker tracker;
-        @Override
-        protected void onPostExecute(String s) {
-            if (tracker!=null){
-                tracker.stopTracking();
-            }
-            login(myProfile.getName(),true);
-            tv_username.setText(myProfile.getName());
-        }
-
-        @Override
-        protected String doInBackground(Void... voids) {
-
-            Profile profile = Profile.getCurrentProfile();
-            if (profile!=null){
-                myProfile.setName(profile.getName());
-            }else {
-
-                tracker = new ProfileTracker() {
-                    @Override
-                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                        if (currentProfile != null) { //the user may have logged in or changed some of his profile settings
-                            myProfile.setName(currentProfile.getName());
-                        } else {
-                            myProfile.setName(oldProfile.getName());
-                        }
-                    }
-                };
-                tracker.startTracking();
-
-                while (!myProfile.profileHasSet()){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("waiting profile.. ");
-                }
-            }
-            return myProfile.getName();
-        }
-
-        private class myProfile {
-            String name;
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public Boolean profileHasSet(){
-                return name!=null;
-            }
-        }
-    }
+//    private class getProfile extends AsyncTask<Void,Void,String>{
+//        myProfile myProfile = new myProfile();
+//        ProfileTracker tracker;
+//        @Override
+//        protected void onPostExecute(String s) {
+//            if (tracker!=null){
+//                tracker.stopTracking();
+//            }
+//            login(myProfile.getName(),true);
+//            tv_username.setText(myProfile.getName());
+//        }
+//
+//        @Override
+//        protected String doInBackground(Void... voids) {
+//
+//            Profile profile = Profile.getCurrentProfile();
+//            if (profile!=null){
+//                myProfile.setName(profile.getName());
+//            }else {
+//
+//                tracker = new ProfileTracker() {
+//                    @Override
+//                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+//                        if (currentProfile != null) { //the user may have logged in or changed some of his profile settings
+//                            myProfile.setName(currentProfile.getName());
+//                        } else {
+//                            myProfile.setName(oldProfile.getName());
+//                        }
+//                    }
+//                };
+//                tracker.startTracking();
+//
+//                while (!myProfile.profileHasSet()){
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println("waiting profile.. ");
+//                }
+//            }
+//            return myProfile.getName();
+//        }
+//
+//        private class myProfile {
+//            String name;
+//
+//            public void setName(String name) {
+//                this.name = name;
+//            }
+//
+//            public String getName() {
+//                return name;
+//            }
+//
+//            public Boolean profileHasSet(){
+//                return name!=null;
+//            }
+//        }
+//    }
 
 
 
