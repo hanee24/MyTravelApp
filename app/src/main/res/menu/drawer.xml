@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/main"
+            android:title="@string/string_main"
+            android:checked="true"/>
+    </group>
+
     <group android:checkableBehavior="single"
-        android:id="@+id/search"
+           android:id="@+id/search"
            android:title="@string/string_search">
         <item
             android:id="@+id/nearby"
@@ -15,8 +23,8 @@
     </group>
 
     <group android:checkableBehavior="single"
-        android:id="@+id/my"
-        android:title="@string/string_my">
+           android:id="@+id/my"
+           android:title="@string/string_my">
         <item
             android:id="@+id/folder"
             android:checked="false"
@@ -30,5 +38,7 @@
             android:checked="false"
             android:title="@string/string_map"/>
     </group>
+
+
 
 </menu>

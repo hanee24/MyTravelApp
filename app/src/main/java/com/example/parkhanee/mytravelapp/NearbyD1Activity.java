@@ -7,11 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class NearbyD1Activity extends AppCompatActivity {
 
@@ -26,7 +21,7 @@ public class NearbyD1Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nearby_d1);
+        setContentView(R.layout.fragment_nearby);
 
         Intent a = getIntent();
         final Double lat = a.getDoubleExtra("lat",0.0);

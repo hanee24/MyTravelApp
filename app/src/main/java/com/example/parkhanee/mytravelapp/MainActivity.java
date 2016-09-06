@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_temp);
 
-
-
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
@@ -87,12 +85,18 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.closeDrawers();
 
                 switch (menuItem.getItemId()){
-                    case R.id.nearby :
-                        Toast.makeText(getApplicationContext(),"nearby Selected",Toast.LENGTH_SHORT).show();
-                        MainContentFragment fragment = new MainContentFragment();
+                    case R.id.main:
+                        MainContentFragment mainFragment = new MainContentFragment();
                         android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.frame,fragment);
-                        fragmentTransaction.commit();
+                        fragmentTransaction.add(R.id.frame,mainFragment)
+                                .commit();
+                        return true;
+                    case R.id.nearby :
+                        NearbyFragment nearbyFragment = new NearbyFragment();
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame,nearbyFragment)
+                                .addToBackStack(null) //is it necessary?
+                                .commit();
                         return true;
                     case R.id.area:
                         Toast.makeText(MainActivity.this, "area clicked", Toast.LENGTH_SHORT).show();

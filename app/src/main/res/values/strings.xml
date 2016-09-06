@@ -12,4 +12,5 @@
     <string name="string_folder">여행 폴더</string>
     <string name="string_poi">찜한 관광지</string>
     <string name="string_map">오프라인 지도</string>
+    <string name="string_main">메인화면</string>
 </resources>
