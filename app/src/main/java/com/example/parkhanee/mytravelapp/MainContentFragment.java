@@ -57,7 +57,6 @@ public class MainContentFragment extends Fragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //TODO check if fragment has been inflated before
         ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_main_content,container,false);
         return v;
     }

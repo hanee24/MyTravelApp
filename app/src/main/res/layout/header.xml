@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+    >
 
 
     <ImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:id="@+id/profile_image"
-        android:paddingTop="16dp"
-        android:src="@drawable/com_facebook_profile_picture_blank_square"/>
+        android:src="@android:drawable/sym_def_app_icon"
+        android:scaleType="fitXY"
+        android:visibility="visible"
+        android:layout_margin="5dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Akash Bangad"
-        android:textSize="14sp"
-        android:textColor="#FFF"
+        android:text="username"
+        android:textSize="15sp"
+        android:textColor="#000000"
         android:textStyle="bold"
         android:gravity="left"
-        android:paddingBottom="4dp"
         android:id="@+id/username"
-        android:layout_above="@+id/email"
-        android:layout_alignLeft="@+id/profile_image"
-        android:layout_alignStart="@+id/profile_image" />
+        android:layout_alignBottom="@+id/profile_image"
+        android:layout_toRightOf="@+id/profile_image"
+        android:layout_toEndOf="@+id/profile_image"
+        android:padding="4dp"
+        android:visibility="visible"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Akash.bangad93@gmail.com"
-        android:id="@+id/email"
-        android:gravity="left"
-        android:layout_marginBottom="8dp"
-        android:textSize="14sp"
-        android:textColor="#fff"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/username"
-        android:layout_alignStart="@+id/username" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="로그인 해 주세요"
+        android:id="@+id/textView18"
+        android:layout_alignTop="@+id/username"
+        android:layout_toRightOf="@+id/username"
+        android:layout_alignBottom="@+id/username"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="13sp"
+        android:layout_marginLeft="5dp"
+        android:paddingTop="5dp"
+        android:visibility="visible"/>
 
 </RelativeLayout>

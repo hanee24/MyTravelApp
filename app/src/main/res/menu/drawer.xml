@@ -14,11 +14,9 @@
            android:title="@string/string_search">
         <item
             android:id="@+id/nearby"
-            android:checked="false"
             android:title="@string/string_nearby"/>
         <item
             android:id="@+id/area"
-            android:checked="false"
             android:title="@string/string_area"/>
     </group>
 
@@ -27,15 +25,12 @@
            android:title="@string/string_my">
         <item
             android:id="@+id/folder"
-            android:checked="false"
             android:title="@string/string_folder"/>
         <item
             android:id="@+id/poi"
-            android:checked="false"
             android:title="@string/string_poi"/>
         <item
             android:id="@+id/map"
-            android:checked="false"
             android:title="@string/string_map"/>
     </group>
 

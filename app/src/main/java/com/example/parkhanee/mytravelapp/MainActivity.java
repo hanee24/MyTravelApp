@@ -1,7 +1,7 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.Manifest;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -61,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
+    TextView tv_login;
+    TextView tv_username;
+    ImageView iv_icon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,46 +79,19 @@ public class MainActivity extends AppCompatActivity {
 
         //Initializing NavigationView
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                //Checking if the item is in checked state or not, if not make it in checked state
-                if(menuItem.isChecked()) menuItem.setChecked(false);
-                else menuItem.setChecked(true);
+        setupDrawerContent(navigationView);
 
-                //Closing drawer on item click
-                drawerLayout.closeDrawers();
 
-                switch (menuItem.getItemId()){
-                    case R.id.main:
-                        MainContentFragment mainFragment = new MainContentFragment();
-                        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.add(R.id.frame,mainFragment)
-                                .commit();
-                        return true;
-                    case R.id.nearby :
-                        NearbyFragment nearbyFragment = new NearbyFragment();
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.frame,nearbyFragment)
-                                .addToBackStack(null) //is it necessary?
-                                .commit();
-                        return true;
-                    case R.id.area:
-                        Toast.makeText(MainActivity.this, "area clicked", Toast.LENGTH_SHORT).show();
-                        return true;
-                    case R.id.folder:
-                        Toast.makeText(MainActivity.this, "folder clicked", Toast.LENGTH_SHORT).show();
-                        return true;
-                    case R.id.poi:
-                        return true;
-                    case R.id.map:
-                        return true;
-                    default:
-                        Toast.makeText(MainActivity.this, "something is wrong..", Toast.LENGTH_SHORT).show();
-                        return true;
-                }
-            }
-        });
+
+        Class fragmentClass = MainContentFragment.class;
+        Fragment fragment=null;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.app_name,R.string.string_map){
@@ -131,31 +109,86 @@ public class MainActivity extends AppCompatActivity {
         };
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-
-
     }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+
+        View headerLayout = navigationView.getHeaderView(0);
+        iv_icon = (ImageView) headerLayout.findViewById(R.id.profile_image);
+        tv_login = (TextView) headerLayout.findViewById(R.id.textView18);
+        tv_username = (TextView) headerLayout.findViewById(R.id.username);
+
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+        Fragment fragment = null;
+        Class fragmentClass;
+        switch(menuItem.getItemId()) {
+            case R.id.main:
+                fragmentClass = MainContentFragment.class;
+                System.out.println("Switch Main");
+                break;
+            case R.id.nearby:
+                fragmentClass = NearbyFragment.class;
+                break;
+//            case R.id.area:
+//                break;
+//            case R.id.folder:
+//                Toast.makeText(MainActivity.this, "folder clicked", Toast.LENGTH_SHORT).show();
+//                break;
+//            case R.id.poi:
+//                break;
+//            case R.id.map:
+//                break;
+            default:
+                fragmentClass = MainContentFragment.class;
+                System.out.println("System default");
+        }
+
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+            System.out.println("new instance");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+
+        // Highlight the selected item has been done by NavigationView
+        //menuItem.setChecked(true);
+        // Set action bar title
+        setTitle(menuItem.getTitle());
+        // Close the navigation drawer
+        drawerLayout.closeDrawers();
+    }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        System.out.println("Main Resume");
 
-        Intent a = getIntent();
-        System.out.println(a);
-        Bundle extras = getIntent().getExtras();
-        System.out.println(extras);
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken!=null){ //if 페북로그인 되어있으면
 
-//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//        if (accessToken!=null){ //if 페북로그인 되어있으면
-//
-//            // execute AsyncTask to get Profile
-//            new getProfile().execute(); //TODO 발표할때 이 한줄만 주석처리하면 똑같은가
-//
-//            String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
-//            login(name,true);
-//        }
+            // execute AsyncTask to get Profile
+            new getProfile().execute(); //TODO 발표할때 이 한줄만 주석처리하면 똑같은가
 
+            String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
+            login(name,true);
+        }
 
         String fb = sharedpreferences.getString(isFBKey,"");
         switch (fb){ //ifLogged랑 ifFbLogged는 mainActivity Create할 때 마다 매번 새로 만들어지는 변수들이므로 SP에서 매번 동기화 필요
@@ -173,38 +206,41 @@ public class MainActivity extends AppCompatActivity {
         //set Boolean islogged
         //if logged, set login info on textview
         //else, set
-//        if (ifLogged){ //TODO set ifLogged when just logged in from fb
-//            tv_login.setText("로그아웃");
-//            tv_username.setText(getLoginId());
-//            System.out.println("Main ifLogged");
-//            iv_icon.setVisibility(View.VISIBLE);
-//            if (ifFbLogged){
-//                iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
-//            }else {
-//                iv_icon.setImageResource(android.R.drawable.sym_def_app_icon);
-//            }
-//        }else {
-//            iv_icon.setVisibility(View.GONE);
-//            System.out.println("Main ! ifLogged");
-//            tv_login.setText("로그인");
-//            tv_username.setText("My Travel App");
-//        }
-//
-//        tv_login.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (ifLogged){ //log out onClick
-//                    logout();
-//                    Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
-//                    tv_login.setText("로그인");
-//                    tv_username.setText("My Travel App");
-//                    iv_icon.setVisibility(View.GONE);
-//                }else { //log in onClick
-//                    Intent i = new Intent(MainActivity.this,LogInActivity.class);
-//                    startActivity(i);
-//                }
-//            }
-//        });
+        if (ifLogged){ //TODO set ifLogged when just logged in from fb
+
+            tv_login.setText("로그아웃");
+            tv_username.setText(getLoginId());
+            System.out.println("Main ifLogged");
+            iv_icon.setVisibility(View.VISIBLE);
+            tv_username.setVisibility(View.VISIBLE);
+            if (ifFbLogged){
+                iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
+            }else {
+                iv_icon.setImageResource(android.R.drawable.sym_def_app_icon);
+            }
+        }else {
+            tv_username.setVisibility(View.GONE);
+            iv_icon.setVisibility(View.GONE);
+            System.out.println("Main ! ifLogged");
+            tv_login.setText("로그인 해 주세요");
+            tv_username.setText("My Travel App");
+        }
+
+        tv_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ifLogged){ //log out onClick
+                    logout();
+                    Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
+                    tv_login.setText("로그인 해 주세요");
+                    tv_username.setVisibility(View.GONE);
+                    iv_icon.setVisibility(View.GONE);
+                }else { //log in onClick
+                    Intent i = new Intent(MainActivity.this,LogInActivity.class);
+                    startActivity(i);
+                }
+            }
+        });
 
 
     }
@@ -248,66 +284,66 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-//    private class getProfile extends AsyncTask<Void,Void,String>{
-//        myProfile myProfile = new myProfile();
-//        ProfileTracker tracker;
-//        @Override
-//        protected void onPostExecute(String s) {
-//            if (tracker!=null){
-//                tracker.stopTracking();
-//            }
-//            login(myProfile.getName(),true);
-//            tv_username.setText(myProfile.getName());
-//        }
-//
-//        @Override
-//        protected String doInBackground(Void... voids) {
-//
-//            Profile profile = Profile.getCurrentProfile();
-//            if (profile!=null){
-//                myProfile.setName(profile.getName());
-//            }else {
-//
-//                tracker = new ProfileTracker() {
-//                    @Override
-//                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-//                        if (currentProfile != null) { //the user may have logged in or changed some of his profile settings
-//                            myProfile.setName(currentProfile.getName());
-//                        } else {
-//                            myProfile.setName(oldProfile.getName());
-//                        }
-//                    }
-//                };
-//                tracker.startTracking();
-//
-//                while (!myProfile.profileHasSet()){
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    System.out.println("waiting profile.. ");
-//                }
-//            }
-//            return myProfile.getName();
-//        }
-//
-//        private class myProfile {
-//            String name;
-//
-//            public void setName(String name) {
-//                this.name = name;
-//            }
-//
-//            public String getName() {
-//                return name;
-//            }
-//
-//            public Boolean profileHasSet(){
-//                return name!=null;
-//            }
-//        }
-//    }
+    private class getProfile extends AsyncTask<Void,Void,String>{
+        myProfile myProfile = new myProfile();
+        ProfileTracker tracker;
+        @Override
+        protected void onPostExecute(String s) {
+            if (tracker!=null){
+                tracker.stopTracking();
+            }
+            login(myProfile.getName(),true);
+            tv_username.setText(myProfile.getName());
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            Profile profile = Profile.getCurrentProfile();
+            if (profile!=null){
+                myProfile.setName(profile.getName());
+            }else {
+
+                tracker = new ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                        if (currentProfile != null) { //the user may have logged in or changed some of his profile settings
+                            myProfile.setName(currentProfile.getName());
+                        } else {
+                            myProfile.setName(oldProfile.getName());
+                        }
+                    }
+                };
+                tracker.startTracking();
+
+                while (!myProfile.profileHasSet()){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("waiting profile.. ");
+                }
+            }
+            return myProfile.getName();
+        }
+
+        private class myProfile {
+            String name;
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public Boolean profileHasSet(){
+                return name!=null;
+            }
+        }
+    }
 
 
 
