@@ -24,8 +24,6 @@
         android:id="@+id/spinner"
         android:layout_gravity="center_horizontal"
         android:spinnerMode="dropdown"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginBottom="40dp"
         android:entries="@array/distance_array_list"/>
 
@@ -35,8 +33,6 @@
         android:id="@+id/spinner2"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:entries="@array/cat_array_list"
         />
 

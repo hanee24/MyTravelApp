@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     //navigation view
     private Toolbar toolbar;
-    private NavigationView navigationView;
+    public static NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
     TextView tv_login;
@@ -79,10 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Initializing NavigationView
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        setupDrawerContent(navigationView);
 
-
-
+        //Init main fragment as default
         Class fragmentClass = MainContentFragment.class;
         Fragment fragment=null;
         try {
@@ -92,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+
+        setupDrawerContent(navigationView);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.app_name,R.string.string_map){
@@ -113,15 +113,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupDrawerContent(NavigationView navigationView) {
 
+        // init Views in Header.xml
         View headerLayout = navigationView.getHeaderView(0);
         iv_icon = (ImageView) headerLayout.findViewById(R.id.profile_image);
         tv_login = (TextView) headerLayout.findViewById(R.id.textView18);
         tv_username = (TextView) headerLayout.findViewById(R.id.username);
 
+        // init button onclick in MainContentFragment.xml
+
+
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        if (menuItem.getItemId()==R.id.folder){
+                            if (!ifLogged){
+                                AlertDialog.Builder adb = new AlertDialog.Builder(MainActivity.this);
+                                adb.setTitle("로그인이 필요한 서비스 입니다");
+                                adb.setIcon(android.R.drawable.ic_dialog_alert);
+                                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent i = new Intent(MainActivity.this,LogInActivity.class);
+                                        startActivity(i);
+                                    } });
+                                adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    } });
+                                adb.show();
+                                return false;
+                            }
+                        }
                         selectDrawerItem(menuItem);
                         return true;
                     }
@@ -132,31 +154,45 @@ public class MainActivity extends AppCompatActivity {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
+
+        Double lat=0.0;
+        Double lng=0.0; // location data appending to nearbyFragment
         switch(menuItem.getItemId()) {
             case R.id.main:
                 fragmentClass = MainContentFragment.class;
-                System.out.println("Switch Main");
                 break;
             case R.id.nearby:
                 fragmentClass = NearbyFragment.class;
+                //get location data from MainContentFragment
+                // in order to pass the data to nearbyFragment
+                lat = MainContentFragment.lat;
+                lng = MainContentFragment.lng;
                 break;
-//            case R.id.area:
-//                break;
-//            case R.id.folder:
-//                Toast.makeText(MainActivity.this, "folder clicked", Toast.LENGTH_SHORT).show();
-//                break;
+            case R.id.area:
+                fragmentClass = AreaFragment.class;
+                break;
+            case R.id.folder:
+                fragmentClass = FolderFragment.class;
+                break;
 //            case R.id.poi:
 //                break;
 //            case R.id.map:
 //                break;
             default:
                 fragmentClass = MainContentFragment.class;
-                System.out.println("System default");
+                System.out.println("selectDrawerItem default ?");
         }
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
             System.out.println("new instance");
+            if (lat!=0.0){ //pass location data to nearbyFragment
+                System.out.println("set location data as arguments");
+                Bundle bundle = new Bundle();
+                bundle.putDouble("lat", lat);
+                bundle.putDouble("lng",lng);
+                fragment.setArguments(bundle);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -183,8 +219,8 @@ public class MainActivity extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken!=null){ //if 페북로그인 되어있으면
 
-            // execute AsyncTask to get Profile
-            new getProfile().execute(); //TODO 발표할때 이 한줄만 주석처리하면 똑같은가
+            // execute AsyncTask to get Profile asynchronously
+            new getProfile().execute();
 
             String name = accessToken.getUserId(); // set temp name while waiting for profile to come ?
             login(name,true);

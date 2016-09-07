@@ -42,7 +42,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
     Button btnLoadMore;
 
     Double lat;
-    Double lgt;
+    Double lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
         cat = intent.getIntExtra("cat", -1);
         strRadius = intent.getStringExtra("strRadius");
         strCat = intent.getStringExtra("strCat");
-        lgt = intent.getDoubleExtra("lgt",0.0);
+        lng = intent.getDoubleExtra("lng",0.0);
         lat = intent.getDoubleExtra("lat",0.0);
 
 
@@ -90,7 +90,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
                 i.putExtra("radius", radius);
                 i.putExtra("cat", cat);
                 i.putExtra("lat",lat);  // my location
-                i.putExtra("lgt",lgt);
+                i.putExtra("lng",lng);
                 startActivity(i);
             }
         });
@@ -144,9 +144,9 @@ public class NearbyD2Activity extends AppCompatActivity  {
 
                 try {
                     if (cat==-1){
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + lgt + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }else{
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + lgt + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                     }
 
                     in = new BufferedReader(

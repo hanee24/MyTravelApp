@@ -114,31 +114,28 @@ public class FbLoginFragment extends Fragment{
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) { //when the user newly logged in
-                //String string = loginResult.getAccessToken().getUserId();
-                //MainActivity.login(string);
-                //loginResult.getAccessToken();
 
-//                while (!profileHasSet){ // wait til profile has set
-//                    //TODO : it may causes ANR. make it Asynchronous
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    System.out.println("waiting profile.. ");
-//                }
-//                String name = profile.getName();
-                String name = "temp name";
+                final String name = "temp name"; // TODO: 2016. 9. 7. not necessary?
 
                 //send userInfo to server
                 putDataIntoParams(loginResult,profile);
                 myClickHandler();
 
-                Intent a = new Intent(getActivity(),MainActivity.class);
-                a.putExtra("name",name);
-                a.putExtra("newlyLogged",true);
-                a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //TODO : not sure if it's correct to use this flag
-                startActivity(a);
+                //TODO set a dialog which informs that the user has just logged in.
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage("로그인 되었습니다")
+                        .setCancelable(false)
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent a = new Intent(getActivity(),MainActivity.class);
+//                                a.putExtra("name",name);
+//                                a.putExtra("newlyLogged",true);
+                                a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //TODO : not sure if it's correct to use this flag
+                                startActivity(a);
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
             }
 
             @Override

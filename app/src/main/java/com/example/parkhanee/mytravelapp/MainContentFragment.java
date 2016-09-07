@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.Layout;
 import android.view.LayoutInflater;
@@ -38,19 +39,14 @@ import java.net.URLConnection;
 public class MainContentFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    Button btn_search ;
+    Button btn_nearby ;
     Button btn_folder;
     TextView location;
 
-    //test
-    TextView tv_username;
-    TextView tv_login;
-    ImageView iv_icon;
-
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
-    Double lat;
-    Double lgt;
+    public static Double lat;
+    public static Double lng;
 
     View a;
 
@@ -66,7 +62,7 @@ public class MainContentFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         a = view.findViewById(R.id.fragment_fb);
-        btn_search = (Button)view.findViewById(R.id.button);
+        btn_nearby = (Button)view.findViewById(R.id.button);
         btn_folder = (Button) view.findViewById(R.id.button2);
         location = (TextView) view.findViewById(R.id.textView2);
 
@@ -77,10 +73,6 @@ public class MainContentFragment extends Fragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        tv_username = (TextView) findViewById(R.id.tv_test);
-//        tv_login = (TextView) findViewById(R.id.tv_test2);
-//        iv_icon = (ImageView) findViewById(R.id.icon);
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -115,28 +107,58 @@ public class MainContentFragment extends Fragment implements
                 mGoogleApiClient);
 
         lat = myLocation.getLatitude();
-        lgt = myLocation.getLongitude();
+        lng = myLocation.getLongitude();
         String Lat = String.valueOf(lat);
-        String Lgt = String.valueOf(lgt);
+        String Lgt = String.valueOf(lng);
         String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lgt+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
-        //String url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=37.4841774,126.9727024&language=ko&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194" ;
         new getGeoCode().execute(url);
 
-        btn_search.setOnClickListener(new View.OnClickListener() {
+        btn_nearby.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getContext(),NearbyD1Activity.class);
-                i.putExtra("lat",lat);
-                i.putExtra("lgt",lgt);
-                startActivity(i);
+                //open nearbyFragment with extras (lat, lgt)
+                Class fragmentClass = NearbyFragment.class;
+                Fragment fragment=null;
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble("lat", lat);
+                    bundle.putDouble("lng",lng);
+                    fragment.setArguments(bundle);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+                //set action bar title
+                getActivity().setTitle(R.string.string_nearby);
+                //set navigation view item checked
+                MainActivity.navigationView.setCheckedItem(R.id.nearby);
             }
         });
 
         btn_folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (false){ //TODO ifLogged
-                    //TODO : go to travel folder activity
+                if (MainActivity.ifLogged){ //TODO check ifLogged
+                    //go to folderFragment if user has been logged in
+                    Class fragmentClass = FolderFragment.class;
+                    Fragment fragment=null;
+                    try {
+                        fragment = (Fragment) fragmentClass.newInstance();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putDouble("lat", lat);
+//                        bundle.putDouble("lng",lng);
+//                        fragment.setArguments(bundle);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+                    //set action bar title
+                    getActivity().setTitle(R.string.string_folder);
+                    //set navigation view item checked
+                    MainActivity.navigationView.setCheckedItem(R.id.folder);
                 }else {
                     AlertDialog.Builder adb = new AlertDialog.Builder(getContext());
                     adb.setTitle("로그인이 필요한 서비스 입니다");
