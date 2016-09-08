@@ -1,5 +1,6 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,10 @@ public class FolderFragment extends Fragment{
     String postData;
     String DEBUG_TAG="folderFragment";
 
+    private ListView listView;
+    private FolderListAdapter myAdapter;
+    ProgressDialog dialog;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,6 +57,11 @@ public class FolderFragment extends Fragment{
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        myAdapter = new FolderListAdapter(getActivity());
+        listView = (ListView) view.findViewById(R.id.listView2);
+        listView.setAdapter(myAdapter);
+        dialog = new ProgressDialog(getContext());
+
         //fetch data to make folder list at first
         userId = MainActivity.getLoginId();
         postData = "user_id="+userId;
@@ -84,6 +95,13 @@ public class FolderFragment extends Fragment{
 
 
     private class FetchData extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage("데이터를 가져오는 중입니다");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        }
 
         @Override
         protected String doInBackground(String... strings) {
@@ -152,6 +170,7 @@ public class FolderFragment extends Fragment{
             ArrayList<String> folderArrayList = new ArrayList<>();
             ArrayList<String> descArrayList = new ArrayList<>();
 
+
             try{
                 JSONObject result = new JSONObject(s);
                 JSONObject header = result.getJSONObject("header");
@@ -164,31 +183,40 @@ public class FolderFragment extends Fragment{
                         JSONObject folders=body.getJSONObject("folders");
                         folderArrayList.add(0, folders.getString("folder_name"));
                         descArrayList.add(0,folders.getString("description"));
+
+                        Folder folderItem = new Folder(folders.getString("folder_name"),folders.getString("description"));
+                        myAdapter.clearItem();// to avoid duplicated data shown when refresh
+                        myAdapter.addItem(0,folderItem);
                     }else if (totalCount>1){
                         JSONArray folders = body.getJSONArray("folders");
+                        myAdapter.clearItem(); // to avoid duplicated data shown when refresh
                         for (int i=0; i<totalCount;i++){
                             JSONObject folder = folders.getJSONObject(i);
                             folderArrayList.add(i,folder.getString("folder_name"));
                             descArrayList.add(i,folder.getString("description"));
+
+                            Folder folderItem = new Folder(folder.getString("folder_name"),folder.getString("description"));
+                            myAdapter.addItem(i,folderItem);
                         }
                     }
                 }// result if ok
-
-                for (int k=0;k<totalCount;k++){
-                    System.out.println(folderArrayList.get(k));
-                    System.out.println(descArrayList.get(k));
-                }
-
-
-                //resultCode = result.getInt("resultCode");
-                //resultMsg = result.getString("resultMsg");
                 resultMsg = result.toString();
             }catch (JSONException e){
                 e.printStackTrace();
             }
-
+            
+            for (int k=0;k<totalCount;k++){
+                System.out.println(folderArrayList.get(k));
+                System.out.println(descArrayList.get(k));
+            }
+            //resultCode = result.getInt("resultCode");
+            //resultMsg = result.getString("resultMsg");
             System.out.println(resultMsg);
 
+            myAdapter.notifyDataSetChanged();
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
         }
     }
 
