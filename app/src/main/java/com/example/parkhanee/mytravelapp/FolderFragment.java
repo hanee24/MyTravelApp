@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +31,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by parkhanee on 2016. 9. 6..
@@ -146,8 +148,38 @@ public class FolderFragment extends Fragment{
             int resultCode=99;
             String resultMsg="";
             String msg;
+            int totalCount=0;
+            ArrayList<String> folderArrayList = new ArrayList<>();
+            ArrayList<String> descArrayList = new ArrayList<>();
+
             try{
                 JSONObject result = new JSONObject(s);
+                JSONObject header = result.getJSONObject("header");
+                resultCode = header.getInt("resultCode");
+                resultMsg = header.getString("resultMsg");
+                if (resultCode==00){
+                    JSONObject body = result.getJSONObject("body");
+                    totalCount = body.getInt("totalCount");
+                    if (totalCount==1){
+                        JSONObject folders=body.getJSONObject("folders");
+                        folderArrayList.add(0, folders.getString("folder_name"));
+                        descArrayList.add(0,folders.getString("description"));
+                    }else if (totalCount>1){
+                        JSONArray folders = body.getJSONArray("folders");
+                        for (int i=0; i<totalCount;i++){
+                            JSONObject folder = folders.getJSONObject(i);
+                            folderArrayList.add(i,folder.getString("folder_name"));
+                            descArrayList.add(i,folder.getString("description"));
+                        }
+                    }
+                }// result if ok
+
+                for (int k=0;k<totalCount;k++){
+                    System.out.println(folderArrayList.get(k));
+                    System.out.println(descArrayList.get(k));
+                }
+
+
                 //resultCode = result.getInt("resultCode");
                 //resultMsg = result.getString("resultMsg");
                 resultMsg = result.toString();
