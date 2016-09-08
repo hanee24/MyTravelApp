@@ -102,7 +102,7 @@ public class SignInActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            if (resultCode==00){ //result is Okay
+            if (resultCode==00){    //result is Okay
                 msg = "가입되었습니다. 로그인 해주세요";
                 AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
                 builder.setMessage(msg)
@@ -193,6 +193,8 @@ public class SignInActivity extends AppCompatActivity {
                 result.append("=");
                 result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
             }
+
+            System.out.println(result.toString());
 
             return result.toString();
         }

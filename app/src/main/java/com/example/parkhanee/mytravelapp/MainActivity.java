@@ -1,18 +1,12 @@
 package com.example.parkhanee.mytravelapp;
 
-import android.Manifest;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,8 +27,6 @@ import com.facebook.AccessToken;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String MyPREFERENCES = "MyPrefs" ;
     public static final String userIdKey = "userId";
     public static final String isFBKey = "isFB"; // "y", "n"
-    public static String fbName="";
 
     //navigation view
     private Toolbar toolbar;
@@ -172,8 +163,10 @@ public class MainActivity extends AppCompatActivity {
                 fragmentClass = AreaFragment.class;
                 break;
             case R.id.folder:
+                // TODO: 2016. 9. 8.  folderlist_process php 파일 실행시키고 그 데이터 받아와서 리스트뷰 통해서 뿌려주기
                 fragmentClass = FolderFragment.class;
                 break;
+            // TODO: 2016. 9. 8. create poi, map fragment
 //            case R.id.poi:
 //                break;
 //            case R.id.map:
@@ -185,9 +178,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
-            System.out.println("new instance");
-            if (lat!=0.0){ //pass location data to nearbyFragment
-                System.out.println("set location data as arguments");
+            if (lat!=0.0){
+                //pass location data to nearbyFragment
                 Bundle bundle = new Bundle();
                 bundle.putDouble("lat", lat);
                 bundle.putDouble("lng",lng);
