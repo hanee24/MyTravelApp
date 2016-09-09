@@ -13,12 +13,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -142,7 +140,7 @@ public class MainContentFragment extends Fragment implements
             public void onClick(View view) {
                 if (MainActivity.ifLogged){ //TODO check ifLogged
                     //go to folderFragment if user has been logged in
-                    Class fragmentClass = FolderFragment.class;
+                    Class fragmentClass = FolderListFragment.class;
                     Fragment fragment=null;
                     try {
                         fragment = (Fragment) fragmentClass.newInstance();

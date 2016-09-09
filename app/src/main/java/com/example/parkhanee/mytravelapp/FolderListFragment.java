@@ -2,15 +2,12 @@ package com.example.parkhanee.mytravelapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,12 +30,11 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * Created by parkhanee on 2016. 9. 6..
  */
-public class FolderFragment extends Fragment{
+public class FolderListFragment extends Fragment{
     TextView refresh;
     String userId;
     String postData;
@@ -51,7 +47,7 @@ public class FolderFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_folder,container,false);
+        View v = inflater.inflate(R.layout.fragment_folder_list,container,false);
         return v;
     }
 
@@ -167,56 +163,49 @@ public class FolderFragment extends Fragment{
             String resultMsg="";
             String msg;
             int totalCount=0;
-            ArrayList<String> folderArrayList = new ArrayList<>();
-            ArrayList<String> descArrayList = new ArrayList<>();
-
 
             try{
                 JSONObject result = new JSONObject(s);
                 JSONObject header = result.getJSONObject("header");
                 resultCode = header.getInt("resultCode");
                 resultMsg = header.getString("resultMsg");
-                if (resultCode==00){
+                if (resultCode==00) {
                     JSONObject body = result.getJSONObject("body");
                     totalCount = body.getInt("totalCount");
-                    if (totalCount==1){
-                        JSONObject folders=body.getJSONObject("folders");
-                        folderArrayList.add(0, folders.getString("folder_name"));
-                        descArrayList.add(0,folders.getString("description"));
-
-                        Folder folderItem = new Folder(folders.getString("folder_name"),folders.getString("description"));
+                    if (totalCount == 1) {
+                        JSONObject folder = body.getJSONObject("folders");
+                        Folder folderItem = getFolderInfo(folder);
                         myAdapter.clearItem();// to avoid duplicated data shown when refresh
-                        myAdapter.addItem(0,folderItem);
-                    }else if (totalCount>1){
+                        myAdapter.addItem(0, folderItem);
+                    } else if (totalCount > 1) {
                         JSONArray folders = body.getJSONArray("folders");
                         myAdapter.clearItem(); // to avoid duplicated data shown when refresh
-                        for (int i=0; i<totalCount;i++){
+                        for (int i = 0; i < totalCount; i++) {
                             JSONObject folder = folders.getJSONObject(i);
-                            folderArrayList.add(i,folder.getString("folder_name"));
-                            descArrayList.add(i,folder.getString("description"));
-
-                            Folder folderItem = new Folder(folder.getString("folder_name"),folder.getString("description"));
-                            myAdapter.addItem(i,folderItem);
+                            Folder folderItem = getFolderInfo(folder);
+                            myAdapter.addItem(i, folderItem);
                         }
                     }
-                }// result if ok
+                }// result is ok
                 resultMsg = result.toString();
             }catch (JSONException e){
                 e.printStackTrace();
             }
-            
-            for (int k=0;k<totalCount;k++){
-                System.out.println(folderArrayList.get(k));
-                System.out.println(descArrayList.get(k));
-            }
-            //resultCode = result.getInt("resultCode");
-            //resultMsg = result.getString("resultMsg");
             System.out.println(resultMsg);
 
             myAdapter.notifyDataSetChanged();
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+        }
+
+        public Folder getFolderInfo(JSONObject folder) throws JSONException {
+            String name = folder.getString("folder_name");
+            String desc  =  folder.getString("description");
+            String start = folder.getString("date_start").substring(0,10);
+            String end = folder.getString("date_end").substring(0,10);
+            Folder folderItem = new Folder(name,desc,start,end);
+            return folderItem;
         }
     }
 

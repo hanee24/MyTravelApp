@@ -55,19 +55,25 @@ public class FolderListAdapter extends BaseAdapter{
         if (v == null) {
             holder = new ViewHolder();
             v = inflater.inflate(R.layout.listview_folderlist, null);
-
             holder.tvName = (TextView) v.findViewById(R.id.folder_name);
             holder.tvDesc = (TextView) v.findViewById(R.id.folder_desc);
+            holder.tvDate = (TextView) v.findViewById(R.id.textView19);
             v.setTag(holder);
 
         } else {
             holder = (ViewHolder) v.getTag(); // we call the view created before to not create a view in each time
         }
         if (folderArrayList.size()>0){
-            holder.tvName.setText(folderArrayList.get(position).getName());
-            holder.tvDesc.setText(folderArrayList.get(position).getDesc());
+            Folder f = folderArrayList.get(position);
+            holder.tvName.setText(f.getName());
+            holder.tvDesc.setText(f.getDesc());
+            String start = f.getDate_start();
+            String end = f.getDate_end();
+            String str = start+" ~ "+end;
+            holder.tvDate.setText(str);
         }else{
-          // 아직 생성한 여행폴더가 없습니다 문구
+            // TODO: 2016. 9. 9. 아직 생성한 여행폴더가 없습니다 문구
+            //근데 그 문구르 ㄹ여기다 넣는게 아닌거같은데. 이건 아이템 하나마다 한번씩 다 지나가니까? 근데 아이템이 없으니까 한번만 지나가기때매 상관없나?? 안지나가나?
         }
         return v;
     }
@@ -75,6 +81,7 @@ public class FolderListAdapter extends BaseAdapter{
     private static class ViewHolder{
         TextView tvName = null;
         TextView tvDesc = null;
+        TextView tvDate = null;
     }
 
 

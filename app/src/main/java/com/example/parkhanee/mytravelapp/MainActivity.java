@@ -16,8 +16,6 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,15 +25,6 @@ import com.facebook.AccessToken;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -164,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.folder:
                 // TODO: 2016. 9. 8.  folderlist_process php 파일 실행시키고 그 데이터 받아와서 리스트뷰 통해서 뿌려주기
-                fragmentClass = FolderFragment.class;
+                fragmentClass = FolderListFragment.class;
                 break;
             // TODO: 2016. 9. 8. create poi, map fragment
 //            case R.id.poi:
