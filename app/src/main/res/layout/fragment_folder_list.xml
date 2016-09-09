@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_alignParentStart="false"
-        android:layout_marginBottom="-250dp">
+        android:visibility="gone">
         <include
             android:id="@+id/include"
             layout="@layout/fragment_new_folder"/>
@@ -26,7 +26,9 @@
             android:id="@+id/button8"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_margin="20dp"/>
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:onClick="mOnClick"/>
 
         <ListView
             android:layout_width="wrap_content"
@@ -34,16 +36,16 @@
             android:id="@+id/listView2"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/button8"/>
+            android:layout_below="@+id/refresh"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="새로고침"
-            android:id="@+id/textView25"
-            android:layout_above="@+id/listView2"
+            android:id="@+id/refresh"
             android:layout_alignRight="@+id/listView2"
-            android:layout_alignEnd="@+id/listView2"/>
+            android:layout_alignEnd="@+id/listView2"
+            android:layout_below="@+id/button8"/>
     </RelativeLayout>
 </RelativeLayout>

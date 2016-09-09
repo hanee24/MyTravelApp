@@ -12,6 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,11 +47,15 @@ public class FolderListFragment extends Fragment{
     private ListView listView;
     private FolderListAdapter myAdapter;
     ProgressDialog dialog;
+    public static Boolean isHidden;
+    Button btn_new;
+     // tells if the drop-down "new folder" fragment is hidden // TODO: 2016. 9. 9. is it correct to set true here ?
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_folder_list,container,false);
+        isHidden = true;
         return v;
     }
 
@@ -73,6 +81,35 @@ public class FolderListFragment extends Fragment{
                 postData = "user_id="+userId;
                 myClickHandler();
             }
+        });
+
+        //set onClickListener on the "create new folder" button
+        btn_new = (Button) view.findViewById(R.id.button8);
+        System.out.println(btn_new);
+        final View frame =  view.findViewById(R.id.frame1);
+        System.out.println(frame);
+        btn_new.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ExpandCollapseAnimation animation = null;
+                if(isHidden) { //닫혀있는거 열기
+                    animation = new ExpandCollapseAnimation(frame, 1000, 1);
+                    isHidden = false;
+                    btn_new.setText("저장");
+                } else { //열린거 닫기
+                    animation = new ExpandCollapseAnimation(frame, 1000, 0);
+                    isHidden = true;
+                    btn_new.setText("새로운 폴더 만들기");
+
+                    // TODO: 2016. 9. 9. Do refresh only when new information is being sent to server
+                    //fetch data to REFRESH folder list
+                    userId = MainActivity.getLoginId();
+                    postData = "user_id="+userId;
+                    myClickHandler();
+                }
+                frame.startAnimation(animation);
+
+            } //onclick
         });
     }
 
