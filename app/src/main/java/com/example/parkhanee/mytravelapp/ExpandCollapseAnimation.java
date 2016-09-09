@@ -9,7 +9,7 @@ import android.view.animation.Transformation;
 
 /**
  * Class for handling collapse and expand animations.
- * @author Esben Gaarsmand
+ * @author Esben Gaarsmand ^_^
  *
  */
 public class ExpandCollapseAnimation extends Animation {

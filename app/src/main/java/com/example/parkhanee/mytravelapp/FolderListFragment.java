@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,7 @@ import java.net.URL;
 /**
  * Created by parkhanee on 2016. 9. 6..
  */
-public class FolderListFragment extends Fragment{
+public class FolderListFragment extends Fragment {
     TextView refresh;
     String userId;
     String postData;
@@ -47,9 +48,9 @@ public class FolderListFragment extends Fragment{
     private ListView listView;
     private FolderListAdapter myAdapter;
     ProgressDialog dialog;
-    public static Boolean isHidden;
+    public static Boolean isHidden;// tells if the drop-down "newFolder" fragment is hidden
     Button btn_new;
-     // tells if the drop-down "new folder" fragment is hidden // TODO: 2016. 9. 9. is it correct to set true here ?
+
 
     @Nullable
     @Override
@@ -83,21 +84,32 @@ public class FolderListFragment extends Fragment{
             }
         });
 
-        //set onClickListener on the "create new folder" button
+
         btn_new = (Button) view.findViewById(R.id.button8);
         System.out.println(btn_new);
         final View frame =  view.findViewById(R.id.frame1);
-        System.out.println(frame);
-        btn_new.setOnClickListener(new View.OnClickListener() {
+
+        //set fragment
+        Class fragmentClass = NewFolderFragment.class;
+        Fragment fragment=null;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.frame1, fragment).commit();
+
+        btn_new.setOnClickListener(new View.OnClickListener() { //새로운 폴더 만들기 button onclick
             @Override
             public void onClick(View view) {
                 ExpandCollapseAnimation animation = null;
                 if(isHidden) { //닫혀있는거 열기
-                    animation = new ExpandCollapseAnimation(frame, 1000, 1);
+                    animation = new ExpandCollapseAnimation(frame, 700, 0);
                     isHidden = false;
                     btn_new.setText("저장");
                 } else { //열린거 닫기
-                    animation = new ExpandCollapseAnimation(frame, 1000, 0);
+                    animation = new ExpandCollapseAnimation(frame, 400, 1);
                     isHidden = true;
                     btn_new.setText("새로운 폴더 만들기");
 

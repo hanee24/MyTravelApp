@@ -6,12 +6,13 @@
     <FrameLayout
         android:id="@+id/frame1"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="260dp"
         android:layout_alignParentStart="false"
-        android:visibility="gone">
-        <include
+        android:visibility="gone"
+        android:contextClickable="false">
+        <!--<include
             android:id="@+id/include"
-            layout="@layout/fragment_new_folder"/>
+            layout="@layout/fragment_new_folder"/>-->
     </FrameLayout>
 
     <RelativeLayout
