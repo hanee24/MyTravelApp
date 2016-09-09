@@ -3,6 +3,7 @@ package com.example.parkhanee.mytravelapp;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -23,7 +24,7 @@ import java.util.Calendar;
 public class NewFolderFragment extends Fragment {
 
     String TAG = "NewFolderFragment";
-    public static EditText et_start, et_end;
+    public static EditText et_name, et_desc, et_start, et_end;
 
     @Nullable
     @Override
@@ -36,7 +37,11 @@ public class NewFolderFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         et_start = (EditText) view.findViewById(R.id.date_start);
+        et_start.setTag(20160909);
         et_end = (EditText) view.findViewById(R.id.date_end);
+        et_end.setTag(20160909);
+        et_name = (EditText) view.findViewById(R.id.editText4);
+        et_desc = (EditText) view.findViewById(R.id.editText5);
 
         ImageButton btn_start = (ImageButton)view.findViewById(R.id.pick_start_date);
         btn_start.setOnClickListener(new View.OnClickListener() {
@@ -84,10 +89,16 @@ public class NewFolderFragment extends Fragment {
             }
             String date = String.valueOf(year) + " - "+str_month+" - "+str_day;
 
-            if (start){
-                et_start.setText(date); 
-            }else{
+            if (start){ // set selected date as string at et_start
+                et_start.setText(date);
+                //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
+                     //et_start.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
+                et_start.setTag(String.valueOf(year)+String.valueOf(month)+String.valueOf(day));
+            }else{ // set selected date as string at et_end
                 et_end.setText(date);
+                //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
+                    //et_end.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
+                et_end.setTag(String.valueOf(year)+String.valueOf(month)+String.valueOf(day));
             }
         }
     }

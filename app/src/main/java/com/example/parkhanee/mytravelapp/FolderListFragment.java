@@ -35,6 +35,9 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by parkhanee on 2016. 9. 6..
@@ -51,6 +54,9 @@ public class FolderListFragment extends Fragment {
     public static Boolean isHidden;// tells if the drop-down "newFolder" fragment is hidden
     Button btn_new;
 
+    String TAG = "FolderListFragment";
+    HashMap<String, String> newFolderPostDataParams;
+
 
     @Nullable
     @Override
@@ -66,11 +72,12 @@ public class FolderListFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.listView2);
         listView.setAdapter(myAdapter);
         dialog = new ProgressDialog(getContext());
+        newFolderPostDataParams = new HashMap<>();
 
-        //fetch data to make folder list at first
+        //fetch data to make folder list on create
         userId = MainActivity.getLoginId();
         postData = "user_id="+userId;
-        myClickHandler();
+        myClickHandler("list");
 
         refresh = (TextView) view.findViewById(R.id.refresh);
         refresh.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +87,7 @@ public class FolderListFragment extends Fragment {
                 // get user id from shared preference
                 userId = MainActivity.getLoginId();
                 postData = "user_id="+userId;
-                myClickHandler();
+                myClickHandler("list");
             }
         });
 
@@ -113,11 +120,29 @@ public class FolderListFragment extends Fragment {
                     isHidden = true;
                     btn_new.setText("새로운 폴더 만들기");
 
+                    // get info from NewFolderFragment
+                    //프래그먼트에서 뷰(에딧텍스트) 가져오기 //에딧텍스트에서 그안의 스트링 가져오기
+                    String name = NewFolderFragment.et_name.getText().toString();
+                    String desc = NewFolderFragment.et_desc.getText().toString();
+                    String start_date = NewFolderFragment.et_start.getTag().toString();
+                    String end_date = NewFolderFragment.et_end.getTag().toString();
+
+                    // send info to server and get response.
+                    userId = MainActivity.getLoginId();
+                    newFolderPostDataParams.put("user_id",userId);
+                    newFolderPostDataParams.put("folder_name",name);
+                    newFolderPostDataParams.put("description",desc);
+                    newFolderPostDataParams.put("date_start",start_date);
+                    newFolderPostDataParams.put("date_end",end_date);
+                    myClickHandler("new");
+
+                    // TODO: 2016. 9. 9. Throw Exceptions
+
                     // TODO: 2016. 9. 9. Do refresh only when new information is being sent to server
                     //fetch data to REFRESH folder list
-                    userId = MainActivity.getLoginId();
-                    postData = "user_id="+userId;
-                    myClickHandler();
+
+                    //postData = "user_id="+userId;
+                    //myClickHandler("list");
                 }
                 frame.startAnimation(animation);
 
@@ -125,14 +150,28 @@ public class FolderListFragment extends Fragment {
         });
     }
 
-    public void myClickHandler() { // check if the network has connected
-        String stringUrl = "http://hanea8199.vps.phps.kr/folderlist_process.php";
+    public void myClickHandler(String my) { // check if the network has connected
+        String stringUrl; //server url
+        String tag;
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            // get folders list
-            new FetchData().execute(stringUrl);
+            switch (my){
+                case "new": // creating a new folder
+                    stringUrl = "http://hanea8199.vps.phps.kr/newfolder_process.php";
+                    tag ="new";
+                    break;
+                case "list": // getting folder list from server
+                    stringUrl = "http://hanea8199.vps.phps.kr/folderlist_process.php";
+                    tag = "list";
+                    break;
+                default:stringUrl="";
+                    tag="default";
+                    Log.d(TAG, "myClickHandler: switch case default");
+                    break;
+            }
+            new FetchData().execute(stringUrl,tag);
         } else {
             Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
         }
@@ -140,6 +179,8 @@ public class FolderListFragment extends Fragment {
 
 
     private class FetchData extends AsyncTask<String, Void, String>{
+        Boolean  isList; // tells if this task is to fetch folder list(true)
+                        // or create a new folder(false)
 
         @Override
         protected void onPreExecute() {
@@ -150,6 +191,7 @@ public class FolderListFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
+            isList = strings[1].equals("list");
             try {
                 return downloadUrl(strings[0]);
             } catch (IOException e) {
@@ -174,14 +216,21 @@ public class FolderListFragment extends Fragment {
                 // add post parameters
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(postData);
+                if (isList){
+                    writer.write(postData);
+                    Log.d(TAG, "downloadUrl: isList==true");
+                }else{
+                    writer.write(getPostDataString(newFolderPostDataParams));
+                    Log.d(TAG, "downloadUrl: isList==false");
+                }
+
                 writer.flush();
                 writer.close();
                 os.close();
 
                 conn.connect();
                 int response = conn.getResponseCode();
-                Log.d(DEBUG_TAG, "The response is: " + response);
+                Log.d(TAG, "The server response is: " + response);
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
@@ -256,6 +305,26 @@ public class FolderListFragment extends Fragment {
             Folder folderItem = new Folder(name,desc,start,end);
             return folderItem;
         }
+    }
+
+    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+        //convert data  being sent to server as POST method into correct form
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        Log.d(TAG, "getPostDataString: "+result.toString());
+
+        return result.toString();
     }
 
 
