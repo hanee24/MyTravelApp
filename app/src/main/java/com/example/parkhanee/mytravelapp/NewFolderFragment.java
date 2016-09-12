@@ -58,6 +58,20 @@ public class NewFolderFragment extends Fragment {
                 showDatePickerDialog(view);
             }
         });
+
+        // scroll up the NewFolderFragment in case the user doesn't want to make a new folder
+        ImageButton btn_up = (ImageButton) view.findViewById(R.id.uparrow);
+        btn_up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: 2016. 9. 10.
+
+                ExpandCollapseAnimation animation = new ExpandCollapseAnimation(FolderListFragment.frame, 400, 1);
+                FolderListFragment.isHidden = true;
+                FolderListFragment.btn_new.setText("새로운 폴더 만들기");
+                FolderListFragment.frame.startAnimation(animation);
+            }
+        });
     }
 
     public static class DatePickerFragment extends DialogFragment

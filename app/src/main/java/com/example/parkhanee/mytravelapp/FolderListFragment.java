@@ -52,7 +52,8 @@ public class FolderListFragment extends Fragment {
     private FolderListAdapter myAdapter;
     ProgressDialog dialog;
     public static Boolean isHidden;// tells if the drop-down "newFolder" fragment is hidden
-    Button btn_new;
+    public static Button btn_new;
+    public static View frame;
 
     String TAG = "FolderListFragment";
     HashMap<String, String> newFolderPostDataParams;
@@ -94,7 +95,7 @@ public class FolderListFragment extends Fragment {
 
         btn_new = (Button) view.findViewById(R.id.button8);
         System.out.println(btn_new);
-        final View frame =  view.findViewById(R.id.frame1);
+        frame =  view.findViewById(R.id.frame1);
 
         //set fragment
         Class fragmentClass = NewFolderFragment.class;
