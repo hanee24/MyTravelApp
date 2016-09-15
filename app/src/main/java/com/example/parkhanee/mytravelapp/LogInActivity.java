@@ -136,7 +136,8 @@ public class LogInActivity extends AppCompatActivity {
             if (resultCode==00){ //result is Okay
                 msg = "로그인 되었습니다";
                 et_id = (EditText) findViewById(R.id.id);
-                MainActivity.login(et_id.getText().toString(),false);
+                String id = et_id.getText().toString();
+                MainActivity.login(id,id,false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);
                 builder.setMessage(msg)
                         .setCancelable(false)

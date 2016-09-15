@@ -46,7 +46,6 @@ public class FolderListFragment extends Fragment {
     TextView refresh;
     String userId;
     String postData;
-    String DEBUG_TAG="folderFragment";
 
     private ListView listView;
     private FolderListAdapter myAdapter;
@@ -76,7 +75,7 @@ public class FolderListFragment extends Fragment {
         newFolderPostDataParams = new HashMap<>();
 
         //fetch data to make folder list on create
-        userId = MainActivity.getLoginId();
+        userId = MainActivity.getUserId();
         postData = "user_id="+userId;
         myClickHandler("list");
 
@@ -86,7 +85,7 @@ public class FolderListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // get user id from shared preference
-                userId = MainActivity.getLoginId();
+                userId = MainActivity.getUserId();
                 postData = "user_id="+userId;
                 myClickHandler("list");
             }
@@ -128,8 +127,10 @@ public class FolderListFragment extends Fragment {
                     String start_date = NewFolderFragment.et_start.getTag().toString();
                     String end_date = NewFolderFragment.et_end.getTag().toString();
 
+                    Log.d(TAG, "onClick: "+name+desc+start_date+end_date);
+
                     // send info to server and get response.
-                    userId = MainActivity.getLoginId();
+                    userId = MainActivity.getUserId();
                     newFolderPostDataParams.put("user_id",userId);
                     newFolderPostDataParams.put("folder_name",name);
                     newFolderPostDataParams.put("description",desc);
@@ -162,14 +163,16 @@ public class FolderListFragment extends Fragment {
                 case "new": // creating a new folder
                     stringUrl = "http://hanea8199.vps.phps.kr/newfolder_process.php";
                     tag ="new";
+                    Log.d(TAG, "myClickHandler: NEW");
                     break;
                 case "list": // getting folder list from server
                     stringUrl = "http://hanea8199.vps.phps.kr/folderlist_process.php";
                     tag = "list";
+                    Log.d(TAG, "myClickHandler: LIST");
                     break;
                 default:stringUrl="";
                     tag="default";
-                    Log.d(TAG, "myClickHandler: switch case default");
+                    Log.d(TAG, "myClickHandler: DEFAULT");
                     break;
             }
             new FetchData().execute(stringUrl,tag);
@@ -247,7 +250,7 @@ public class FolderListFragment extends Fragment {
             }
         }
 
-        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+        public String readIt(InputStream stream, int len) throws IOException {
             Reader reader = null;
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
@@ -267,7 +270,12 @@ public class FolderListFragment extends Fragment {
                 JSONObject result = new JSONObject(s);
                 JSONObject header = result.getJSONObject("header");
                 resultCode = header.getInt("resultCode");
-                resultMsg = header.getString("resultMsg");
+
+                //check the whole result
+                resultMsg = result.toString();
+                System.out.println(resultMsg);
+                //resultMsg = header.getString("resultMsg");
+
                 if (resultCode==00) {
                     JSONObject body = result.getJSONObject("body");
                     totalCount = body.getInt("totalCount");
@@ -286,11 +294,11 @@ public class FolderListFragment extends Fragment {
                         }
                     }
                 }// result is ok
-                resultMsg = result.toString();
+
             }catch (JSONException e){
                 e.printStackTrace();
             }
-            System.out.println(resultMsg);
+
 
             myAdapter.notifyDataSetChanged();
             if (dialog.isShowing()) {

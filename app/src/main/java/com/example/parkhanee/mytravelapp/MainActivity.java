@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
     public static final String userIdKey = "userId";
+    public static final String userNameKey = "userName";
     public static final String isFBKey = "isFB"; // "y", "n"
 
     //navigation view
@@ -224,11 +225,15 @@ public class MainActivity extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken!=null){ //if 페북로그인 되어있으면
 
+
+
+            String id = accessToken.getUserId();
+            String name = "null"; // TODO: 2016. 9. 15. could be a problem?
+
+            login(id,name,true);
+
             // execute AsyncTask to get Profile asynchronously
             myClickHandler();
-
-            String name = accessToken.getUserId();
-            login(name,true);
         }
 
         String fb = sharedpreferences.getString(isFBKey,"");
@@ -247,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         if (ifLogged){
 
             tv_login.setText("로그아웃");
-            tv_username.setText(getLoginId());
+            tv_username.setText(getUserName());
             System.out.println("Main ifLogged");
             iv_icon.setVisibility(View.VISIBLE);
             tv_username.setVisibility(View.VISIBLE);
@@ -283,8 +288,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static String getLoginId(){
+    public static String getUserId(){
         String str = sharedpreferences.getString(userIdKey,null);
+        return str;
+    }
+
+    public static String getUserName(){
+        String str = sharedpreferences.getString(userNameKey,null);
         return str;
     }
 
@@ -293,9 +303,10 @@ public class MainActivity extends AppCompatActivity {
         return str.equals("y");
     }
 
-    public static void login(String id,Boolean isFB){
+    public static void login(String id,String name,Boolean isFB){
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString(userIdKey, id);
+        editor.putString(userNameKey,name);
         if (isFB){
             editor.putString(isFBKey,"y"); //FB login
         }else{
@@ -314,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.remove(userIdKey);
         editor.remove(isFBKey);
+        editor.remove(userNameKey);
         editor.commit();
         ifLogged = false;
     }
@@ -332,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
             }
             String user_name = myProfile.getName();
             String user_id = myProfile.getId();
-            login(user_name,true);
+            login(user_id,user_name,true);
             tv_username.setText(myProfile.getName());
 
             postDataParams = new HashMap<>();
