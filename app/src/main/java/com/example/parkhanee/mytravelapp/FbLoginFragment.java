@@ -57,11 +57,8 @@ public class FbLoginFragment extends Fragment{
     private ProfileTracker profileTracker;
     private AccessTokenTracker tokenTracker;
     LoginButton loginButton;
-    static Profile profile;
-    public static Boolean profileHasSet=false;
 
     HashMap<String, String> postDataParams;
-    private static final String DEBUG_TAG = "FbLoginFragment";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) { //get arguments and set them as private variables
@@ -79,13 +76,6 @@ public class FbLoginFragment extends Fragment{
         profileTracker = new ProfileTracker() {
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
-                if (newProfile != null) { //the user may have logged in or changed some of his profile settings
-                    profile = newProfile;
-                    profileHasSet=true;
-                } else {
-                    profile = oldProfile;
-                    profileHasSet=true;
-                }
             }
         };
         profileTracker.startTracking();
@@ -115,21 +105,13 @@ public class FbLoginFragment extends Fragment{
             @Override
             public void onSuccess(LoginResult loginResult) { //when the user newly logged in
 
-                final String name = "temp name"; // TODO: 2016. 9. 7. not necessary?
-
-                //send userInfo to server
-                putDataIntoParams(loginResult,profile);
-                myClickHandler();
-
-                //TODO set a dialog which informs that the user has just logged in.
+                // set a dialog which informs that the user has just logged in.
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setMessage("로그인 되었습니다")
                         .setCancelable(false)
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent a = new Intent(getActivity(),MainActivity.class);
-//                                a.putExtra("name",name);
-//                                a.putExtra("newlyLogged",true);
                                 a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); //TODO : not sure if it's correct to use this flag
                                 startActivity(a);
                             }
@@ -158,142 +140,7 @@ public class FbLoginFragment extends Fragment{
 
 
 
-    public void putDataIntoParams(LoginResult result,Profile profile){
-        String user_id = result.getAccessToken().getUserId();
-        postDataParams.put("user_id",user_id);
-//        String user_name = profile.getName();
-        String user_name = "temp name";
-        postDataParams.put("user_name",user_name);
-    }
 
-    public void myClickHandler() { // check if the network has connected
-        String stringUrl = "http://hanea8199.vps.phps.kr/fb_signin.php";
-        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            // fetch data
-            new DownloadWebpageTask().execute(stringUrl);
-        } else {
-            Toast.makeText(getContext(), "! No network connection available.", Toast.LENGTH_SHORT).show();
-        }
-    }
 
-    private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            try {
-                return downloadUrl(urls[0]);
-            } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-
-            int resultCode=99;
-            String resultMsg="";
-            String msg;
-            try{
-                JSONObject result = new JSONObject(s);
-                resultCode = result.getInt("resultCode");
-                //resultMsg = result.getString("resultMsg");
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-
-            if (resultCode==00){ //result is Okay
-                msg = "fb info has passed to server db successfully";
-               /*AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage(msg)
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent aa = new Intent(getContext(),LogInActivity.class);
-                                startActivity(aa);
-                            }
-                        });
-                AlertDialog alert = builder.create();
-                alert.show();*/
-                Toast.makeText(getContext(),msg, Toast.LENGTH_SHORT).show();
-            }else{ // error occurred
-                switch (resultCode){
-                    case 11 : msg = "no info";
-                        break;
-                    case 12: msg = "id already added on the server";
-                        break;
-                    default: msg = "unknown error";
-                        break;
-                }
-                Toast.makeText(getContext(),msg, Toast.LENGTH_SHORT).show();
-            }
-
-        }
-
-        private String downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-            // Only display the first 500 characters of the retrieved
-            // web page content.
-            int len = 500;
-
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-
-                // add post parameters
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(getPostDataString(postDataParams));
-                writer.flush();
-                writer.close();
-                os.close();
-
-                conn.connect();
-                int response = conn.getResponseCode();
-                Log.d(DEBUG_TAG, "The response is: " + response);
-                is = conn.getInputStream();
-
-                // Convert the InputStream into a string
-                String contentAsString = readIt(is, len);
-                return contentAsString;
-
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-        }
-
-        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-            Reader reader = null;
-            reader = new InputStreamReader(stream, "UTF-8");
-            char[] buffer = new char[len];
-            reader.read(buffer);
-            return new String(buffer);
-        }
-
-        private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
-            StringBuilder result = new StringBuilder();
-            boolean first = true;
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                if (first)
-                    first = false;
-                else
-                    result.append("&");
-
-                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-                result.append("=");
-                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-            }
-
-            return result.toString();
-        }
-    }
 
 }
