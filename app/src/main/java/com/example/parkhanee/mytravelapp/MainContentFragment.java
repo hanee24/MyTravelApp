@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,10 @@ public class MainContentFragment extends Fragment implements
     public static Double lng;
 
     View a;
+
+    // to check if the mainContentFragment is now active. --> MainActivity.OnBackPressed
+    public static Boolean isMain;
+    String TAG = "MainContentFragment";
 
     @Nullable
     @Override
@@ -138,7 +143,7 @@ public class MainContentFragment extends Fragment implements
         btn_folder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (MainActivity.ifLogged){ //TODO check ifLogged
+                if (MainActivity.ifLogged){
                     //go to folderFragment if user has been logged in
                     Class fragmentClass = FolderListFragment.class;
                     Fragment fragment=null;
@@ -238,5 +243,19 @@ public class MainContentFragment extends Fragment implements
             String ss = str[1]+" "+str[2]+" "+str[3];
             location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isMain = true;
+        Log.d(TAG, "onResume: isMain");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        isMain = false;
+        Log.d(TAG, "onPause: ! isMain");
     }
 }

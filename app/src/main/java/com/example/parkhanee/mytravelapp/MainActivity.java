@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        final FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
 
         setupDrawerContent(navigationView);
@@ -114,6 +114,28 @@ public class MainActivity extends AppCompatActivity {
         };
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+    }
+
+    // This was added in order to manage Fragment BackStack
+    @Override
+    public void onBackPressed() {
+        // TODO: 2016. 9. 16. set nav view item selected
+        if (MainContentFragment.isMain){
+            //if mainContentFragment is active, quit the app
+            super.onBackPressed();
+        }else{
+            //if not, redirect to mainFragment.
+            Class fragmentClass = MainContentFragment.class;
+            Fragment fragment=null;
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+            navigationView.setCheckedItem(R.id.main);
+        }
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
