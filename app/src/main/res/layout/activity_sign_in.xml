@@ -39,7 +39,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         android:singleLine="true"
-        android:imeOptions="actionNext"/>
+        android:imeOptions="actionNext"
+        android:inputType="textPassword"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -69,7 +70,7 @@
         android:layout_marginTop="20dp"
         android:singleLine="true"
         android:imeOptions="actionDone"
-        />
+        android:inputType="textPassword"/>
 
     <Button
         android:layout_width="150dp"

@@ -121,10 +121,13 @@ public class FolderListFragment extends Fragment {
                     //프래그먼트에서 뷰(에딧텍스트) 가져오기 //에딧텍스트에서 그안의 스트링 가져오기
                     String name = NewFolderFragment.et_name.getText().toString();
                     String desc = NewFolderFragment.et_desc.getText().toString();
+                    // TODO: 2016. 9. 16. Process date info
                     String start_date = NewFolderFragment.et_start.getTag().toString();
                     String end_date = NewFolderFragment.et_end.getTag().toString();
 
-                    Log.d(TAG, "onClick: "+name+desc+start_date+end_date);
+                    Log.d(TAG, "onClick: "+name+desc);
+                    Log.d(TAG, "onClick: start_date "+start_date);
+                    Log.d(TAG, "onClick: end_date "+end_date);
 
                     // send info to server and get response.
                     userId = MainActivity.getUserId();
@@ -140,6 +143,7 @@ public class FolderListFragment extends Fragment {
                     // reset editTexts since the data within them has been sent
                     NewFolderFragment.et_name.setText("");
                     NewFolderFragment.et_desc.setText("");
+                    // TODO: 2016. 9. 16. set current date @ et_start, et_end
                     NewFolderFragment.et_start.setText("2016 - 09 - 09");
                     NewFolderFragment.et_end.setText("2016 - 09 - 09");
 

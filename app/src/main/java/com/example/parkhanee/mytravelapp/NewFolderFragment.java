@@ -39,9 +39,9 @@ public class NewFolderFragment extends Fragment {
 
         //initiate views in order to use later in FolderListFragment when creating new folder
         et_start = (EditText) view.findViewById(R.id.date_start);
-        et_start.setTag(20160909); // TODO: 2016. 9. 16. temporary date value due to date data passing error
+        //et_start.setTag(20160909); // TODO: 2016. 9. 16. temporary date value due to date data passing error
         et_end = (EditText) view.findViewById(R.id.date_end);
-        et_end.setTag(20160909);
+        //et_end.setTag(20160909);
         et_name = (EditText) view.findViewById(R.id.editText4);
         et_desc = (EditText) view.findViewById(R.id.editText5);
 
@@ -66,8 +66,6 @@ public class NewFolderFragment extends Fragment {
         btn_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2016. 9. 10. ????
-
                 ExpandCollapseAnimation animation = new ExpandCollapseAnimation(FolderListFragment.frame, 400, 1);
                 FolderListFragment.isHidden = true;
                 FolderListFragment.btn_new.setText("새로운 폴더 만들기");
@@ -110,13 +108,13 @@ public class NewFolderFragment extends Fragment {
             if (start){ // set selected date as string at et_start
                 et_start.setText(date);
                 //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
-                     //et_start.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
-                et_start.setTag(String.valueOf(year)+String.valueOf(month)+String.valueOf(day));
+                et_start.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
+
             }else{ // set selected date as string at et_end
                 et_end.setText(date);
                 //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
-                    //et_end.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
-                et_end.setTag(String.valueOf(year)+String.valueOf(month)+String.valueOf(day));
+                et_end.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
+                
             }
         }
     }
