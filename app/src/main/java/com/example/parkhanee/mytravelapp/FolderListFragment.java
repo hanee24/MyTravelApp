@@ -140,11 +140,12 @@ public class FolderListFragment extends Fragment {
 
                     // TODO: 2016. 9. 9. Throw Exceptions
 
-                    // TODO: 2016. 9. 9. Do refresh only when new information is being sent to server
-                    //fetch data to REFRESH folder list
+                    // reset editTexts since the data within them has been sent
+                    NewFolderFragment.et_name.setText("");
+                    NewFolderFragment.et_desc.setText("");
+                    NewFolderFragment.et_start.setText("2016 - 09 - 09");
+                    NewFolderFragment.et_end.setText("2016 - 09 - 09");
 
-                    //postData = "user_id="+userId;
-                    //myClickHandler("list");
                 }
                 frame.startAnimation(animation);
 

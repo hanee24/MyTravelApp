@@ -36,8 +36,10 @@ public class NewFolderFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        //initiate views in order to use later in FolderListFragment when creating new folder
         et_start = (EditText) view.findViewById(R.id.date_start);
-        et_start.setTag(20160909);
+        et_start.setTag(20160909); // TODO: 2016. 9. 16. temporary date value due to date data passing error
         et_end = (EditText) view.findViewById(R.id.date_end);
         et_end.setTag(20160909);
         et_name = (EditText) view.findViewById(R.id.editText4);
@@ -64,7 +66,7 @@ public class NewFolderFragment extends Fragment {
         btn_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 2016. 9. 10.
+                // TODO: 2016. 9. 10. ????
 
                 ExpandCollapseAnimation animation = new ExpandCollapseAnimation(FolderListFragment.frame, 400, 1);
                 FolderListFragment.isHidden = true;
@@ -90,8 +92,10 @@ public class NewFolderFragment extends Fragment {
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
+        // when user choose a date on DatePicker and clicked ok,
+        // Do something with the date
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
+
             String str_month,str_day;
             str_month = String.valueOf(month+1);
             str_day = String.valueOf(day);

@@ -6,10 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +50,11 @@ public class LogInActivity extends AppCompatActivity {
     HashMap<String, String> postDataParams;
     EditText et_id;
     ProgressDialog dialog;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +65,11 @@ public class LogInActivity extends AppCompatActivity {
         dialog = new ProgressDialog(LogInActivity.this);
         btn_okay = (Button) findViewById(R.id.okay);
         postDataParams = new HashMap<>();
+
+        // hide password when typed
+//        EditText pwd = (EditText) findViewById(R.id.pasword);
+//        pwd.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//        pwd.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
         btn_okay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,10 +89,13 @@ public class LogInActivity extends AppCompatActivity {
         btn_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent aa = new Intent(LogInActivity.this,SignInActivity.class);
+                Intent aa = new Intent(LogInActivity.this, SignInActivity.class);
                 startActivity(aa);
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     public void myClickHandler(View view) { // check if the network has connected   //TODO : add this to all the activities which need network connection
@@ -92,6 +111,46 @@ public class LogInActivity extends AppCompatActivity {
         } else {
             Toast.makeText(LogInActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "LogIn Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.parkhanee.mytravelapp/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "LogIn Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.parkhanee.mytravelapp/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 
     private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
@@ -117,14 +176,14 @@ public class LogInActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
 
-            int resultCode=99;
-            String resultMsg="";
+            int resultCode = 99;
+            String resultMsg = "";
             String msg;
-            try{
+            try {
                 JSONObject result = new JSONObject(s);
                 resultCode = result.getInt("resultCode");
                 //resultMsg = result.getString("resultMsg");
-            }catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -133,17 +192,17 @@ public class LogInActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
 
-            if (resultCode==00){ //result is Okay
+            if (resultCode == 00) { //result is Okay
                 msg = "로그인 되었습니다";
                 et_id = (EditText) findViewById(R.id.id);
                 String id = et_id.getText().toString();
-                MainActivity.login(id,id,false);
+                MainActivity.login(id, id, false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);
                 builder.setMessage(msg)
                         .setCancelable(false)
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                Intent aa = new Intent(LogInActivity.this,MainActivity.class);
+                                Intent aa = new Intent(LogInActivity.this, MainActivity.class);
                                 aa.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(aa);
                                 finish();
@@ -151,16 +210,19 @@ public class LogInActivity extends AppCompatActivity {
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
-            }else{ // error occurred
-                switch (resultCode){
-                    case 14 : msg = "로그인 정보가 바르지 않습니다";
+            } else { // error occurred
+                switch (resultCode) {
+                    case 14:
+                        msg = "로그인 정보가 바르지 않습니다";
                         break;
-                    case 11: msg = "모든 정보를 입력해 주세요";
+                    case 11:
+                        msg = "모든 정보를 입력해 주세요";
                         break;
-                    default: msg = "unknown error";
+                    default:
+                        msg = "unknown error";
                         break;
                 }
-                Toast.makeText(LogInActivity.this,msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LogInActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         }
 

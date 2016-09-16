@@ -34,4 +34,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:9.4.0'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.android.support:support-v4:24.1.1'
+    compile 'com.google.android.gms:play-services-appindexing:9.4.0'
 }

@@ -38,7 +38,8 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:singleLine="true"
-        android:imeOptions="actionDone"/>
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"/>
 
     <TextView
         android:layout_width="wrap_content"
