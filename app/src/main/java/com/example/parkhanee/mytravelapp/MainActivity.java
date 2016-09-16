@@ -295,7 +295,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (ifLogged){ //log out onClick
-                    logout();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    logout(fragmentManager);
                     Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
                     tv_login.setText("로그인 해 주세요");
                     tv_username.setVisibility(View.GONE);
@@ -339,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
         ifLogged = true;
     }
 
-    public static void logout(){ //removeLoginInfoFromSharedPreference
+    public static void logout(FragmentManager fm){ //removeLoginInfoFromSharedPreference
         if (getisFB()){
             LoginManager.getInstance().logOut(); // facebook logout !!
             ifFbLogged=false;
@@ -350,6 +351,18 @@ public class MainActivity extends AppCompatActivity {
         editor.remove(userNameKey);
         editor.commit();
         ifLogged = false;
+
+        // redirect user to MainFragment
+        Class fragmentClass = MainContentFragment.class;
+        Fragment fragment=null;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        fm.beginTransaction().replace(R.id.frame, fragment).commit();
+        navigationView.setCheckedItem(R.id.main);
     }
 
 
