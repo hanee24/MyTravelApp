@@ -114,7 +114,6 @@ public class NewFolderFragment extends Fragment {
                 et_end.setText(date);
                 //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
                 et_end.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
-                
             }
         }
     }

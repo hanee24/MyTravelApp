@@ -2,6 +2,7 @@ package com.example.parkhanee.mytravelapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -138,12 +140,13 @@ public class FolderListFragment extends Fragment {
                     newFolderPostDataParams.put("date_end",end_date);
                     myClickHandler("new");
 
-                    // TODO: 2016. 9. 9. Throw Exceptions
+                    // TODO: 2016. 9. 9. Throw Exceptions ? such as not all info is written
 
                     // reset editTexts since the data within them has been sent
                     NewFolderFragment.et_name.setText("");
                     NewFolderFragment.et_desc.setText("");
-                    // TODO: 2016. 9. 16. set current date @ et_start, et_end
+
+                    // TODO: 2016. 9. 16. set current date instead of 09-09 @ et_start, et_end
                     NewFolderFragment.et_start.setText("2016 - 09 - 09");
                     NewFolderFragment.et_end.setText("2016 - 09 - 09");
 
@@ -151,6 +154,28 @@ public class FolderListFragment extends Fragment {
                 frame.startAnimation(animation);
 
             } //onclick
+        });
+
+        // set item onClickListener on the listView
+        // direct to FolderActivity
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent a = new Intent(getActivity(),FolderActivity.class);
+                Folder folder = (Folder) adapterView.getAdapter().getItem(i);
+                Bundle args = new Bundle();
+                args.putString("name",folder.getName());
+                args.putString("desc",folder.getDesc());
+                args.putString("start",folder.getDate_start());
+                args.putString("end",folder.getDate_end());
+
+                Log.d(TAG, "onItemClick: "+folder);
+                Log.d(TAG, "onItemClick: "+folder.getName());
+                Log.d(TAG, "onItemClick: "+folder.getDate_end());
+
+                a.putExtra("args",args);
+                startActivity(a);
+            }
         });
     }
 
@@ -185,8 +210,9 @@ public class FolderListFragment extends Fragment {
 
 
     private class FetchData extends AsyncTask<String, Void, String>{
-        Boolean  isList; // tells if this task is to fetch folder list(true)
-                        // or create a new folder(false)
+        // tells if this task is to fetch folder list(true)
+        // or create a new folder(false)
+        Boolean  isList;
 
         @Override
         protected void onPreExecute() {
@@ -306,13 +332,18 @@ public class FolderListFragment extends Fragment {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+
+
         }
 
         public Folder getFolderInfo(JSONObject folder) throws JSONException {
+            // sort folder information from a jsonObject sent from the server
             String name = folder.getString("folder_name");
             String desc  =  folder.getString("description");
             String start = folder.getString("date_start").substring(0,10);
             String end = folder.getString("date_end").substring(0,10);
+            //this is the format how they are being saved on the Folder Item
+            Log.d(TAG, "getFolderInfo: "+start + " "+end);
             Folder folderItem = new Folder(name,desc,start,end);
             return folderItem;
         }

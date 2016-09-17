@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             final FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
             navigationView.setCheckedItem(R.id.main);
+            setTitle(R.string.string_main);
         }
     }
 

@@ -27,7 +27,7 @@ public class FolderListAdapter extends BaseAdapter{
     }
 
     @Override
-    public Object getItem(int i) {
+    public Folder getItem(int i) {
         return folderArrayList.get(i);
     }
 
