@@ -7,9 +7,11 @@ public class Folder {
     private String name;
     private String desc;
     private String date_start, date_end;
+    private int id;
 
-    public Folder (String name, String desc,String start, String end){
+    public Folder (int id,String name, String desc,String start, String end){
         super();
+        this.id = id;
         this.name = name;
         this.desc = desc;
         date_end = end;
@@ -18,6 +20,10 @@ public class Folder {
 
 
     //getters and setters
+
+    public int getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -33,6 +39,10 @@ public class Folder {
 
     public String getDate_start() {
         return date_start;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {

@@ -64,7 +64,7 @@
         android:layout_width="180dp"
         android:layout_height="40dp"
         android:text="로그인"
-        android:id="@+id/okay"
+        android:id="@+id/save"
         android:layout_below="@+id/pasword"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="51dp"/>
@@ -85,7 +85,7 @@
         android:name="com.example.parkhanee.mytravelapp.FbLoginFragment"
         android:id="@+id/fragment"
         tools:layout="@layout/fragment_fb_login"
-        android:layout_below="@+id/okay"
+        android:layout_below="@+id/save"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

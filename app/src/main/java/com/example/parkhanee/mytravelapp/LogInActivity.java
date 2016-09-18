@@ -11,13 +11,10 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
@@ -63,7 +60,7 @@ public class LogInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
 
         dialog = new ProgressDialog(LogInActivity.this);
-        btn_okay = (Button) findViewById(R.id.okay);
+        btn_okay = (Button) findViewById(R.id.save);
         postDataParams = new HashMap<>();
 
         // hide password when typed

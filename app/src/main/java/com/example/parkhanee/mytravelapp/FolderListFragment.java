@@ -124,8 +124,8 @@ public class FolderListFragment extends Fragment {
                     String name = NewFolderFragment.et_name.getText().toString();
                     String desc = NewFolderFragment.et_desc.getText().toString();
                     // TODO: 2016. 9. 16. Process date info
-                    String start_date = NewFolderFragment.et_start.getTag().toString();
-                    String end_date = NewFolderFragment.et_end.getTag().toString();
+                    String start_date = NewFolderFragment.et_start.getText().toString();
+                    String end_date = NewFolderFragment.et_end.getText().toString();
 
                     Log.d(TAG, "onClick: "+name+desc);
                     Log.d(TAG, "onClick: start_date "+start_date);
@@ -168,10 +168,6 @@ public class FolderListFragment extends Fragment {
                 args.putString("desc",folder.getDesc());
                 args.putString("start",folder.getDate_start());
                 args.putString("end",folder.getDate_end());
-
-                Log.d(TAG, "onItemClick: "+folder);
-                Log.d(TAG, "onItemClick: "+folder.getName());
-                Log.d(TAG, "onItemClick: "+folder.getDate_end());
 
                 a.putExtra("args",args);
                 startActivity(a);
@@ -342,9 +338,10 @@ public class FolderListFragment extends Fragment {
             String desc  =  folder.getString("description");
             String start = folder.getString("date_start").substring(0,10);
             String end = folder.getString("date_end").substring(0,10);
+            int id = folder.getInt("folder_id");
             //this is the format how they are being saved on the Folder Item
-            Log.d(TAG, "getFolderInfo: "+start + " "+end);
-            Folder folderItem = new Folder(name,desc,start,end);
+            Log.d(TAG, "getFolderInfo: folderId!! "+id );
+            Folder folderItem = new Folder(id,name,desc,start,end);
             return folderItem;
         }
     }
