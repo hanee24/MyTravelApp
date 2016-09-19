@@ -84,4 +84,11 @@ public class Folder {
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
+
+
+    @Override
+    public String toString() {
+       return "Folder [folder_id=" + id + ", folder_name=" + name + ", desc=" + desc
+                + "]";
+    }
 }

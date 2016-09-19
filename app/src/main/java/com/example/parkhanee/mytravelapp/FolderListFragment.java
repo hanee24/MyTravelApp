@@ -1,5 +1,6 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -206,8 +208,8 @@ public class FolderListFragment extends Fragment {
 
 
     private class FetchData extends AsyncTask<String, Void, String>{
-        // tells if this task is to fetch folder list(true)
-        // or create a new folder(false)
+        // tells if this task is to fetch folder list (true)
+        // or create a new folder and then fetch the list (false)
         Boolean  isList;
 
         @Override
@@ -231,7 +233,7 @@ public class FolderListFragment extends Fragment {
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 50000;
+            int len = 5000000;
 
             try {
                 URL url = new URL(myurl);
@@ -289,6 +291,7 @@ public class FolderListFragment extends Fragment {
             String resultMsg="";
             String msg;
             int totalCount=0;
+            DBHelper db = new DBHelper(getActivity());
 
             try{
                 JSONObject result = new JSONObject(s);
@@ -297,26 +300,44 @@ public class FolderListFragment extends Fragment {
 
                 //check the whole result
                 resultMsg = result.toString();
-                System.out.println(resultMsg);
+                //System.out.println(resultMsg);
                 //resultMsg = header.getString("resultMsg");
 
                 if (resultCode==00) {
                     JSONObject body = result.getJSONObject("body");
                     totalCount = body.getInt("totalCount");
                     if (totalCount == 1) {
+
                         JSONObject folder = body.getJSONObject("folders");
+                        // set the contents of folder to a folder instance
                         Folder folderItem = getFolderInfo(folder);
                         myAdapter.clearItem();// to avoid duplicated data shown when refresh
+                        // set the instance to the ListViewAdapter
                         myAdapter.addItem(0, folderItem);
+
+                        if (!isList){
+                            //add a row on folder table of localDB for the newly-created folder
+                            db.addFolder(folderItem);
+                        }
+
                     } else if (totalCount > 1) {
+
                         JSONArray folders = body.getJSONArray("folders");
                         myAdapter.clearItem(); // to avoid duplicated data shown when refresh
                         for (int i = 0; i < totalCount; i++) {
                             JSONObject folder = folders.getJSONObject(i);
+
+                            // set the contents of folder to a folder instance
                             Folder folderItem = getFolderInfo(folder);
+                            // set the instance to the ListViewAdapter
                             myAdapter.addItem(i, folderItem);
+                            if (!isList&i==0){
+                                //add a row on folder table of localDB for the newly-created folder
+                                db.addFolder(folderItem);
+                            }
                         }
                     }
+                    db.getAllFolders();
                 }// result is ok
 
             }catch (JSONException e){
@@ -340,8 +361,7 @@ public class FolderListFragment extends Fragment {
             int id = folder.getInt("folder_id");
             String user_id = folder.getString("user_id");
             String created = folder.getString("created").substring(0,10);
-            //this is the format how they are being saved on the Folder Item
-            Log.d(TAG, "getFolderInfo: folderId!! "+id );
+
             Folder folderItem = new Folder(id,name,user_id,desc,start,end,created);
             return folderItem;
         }

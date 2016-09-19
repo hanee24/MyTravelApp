@@ -65,7 +65,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String TABLE_FOLDER = "folder";
 
     // folder Table Columns names
-    private static final String KEY_ID = "id";
+    private static final String KEY_ID = "folder_id";
     private static final String KEY_NAME = "folder_name";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_DESC = "description";
