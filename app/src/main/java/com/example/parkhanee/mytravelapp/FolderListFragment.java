@@ -140,7 +140,7 @@ public class FolderListFragment extends Fragment {
                     newFolderPostDataParams.put("date_end",end_date);
                     myClickHandler("new");
 
-                    // TODO: 2016. 9. 9. Throw Exceptions ? such as not all info is written
+                    // TODO: 2016. 9. 9. Throw Exceptions ? such as "not all info is written"
 
                     // reset editTexts since the data within them has been sent
                     NewFolderFragment.et_name.setText("");
@@ -323,7 +323,6 @@ public class FolderListFragment extends Fragment {
                 e.printStackTrace();
             }
 
-
             myAdapter.notifyDataSetChanged();
             if (dialog.isShowing()) {
                 dialog.dismiss();
@@ -339,9 +338,11 @@ public class FolderListFragment extends Fragment {
             String start = folder.getString("date_start").substring(0,10);
             String end = folder.getString("date_end").substring(0,10);
             int id = folder.getInt("folder_id");
+            String user_id = folder.getString("user_id");
+            String created = folder.getString("created").substring(0,10);
             //this is the format how they are being saved on the Folder Item
             Log.d(TAG, "getFolderInfo: folderId!! "+id );
-            Folder folderItem = new Folder(id,name,desc,start,end);
+            Folder folderItem = new Folder(id,name,user_id,desc,start,end,created);
             return folderItem;
         }
     }

@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_temp);
 
-
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
