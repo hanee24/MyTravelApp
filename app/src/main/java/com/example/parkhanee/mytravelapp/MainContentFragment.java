@@ -1,10 +1,13 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -114,7 +118,9 @@ public class MainContentFragment extends Fragment implements
         String Lat = String.valueOf(lat);
         String Lgt = String.valueOf(lng);
         String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lgt+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
-        new getGeoCode().execute(url);
+
+        myClickHandler(url);
+
 
         btn_nearby.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,6 +186,17 @@ public class MainContentFragment extends Fragment implements
 
             }
         });
+    }
+
+    public void myClickHandler(String url) { // check if the network has connected
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new getGeoCode().execute(url);
+        } else {
+            Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

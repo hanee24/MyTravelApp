@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Boolean ifLogged;
     public static Boolean ifFbLogged=false;
+    String TAG = "MainActivity";
 
     public static SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
@@ -584,6 +588,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public boolean onKeyUp(int keyCode, KeyEvent event) { // make drawer open/close on hardware menu button click
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            Log.d(TAG, "onKeyUp: KEYCODE:MENU");
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }else{
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+
+            //  return true when you are handling the event; return false if you want the system to handle the event too.
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
 
 
 

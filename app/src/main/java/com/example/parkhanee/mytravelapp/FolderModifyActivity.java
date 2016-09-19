@@ -37,13 +37,15 @@ import java.util.TimerTask;
 
 public class FolderModifyActivity extends AppCompatActivity {
 
-    String str_name, str_desc,  str_start, str_end;
     private EditText et_name;
     EditText et_desc, et_start, et_end;
     String TAG = "FolderModifyFragment";
     private InputMethodManager imm;
     ProgressDialog dialog;
     HashMap<String, String> modifyFolderPostDataParams;
+    int position;
+    Folder folder;
+    DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +55,11 @@ public class FolderModifyActivity extends AppCompatActivity {
         // get arguments from FolderActivity
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra("args");
-        str_name = bundle.getString("name");
-        str_desc = bundle.getString("desc");
-        str_start = bundle.getString("start");
-        str_end = bundle.getString("end");
+        position = bundle.getInt("position");
+
+        // get folder from local DB
+        db = new DBHelper(FolderModifyActivity.this);
+        folder = db.getFolder(position);
 
         //hide keyboard as default
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -81,17 +84,18 @@ public class FolderModifyActivity extends AppCompatActivity {
         modifyFolderPostDataParams = new HashMap<>();
 
         // set folder information
-        et_name.setText(str_name);
-        et_desc.setText(str_desc);
-        et_start.setText(str_start);
-        et_end.setText(str_end);
+        et_name.setText(folder.getName());
+        et_desc.setText(folder.getDesc());
+        et_start.setText(folder.getDate_start());
+        et_end.setText(folder.getDate_end());
     }
 
     public void mOnClick(View view){
         switch (view.getId()){
             case R.id.save :
+                // TODO: 2016. 9. 19. it may not work with string format of folder_id
+                modifyFolderPostDataParams.put("id",String.valueOf(folder.getId()));
                 // get modified data from EditTexts
-                // TODO: 2016. 9. 17. get folder ID !!!!
                 modifyFolderPostDataParams.put("name",et_name.getText().toString());
                 modifyFolderPostDataParams.put("desc",et_desc.getText().toString());
                 modifyFolderPostDataParams.put("start",et_start.getText().toString());
@@ -121,6 +125,7 @@ public class FolderModifyActivity extends AppCompatActivity {
             
         } else {
             Toast.makeText(FolderModifyActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
+            // TODO: 2016. 9. 19. save with local db
         }
     }
 

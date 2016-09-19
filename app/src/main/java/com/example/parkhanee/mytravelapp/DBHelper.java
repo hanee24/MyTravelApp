@@ -108,7 +108,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor =
                 db.query(TABLE_FOLDER, // a. table
                         COLUMNS, // b. column names
-                        " id = ?", // c. selections
+                        KEY_ID+"  = ?", // c. selections
                         new String[] { String.valueOf(id) }, // d. selections args
                         null, // e. group by
                         null, // f. having

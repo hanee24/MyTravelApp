@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,7 @@ public class FolderListFragment extends Fragment {
     String TAG = "FolderListFragment";
     HashMap<String, String> newFolderPostDataParams;
 
+    DBHelper db;
 
     @Nullable
     @Override
@@ -74,6 +76,7 @@ public class FolderListFragment extends Fragment {
         listView.setAdapter(myAdapter);
         dialog = new ProgressDialog(getContext());
         newFolderPostDataParams = new HashMap<>();
+        db = new DBHelper(getActivity());
 
         //fetch data to make folder list on create
         userId = MainActivity.getUserId();
@@ -125,9 +128,9 @@ public class FolderListFragment extends Fragment {
                     //프래그먼트에서 뷰(에딧텍스트) 가져오기 //에딧텍스트에서 그안의 스트링 가져오기
                     String name = NewFolderFragment.et_name.getText().toString();
                     String desc = NewFolderFragment.et_desc.getText().toString();
-                    // TODO: 2016. 9. 16. Process date info
-                    String start_date = NewFolderFragment.et_start.getText().toString();
-                    String end_date = NewFolderFragment.et_end.getText().toString();
+                    //  date info is processed at NewFolderFragment and passed as a tag
+                    String start_date = NewFolderFragment.et_start.getTag().toString();
+                    String end_date = NewFolderFragment.et_end.getTag().toString();
 
                     Log.d(TAG, "onClick: "+name+desc);
                     Log.d(TAG, "onClick: start_date "+start_date);
@@ -164,18 +167,16 @@ public class FolderListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent a = new Intent(getActivity(),FolderActivity.class);
-                Folder folder = (Folder) adapterView.getAdapter().getItem(i);
                 Bundle args = new Bundle();
-                args.putString("name",folder.getName());
-                args.putString("desc",folder.getDesc());
-                args.putString("start",folder.getDate_start());
-                args.putString("end",folder.getDate_end());
+                args.putInt("position",myAdapter.getItem(i).getId()); // 이 포지션은 리스트뷰 포지션이고 이거말고 폴더 포지션(아이디)을 넘겨야지
 
                 a.putExtra("args",args);
                 startActivity(a);
             }
         });
     }
+
+
 
     public void myClickHandler(String my) { // check if the network has connected
         String stringUrl; //server url
@@ -203,6 +204,13 @@ public class FolderListFragment extends Fragment {
             new FetchData().execute(stringUrl,tag);
         } else {
             Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
+            // get folder list from local DB when there is no network
+            List<Folder> folders = db.getAllFolders();
+            for (int i=0; i< folders.size();i++){
+                Folder folder = folders.get(i);
+                myAdapter.addItem(folder);
+            }
+            myAdapter.notifyDataSetChanged();
         }
     }
 
@@ -291,7 +299,7 @@ public class FolderListFragment extends Fragment {
             String resultMsg="";
             String msg;
             int totalCount=0;
-            DBHelper db = new DBHelper(getActivity());
+
 
             try{
                 JSONObject result = new JSONObject(s);
@@ -386,6 +394,5 @@ public class FolderListFragment extends Fragment {
 
         return result.toString();
     }
-
 
 }
