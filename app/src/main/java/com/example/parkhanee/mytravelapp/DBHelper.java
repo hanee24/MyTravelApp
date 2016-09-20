@@ -197,6 +197,8 @@ public class DBHelper extends SQLiteOpenHelper {
         // 4. close
         db.close();
 
+        Log.d("updateFolder", folder.toString());
+
         return i;
 
     }

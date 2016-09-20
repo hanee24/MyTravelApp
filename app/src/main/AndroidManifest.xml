@@ -69,7 +69,7 @@
 
         <activity android:name=".FolderActivity">
         </activity>
-        <activity android:name=".FolderModifyActivity">
+        <activity android:name=".FolderUpdateActivity">
         </activity>
     </application>
 

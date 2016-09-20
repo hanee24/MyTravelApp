@@ -35,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,10 +77,11 @@ public class FolderListFragment extends Fragment {
         newFolderPostDataParams = new HashMap<>();
         db = new DBHelper(getActivity());
 
-        //fetch data to make folder list on create
-        userId = MainActivity.getUserId();
-        postData = "user_id="+userId;
-        myClickHandler("list");
+
+//        //fetch data to make folder list on create
+//        userId = MainActivity.getUserId();
+//        postData = "user_id="+userId;
+//        myClickHandler("list");
 
         refresh = (TextView) view.findViewById(R.id.refresh);
         refresh.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +97,6 @@ public class FolderListFragment extends Fragment {
 
 
         btn_new = (Button) view.findViewById(R.id.button8);
-        System.out.println(btn_new);
         frame =  view.findViewById(R.id.frame1);
 
         //set fragment
@@ -117,7 +118,7 @@ public class FolderListFragment extends Fragment {
                     animation = new ExpandCollapseAnimation(frame, 700, 0);
                     isHidden = false;
                     btn_new.setText("저장");
-                } else { //열린거 닫기
+                } else { //열린거 닫기 + 저장
                     animation = new ExpandCollapseAnimation(frame, 400, 1);
                     isHidden = true;
                     btn_new.setText("새로운 폴더 만들기");
@@ -136,6 +137,7 @@ public class FolderListFragment extends Fragment {
 
                     // send info to server and get response.
                     userId = MainActivity.getUserId();
+                    Log.d(TAG, "onClick: user"+userId);
                     newFolderPostDataParams.put("user_id",userId);
                     newFolderPostDataParams.put("folder_name",name);
                     newFolderPostDataParams.put("description",desc);
@@ -149,9 +151,7 @@ public class FolderListFragment extends Fragment {
                     NewFolderFragment.et_name.setText("");
                     NewFolderFragment.et_desc.setText("");
 
-                    // TODO: 2016. 9. 16. set current date instead of 09-09 @ et_start, et_end
-                    NewFolderFragment.et_start.setText("2016 - 09 - 09");
-                    NewFolderFragment.et_end.setText("2016 - 09 - 09");
+                    setCurrentDate();
 
                 }
                 frame.startAnimation(animation);
@@ -166,12 +166,41 @@ public class FolderListFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent a = new Intent(getActivity(),FolderActivity.class);
                 Bundle args = new Bundle();
-                args.putInt("position",myAdapter.getItem(i).getId()); // 이 포지션은 리스트뷰 포지션이고 이거말고 폴더 포지션(아이디)을 넘겨야지
+                args.putInt("position",myAdapter.getItem(i).getId()); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
 
                 a.putExtra("args",args);
                 startActivity(a);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        //fetch data to make folder list on RESUME because the new data should be fetched when a folder data has been updated
+        userId = MainActivity.getUserId();
+        postData = "user_id="+userId;
+        myClickHandler("list");
+    }
+
+    public static void setCurrentDate(){
+        // set current date as default
+        final Calendar c = Calendar.getInstance();
+        String year = String.valueOf(c.get(Calendar.YEAR));
+        String month = String.valueOf(c.get(Calendar.MONTH)+1); // TODO : 2016. 9. 20. why does it need to be added by 1 ?
+        String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+
+        if (c.get(Calendar.MONTH)+1<10){
+           month = "0"+month;
+        }
+        if (c.get(Calendar.DAY_OF_MONTH)<10){
+            day = "0"+day;
+        }
+
+        String dateNow = year+"-"+month+"-"+day;
+        NewFolderFragment.et_start.setText(dateNow);
+        NewFolderFragment.et_end.setText(dateNow);
     }
 
 
@@ -364,6 +393,12 @@ public class FolderListFragment extends Fragment {
             String desc  =  folder.getString("description");
             String start = folder.getString("date_start").substring(0,10);
             String end = folder.getString("date_end").substring(0,10);
+
+            // String start == 2016-09-20 , String str_start == 2016 - 09 - 20.
+            // trimming date format
+//            String str_start = start.substring(0,4)+" - "+start.substring(5,7)+" - "+start.substring(8,10);
+//            String str_end = end.substring(0,4)+" - "+end.substring(5,7)+" - "+end.substring(8,10);
+
             int id = folder.getInt("folder_id");
             String user_id = folder.getString("user_id");
             String created = folder.getString("created").substring(0,10);

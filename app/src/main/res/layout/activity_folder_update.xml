@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.parkhanee.mytravelapp.FolderModifyActivity">
+    tools:context=".FolderUpdateActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -121,7 +121,6 @@
                 android:id="@+id/editText9"
                 android:singleLine="true"
                 android:imeOptions="actionNext"
-                android:text="2016 - 09 - 09"
                 android:layout_alignParentLeft="false"
                 android:layout_alignTop="@+id/textView31"
                 android:layout_toRightOf="@+id/textView31"
@@ -167,7 +166,6 @@
                 android:id="@+id/editText8"
                 android:singleLine="true"
                 android:imeOptions="actionNext"
-                android:text="2016 - 09 - 09"
                 android:layout_alignParentLeft="false"
                 android:layout_alignTop="@+id/textView30"
                 android:layout_toRightOf="@+id/textView30"

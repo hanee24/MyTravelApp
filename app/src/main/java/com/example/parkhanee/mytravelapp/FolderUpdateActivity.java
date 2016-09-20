@@ -1,20 +1,24 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,28 +33,29 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class FolderModifyActivity extends AppCompatActivity {
+public class FolderUpdateActivity extends AppCompatActivity {
 
     private EditText et_name;
-    EditText et_desc, et_start, et_end;
-    String TAG = "FolderModifyFragment";
+    static EditText et_desc, et_start, et_end;
     private InputMethodManager imm;
     ProgressDialog dialog;
     HashMap<String, String> modifyFolderPostDataParams;
     int position;
-    Folder folder;
+    public static Folder folder;
     DBHelper db;
+    String TAG = "FolderUpdateActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_folder_modify);
+        setContentView(R.layout.activity_folder_update);
 
         // get arguments from FolderActivity
         Intent i = getIntent();
@@ -58,7 +63,7 @@ public class FolderModifyActivity extends AppCompatActivity {
         position = bundle.getInt("position");
 
         // get folder from local DB
-        db = new DBHelper(FolderModifyActivity.this);
+        db = new DBHelper(FolderUpdateActivity.this);
         folder = db.getFolder(position);
 
         //hide keyboard as default
@@ -72,6 +77,22 @@ public class FolderModifyActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(et_name.getWindowToken(), 0);
             }
         },100);
+
+        ImageButton btn_start = (ImageButton) findViewById(R.id.imageButton2);
+        btn_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePickerDialog(view);
+            }
+        });
+
+        ImageButton btn_end = (ImageButton) findViewById(R.id.imageButton3);
+        btn_end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePickerDialog(view);
+            }
+        });
     }
 
     public void setLayout(){
@@ -80,14 +101,19 @@ public class FolderModifyActivity extends AppCompatActivity {
         et_desc = (EditText) findViewById(R.id.editText7);
         et_start = (EditText) findViewById(R.id.editText8);
         et_end = (EditText) findViewById(R.id.editText9);
-        dialog = new ProgressDialog(FolderModifyActivity.this);
+        dialog = new ProgressDialog(FolderUpdateActivity.this);
         modifyFolderPostDataParams = new HashMap<>();
 
         // set folder information
         et_name.setText(folder.getName());
         et_desc.setText(folder.getDesc());
         et_start.setText(folder.getDate_start());
+        //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
+        String s = folder.getDate_start()+" 00:00:00";
+        et_start.setTag(s);
         et_end.setText(folder.getDate_end());
+        String e = folder.getDate_end()+" 00:00:00";
+        et_end.setTag(e);
     }
 
     public void mOnClick(View view){
@@ -97,8 +123,8 @@ public class FolderModifyActivity extends AppCompatActivity {
                 // get modified data from EditTexts
                 modifyFolderPostDataParams.put("name",et_name.getText().toString());
                 modifyFolderPostDataParams.put("desc",et_desc.getText().toString());
-                modifyFolderPostDataParams.put("start",et_start.getText().toString());
-                modifyFolderPostDataParams.put("end",et_end.getText().toString());
+                modifyFolderPostDataParams.put("start",et_start.getTag().toString()); // TODO: 2016. 9. 20. where does it set the TAG ?
+                modifyFolderPostDataParams.put("end",et_end.getTag().toString());
                 myClickHandler();
 
                 // update local db with new info
@@ -128,14 +154,14 @@ public class FolderModifyActivity extends AppCompatActivity {
         if (networkInfo != null && networkInfo.isConnected()) {
 
             stringUrl = "http://hanea8199.vps.phps.kr/modifyfolder_process.php";
-            new FolderModifyProcess().execute(stringUrl);
+            new FolderUpdateProcess().execute(stringUrl);
             
         } else {
-            Toast.makeText(FolderModifyActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(FolderUpdateActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class FolderModifyProcess extends AsyncTask<String, Void, String>{
+    private class FolderUpdateProcess extends AsyncTask<String, Void, String>{
 
         @Override
         protected void onPreExecute() {
@@ -257,4 +283,77 @@ public class FolderModifyActivity extends AppCompatActivity {
 
     }
 
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+        Boolean start;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+//            final Calendar c = Calendar.getInstance();
+//            int year = c.get(Calendar.YEAR);
+//            int month = c.get(Calendar.MONTH);
+//            int day = c.get(Calendar.DAY_OF_MONTH);
+            start = getArguments().getBoolean("start_date");
+            String date;
+            if (start){
+                date = folder.getDate_start();
+            }else {
+                date = folder.getDate_end();
+            }
+            Log.d("DatePicker", "onCreateDialog: date "+date);
+            int year = Integer.parseInt(date.substring(0,4));
+            Log.d("DatePicker", "onCreateDialog: year"+String.valueOf(year)); //2015-23-23
+            int month = Integer.parseInt(date.substring(5,7))-1; // TODO: 2016. 9. 20. why does it need to be subtracted by 1 ?
+            int day = Integer.parseInt(date.substring(8,10));
+            Log.d("DatePicker", "onCreateDialog: y m d "+year+month+day);
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        // when user choose a date and clicked ok on DatePicker,
+        // Do something with the date
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+
+            String str_month,str_day;
+            str_month = String.valueOf(month+1);
+            str_day = String.valueOf(day);
+            if (month+1<10){
+                str_month = "0"+str_month;
+            }
+            if (day<10){
+                str_day = "0"+str_day;
+            }
+            String date = String.valueOf(year) + "-"+str_month+"-"+str_day;
+
+            if (start){ // set selected date as string at et_start
+                et_start.setText(date);
+                //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
+                et_start.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
+
+            }else{ // set selected date as string at et_end
+                et_end.setText(date);
+                //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
+                et_end.setTag(String.valueOf(year)+"-"+str_month+"-"+str_day + " 00:00:00");
+            }
+        }
+    }
+
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment();
+        Bundle args = new Bundle();
+        if (v.getId() == R.id.imageButton2){ // btn_start clicked
+            args.putBoolean("start_date",true);
+        }else { // btn_end clicked
+            if (v.getId() != R.id.imageButton3){
+                Log.d(TAG, "showDatePickerDialog: check parameter View");
+            }
+            args.putBoolean("start_date",false);
+        }
+
+        newFragment.setArguments(args);
+        newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
 }
+
+

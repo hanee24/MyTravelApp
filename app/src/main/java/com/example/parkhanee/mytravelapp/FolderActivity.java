@@ -7,8 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
-import java.util.List;
+import android.widget.Toast;
 
 public class FolderActivity extends AppCompatActivity {
 
@@ -31,8 +30,8 @@ public class FolderActivity extends AppCompatActivity {
         // get folder from local DB
         db = new DBHelper(FolderActivity.this);
         db.getAllFolders();
-        Log.d(TAG, "position: "+position);
-        folder = db.getFolder(position);
+//        Log.d(TAG, "position: "+position);
+       // folder = db.getFolder(position);
 
         // initiate views
         tv_name = (TextView)findViewById(R.id.folderName);
@@ -40,15 +39,10 @@ public class FolderActivity extends AppCompatActivity {
         tv_date = (TextView) findViewById(R.id.textView25);
         btn_edit = (ImageButton) findViewById(R.id.imageButton);
 
-        tv_name.setText(folder.getName());
-        tv_desc.setText(folder.getDesc());
-        String date = folder.getDate_start()+" ~ "+folder.getDate_end();
-        tv_date.setText(date);
-
         btn_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(FolderActivity.this,FolderModifyActivity.class);
+                Intent i = new Intent(FolderActivity.this,FolderUpdateActivity.class);
                 Bundle bundle1 = new Bundle();
                 bundle1.putInt("position",position);
                 i.putExtra("args",bundle1);
@@ -56,4 +50,15 @@ public class FolderActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        folder = db.getFolder(position);
+        tv_name.setText(folder.getName());
+        tv_desc.setText(folder.getDesc());
+        String date = folder.getDate_start()+" ~ "+folder.getDate_end();
+        tv_date.setText(date);
+    }
+
 }

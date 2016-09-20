@@ -39,11 +39,11 @@ public class NewFolderFragment extends Fragment {
 
         //initiate views in order to use later in FolderListFragment when creating new folder
         et_start = (EditText) view.findViewById(R.id.date_start);
-        //et_start.setTag(20160909); // TODO: 2016. 9. 16. temporary date value due to date data passing error
         et_end = (EditText) view.findViewById(R.id.date_end);
-        //et_end.setTag(20160909);
         et_name = (EditText) view.findViewById(R.id.editText4);
         et_desc = (EditText) view.findViewById(R.id.editText5);
+
+        FolderListFragment.setCurrentDate();
 
         ImageButton btn_start = (ImageButton)view.findViewById(R.id.pick_start_date);
         btn_start.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +103,7 @@ public class NewFolderFragment extends Fragment {
             if (day<10){
                str_day = "0"+str_day;
             }
-            String date = String.valueOf(year) + " - "+str_month+" - "+str_day;
+            String date = String.valueOf(year) + "-"+str_month+"-"+str_day;
 
             if (start){ // set selected date as string at et_start
                 et_start.setText(date);
