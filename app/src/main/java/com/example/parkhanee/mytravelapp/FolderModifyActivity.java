@@ -93,14 +93,21 @@ public class FolderModifyActivity extends AppCompatActivity {
     public void mOnClick(View view){
         switch (view.getId()){
             case R.id.save :
-                // TODO: 2016. 9. 19. it may not work with string format of folder_id
-                modifyFolderPostDataParams.put("id",String.valueOf(folder.getId()));
+                modifyFolderPostDataParams.put("folder_id",String.valueOf(folder.getId()));
                 // get modified data from EditTexts
                 modifyFolderPostDataParams.put("name",et_name.getText().toString());
                 modifyFolderPostDataParams.put("desc",et_desc.getText().toString());
                 modifyFolderPostDataParams.put("start",et_start.getText().toString());
                 modifyFolderPostDataParams.put("end",et_end.getText().toString());
                 myClickHandler();
+
+                // update local db with new info
+                Folder folder1 = folder;
+                folder1.setName(et_name.getText().toString());
+                folder1.setDesc(et_desc.getText().toString());
+                folder1.setDate_start(et_start.getText().toString());
+                folder1.setDate_end(et_end.getText().toString());
+                db.updateFolder(folder1);
                 break;
             case R.id.cancel :
                 finish();
@@ -125,7 +132,6 @@ public class FolderModifyActivity extends AppCompatActivity {
             
         } else {
             Toast.makeText(FolderModifyActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
-            // TODO: 2016. 9. 19. save with local db
         }
     }
 
@@ -146,17 +152,16 @@ public class FolderModifyActivity extends AppCompatActivity {
 
             try{
                 JSONObject result = new JSONObject(s);
-                JSONObject header = result.getJSONObject("header");
-                resultCode = header.getInt("resultCode");
+               //JSONObject header = result.getJSONObject("header");
+                resultCode = result.getInt("resultCode");
 
                 //check the whole result
                 resultMsg = result.toString();
-                System.out.println(resultMsg);
+                Log.d(TAG, "onPostExecute: "+resultMsg);
 
                 if (resultCode==00) { // result is ok
-                    Toast.makeText(FolderModifyActivity.this, "정보가 수정되었습니다", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onPostExecute: Result is OK");
                 }else{
-                    Toast.makeText(FolderModifyActivity.this, "resultCode is not okay ?", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "onPostExecute: resultCode is not okay ? ");
                 }
 

@@ -121,6 +121,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // 4. build folder object
         Folder folder = new Folder();
+        // CursorIndexOutOfBoundsException: Index 0 requested, with a size of 0
+        // when the folder index is wrong so that no folder has called
         folder.setId(Integer.parseInt(cursor.getString(0)));
         folder.setName(cursor.getString(1));
         folder.setUser_id(cursor.getString(2));
