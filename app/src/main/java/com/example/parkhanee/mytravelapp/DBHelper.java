@@ -28,7 +28,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         // TODO: 2016. 9. 19. create folder detail table. 
-        // TODO: 2016. 9. 19. no need user table !! -- 각 클라에 해당하는 폴더테이블만 여기에 만드니까. user id column도 사실 필요없는것같다
+        // TODO: 2016. 9. 19. no need user table !! -- 각 클라에 해당하는 폴더테이블만 여기에 만드니까.
+        // TODO: 2016. 9. 21.  아니 유저테이블 필요한가>? 한 디바이스에 여러 유저가 있을수도 있는데 ??
 
         // SQL statement to create folder table
         String CREATE_FOLDER_TABLE = "CREATE TABLE folder( "+
@@ -138,11 +139,11 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Get All Folders
-    public List<Folder> getAllFolders() {
+    public List<Folder> getAllFolders(String user_id) {
         List<Folder> folders = new LinkedList<Folder>();
 
         // 1. build the query
-        String query = "SELECT  * FROM " + TABLE_FOLDER;
+        String query = "SELECT  * FROM " + TABLE_FOLDER+" WHERE "+KEY_USER_ID+"='"+user_id+"' ORDER BY "+KEY_ID+" DESC";
 
         // 2. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();

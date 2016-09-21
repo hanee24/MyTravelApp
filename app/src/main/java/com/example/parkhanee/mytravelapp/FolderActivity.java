@@ -29,7 +29,7 @@ public class FolderActivity extends AppCompatActivity {
 
         // get folder from local DB
         db = new DBHelper(FolderActivity.this);
-        db.getAllFolders();
+        db.getAllFolders(MainActivity.getUserId());
 //        Log.d(TAG, "position: "+position);
        // folder = db.getFolder(position);
 
@@ -57,7 +57,7 @@ public class FolderActivity extends AppCompatActivity {
         folder = db.getFolder(position);
         tv_name.setText(folder.getName());
         tv_desc.setText(folder.getDesc());
-        String date = folder.getDate_start()+" ~ "+folder.getDate_end();
+        String date = folder.getDate_start().substring(0,10)+" ~ "+folder.getDate_end().substring(0,10);
         tv_date.setText(date);
     }
 

@@ -107,13 +107,13 @@ public class FolderUpdateActivity extends AppCompatActivity {
         // set folder information
         et_name.setText(folder.getName());
         et_desc.setText(folder.getDesc());
-        et_start.setText(folder.getDate_start());
+        et_start.setText(folder.getDate_start().substring(0,10));
         //날짜형식 서버랑 맞추기  2016-08-20 11:04:14
-        String s = folder.getDate_start()+" 00:00:00";
-        et_start.setTag(s);
-        et_end.setText(folder.getDate_end());
-        String e = folder.getDate_end()+" 00:00:00";
-        et_end.setTag(e);
+        //String s = folder.getDate_start()+" 00:00:00";
+        et_start.setTag(folder.getDate_start());
+        et_end.setText(folder.getDate_end().substring(0,10));
+       // String e = folder.getDate_end()+" 00:00:00";
+        et_end.setTag(folder.getDate_end());
     }
 
     public void mOnClick(View view){

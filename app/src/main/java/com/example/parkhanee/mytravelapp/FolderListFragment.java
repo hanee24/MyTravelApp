@@ -35,7 +35,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,17 +49,14 @@ import java.util.Map;
 public class FolderListFragment extends Fragment {
     TextView refresh;
     String userId;
-    String postData;
 
-    private ListView listView;
     private FolderListAdapter myAdapter;
-    ProgressDialog dialog;
     public static Boolean isHidden;// tells if the drop-down "newFolder" fragment is hidden
     public static Button btn_new;
     public static View frame;
 
     String TAG = "FolderListFragment";
-    HashMap<String, String> newFolderPostDataParams;
+    HashMap<String, String> PostDataParams;
 
     DBHelper db;
 
@@ -71,27 +71,18 @@ public class FolderListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         myAdapter = new FolderListAdapter(getActivity());
-        listView = (ListView) view.findViewById(R.id.listView2);
+        ListView listView = (ListView) view.findViewById(R.id.listView2);
         listView.setAdapter(myAdapter);
-        dialog = new ProgressDialog(getContext());
-        newFolderPostDataParams = new HashMap<>();
+//        dialog = new ProgressDialog(getContext());
         db = new DBHelper(getActivity());
-
-
-//        //fetch data to make folder list on create
-//        userId = MainActivity.getUserId();
-//        postData = "user_id="+userId;
-//        myClickHandler("list");
 
         refresh = (TextView) view.findViewById(R.id.refresh);
         refresh.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                // get user id from shared preference
-                userId = MainActivity.getUserId();
-                postData = "user_id="+userId;
-                myClickHandler("list");
+
+                myClickHandler();
             }
         });
 
@@ -135,23 +126,21 @@ public class FolderListFragment extends Fragment {
                     Log.d(TAG, "onClick: start_date "+start_date);
                     Log.d(TAG, "onClick: end_date "+end_date);
 
-                    // send info to server and get response.
-                    userId = MainActivity.getUserId();
-                    Log.d(TAG, "onClick: user"+userId);
-                    newFolderPostDataParams.put("user_id",userId);
-                    newFolderPostDataParams.put("folder_name",name);
-                    newFolderPostDataParams.put("description",desc);
-                    newFolderPostDataParams.put("date_start",start_date);
-                    newFolderPostDataParams.put("date_end",end_date);
-                    myClickHandler("new");
+                    myClickHandler();
 
-                    // TODO: 2016. 9. 9. Throw Exceptions ? such as "not all info is written"
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = new Date();
+                    System.out.println(dateFormat.format(date)); //2014/08/06 15:59:48
+                    int unixTime = (int) System.currentTimeMillis() / 1000; //set unix time as folder id
+                    db.addFolder(new Folder(unixTime,name,MainActivity.getUserId(),desc,start_date,end_date,dateFormat.format(date)));
+                    Log.d(TAG, "created "+dateFormat.format(date));
 
                     // reset editTexts since the data within them has been sent
                     NewFolderFragment.et_name.setText("");
                     NewFolderFragment.et_desc.setText("");
+                    setCurrentDate(); //날짜 에딧텍스트 초기화
 
-                    setCurrentDate();
+                    myClickHandler(); //update listView and sync data to server
 
                 }
                 frame.startAnimation(animation);
@@ -174,21 +163,23 @@ public class FolderListFragment extends Fragment {
         });
     }
 
+
+
+
+
+
     @Override
     public void onResume() {
         super.onResume();
-
         //fetch data to make folder list on RESUME because the new data should be fetched when a folder data has been updated
-        userId = MainActivity.getUserId();
-        postData = "user_id="+userId;
-        myClickHandler("list");
+        myClickHandler();
     }
 
     public static void setCurrentDate(){
         // set current date as default
         final Calendar c = Calendar.getInstance();
         String year = String.valueOf(c.get(Calendar.YEAR));
-        String month = String.valueOf(c.get(Calendar.MONTH)+1); // TODO : 2016. 9. 20. why does it need to be added by 1 ?
+        String month = String.valueOf(c.get(Calendar.MONTH)+1); // TODO : 2016. 9. 20. why does it need +1 ?
         String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
 
         if (c.get(Calendar.MONTH)+1<10){
@@ -200,63 +191,66 @@ public class FolderListFragment extends Fragment {
 
         String dateNow = year+"-"+month+"-"+day;
         NewFolderFragment.et_start.setText(dateNow);
+        NewFolderFragment.et_start.setTag(dateNow+" 00:00:00");
         NewFolderFragment.et_end.setText(dateNow);
+        NewFolderFragment.et_end.setTag(dateNow+" 00:00:00");
     }
 
+    public void setFolderList(List<Folder> folders){
+        myAdapter.clearItem(); // clear Adapter before fetch folder list
+        for (int i=0; i< folders.size();i++){
+            Folder folder = folders.get(i);
+            myAdapter.addItem(folder);
+        }
+        myAdapter.notifyDataSetChanged();
+    }
 
+    public void myClickHandler() {
 
-    public void myClickHandler(String my) { // check if the network has connected
-        String stringUrl; //server url
-        String tag;
+        /* 폴더목록 액티비티에서 데이터 동기화 처리
+        * 1. 로컬디비에서 폴더목록 가져와서 출력
+        * 2. (온라인) 로컬디비의 정보를 서버로 보내서 동기화 -- 새폴더 만들어서 목록 다시 불러오면 새폴더 서버로 동기화도 바로 처리됨.
+        */
+
+        // 1. get folder list from local DB no matter there is network or not.
+        List<Folder> folders = db.getAllFolders(MainActivity.getUserId());
+        setFolderList(folders);
+
+        // check if the network has connected
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            switch (my){
-                case "new": // creating a new folder
-                    stringUrl = "http://hanea8199.vps.phps.kr/newfolder_process.php";
-                    tag ="new";
-                    Log.d(TAG, "myClickHandler: NEW");
-                    break;
-                case "list": // getting folder list from server
-                    stringUrl = "http://hanea8199.vps.phps.kr/folderlist_process.php";
-                    tag = "list";
-                    Log.d(TAG, "myClickHandler: LIST");
-                    break;
-                default:stringUrl="";
-                    tag="default";
-                    Log.d(TAG, "myClickHandler: DEFAULT");
-                    break;
-            }
-            new FetchData().execute(stringUrl,tag);
-        } else {
-            Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
-            // get folder list from local DB when there is no network
-            List<Folder> folders = db.getAllFolders();
+            // 2. synchronize server
+
+            // fetch data from localDB and put them into postData hashMap.
+            PostDataParams = new HashMap<>();
+            userId = MainActivity.getUserId(); // get user id from shared preference
+            PostDataParams.put("size",String.valueOf(folders.size()));
             for (int i=0; i< folders.size();i++){
                 Folder folder = folders.get(i);
-                myAdapter.addItem(folder);
+                PostDataParams.put("user_id"+i,userId);
+                PostDataParams.put("folder_id"+i,String.valueOf(folder.getId()));
+                PostDataParams.put("folder_name"+i,folder.getName());
+                PostDataParams.put("description"+i,folder.getDesc());
+                PostDataParams.put("date_start"+i,folder.getDate_start());
+                PostDataParams.put("date_end"+i,folder.getDate_end());
+                PostDataParams.put("created"+i,folder.getCreated());
             }
-            myAdapter.notifyDataSetChanged();
+
+            String stringUrl = "http://hanea8199.vps.phps.kr/syncfolderlist_process.php"; // TODO: 2016. 9. 21. update server side ..
+            new SyncServer().execute(stringUrl); // connect to server
+
+        } else {
+            Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
         }
     }
 
 
-    private class FetchData extends AsyncTask<String, Void, String>{
-        // tells if this task is to fetch folder list (true)
-        // or create a new folder and then fetch the list (false)
-        Boolean  isList;
-
-        @Override
-        protected void onPreExecute() {
-            dialog.setMessage("데이터를 가져오는 중입니다");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
-        }
+    private class SyncServer extends AsyncTask<String, Void, String>{
 
         @Override
         protected String doInBackground(String... strings) {
-            isList = strings[1].equals("list");
             try {
                 return downloadUrl(strings[0]);
             } catch (IOException e) {
@@ -281,13 +275,8 @@ public class FolderListFragment extends Fragment {
                 // add post parameters
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                if (isList){
-                    writer.write(postData);
-                    Log.d(TAG, "downloadUrl: isList==true");
-                }else{
-                    writer.write(getPostDataString(newFolderPostDataParams));
-                    Log.d(TAG, "downloadUrl: isList==false");
-                }
+
+                writer.write(getPostDataString(PostDataParams));
 
                 writer.flush();
                 writer.close();
@@ -330,60 +319,54 @@ public class FolderListFragment extends Fragment {
 
             try{
                 JSONObject result = new JSONObject(s);
-                JSONObject header = result.getJSONObject("header");
-                resultCode = header.getInt("resultCode");
+                //JSONObject header = result.getJSONObject("header");
+                resultCode = result.getInt("resultCode");
 
                 //check the whole result
                 resultMsg = result.toString();
                 //System.out.println(resultMsg);
                 //resultMsg = header.getString("resultMsg");
 
-                if (resultCode==00) {
-                    JSONObject body = result.getJSONObject("body");
-                    totalCount = body.getInt("totalCount");
-                    if (totalCount == 1) {
-
-                        JSONObject folder = body.getJSONObject("folders");
-                        // set the contents of folder to a folder instance
-                        Folder folderItem = getFolderInfo(folder);
-                        myAdapter.clearItem();// to avoid duplicated data shown when refresh
-                        // set the instance to the ListViewAdapter
-                        myAdapter.addItem(0, folderItem);
-
-                        if (!isList){
-                            //add a row on folder table of localDB for the newly-created folder
-                            db.addFolder(folderItem);
-                        }
-
-                    } else if (totalCount > 1) {
-
-                        JSONArray folders = body.getJSONArray("folders");
-                        myAdapter.clearItem(); // to avoid duplicated data shown when refresh
-                        for (int i = 0; i < totalCount; i++) {
-                            JSONObject folder = folders.getJSONObject(i);
-
-                            // set the contents of folder to a folder instance
-                            Folder folderItem = getFolderInfo(folder);
-                            // set the instance to the ListViewAdapter
-                            myAdapter.addItem(i, folderItem);
-                            if (!isList&i==0){
-                                //add a row on folder table of localDB for the newly-created folder
-                                db.addFolder(folderItem);
-                            }
-                        }
-                    }
-                    db.getAllFolders();
-                }// result is ok
+//                if (resultCode==00) {
+//                    JSONObject body = result.getJSONObject("body");
+//                    totalCount = body.getInt("totalCount");
+//                    if (totalCount == 1) {
+//
+//                        JSONObject folder = body.getJSONObject("folders");
+//                        // set the contents of folder to a folder instance
+//                        Folder folderItem = getFolderInfo(folder);
+//                        myAdapter.clearItem();// to avoid duplicated data shown when refresh
+//                        // set the instance to the ListViewAdapter
+//                        myAdapter.addItem(0, folderItem);
+//
+////                        if (!isList){
+////                            //add a row on folder table of localDB for the newly-created folder
+////                            db.addFolder(folderItem);
+////                        }
+//
+//                    } else if (totalCount > 1) {
+//
+//                        JSONArray folders = body.getJSONArray("folders");
+//                        myAdapter.clearItem(); // to avoid duplicated data shown when refresh
+//                        for (int i = 0; i < totalCount; i++) {
+//                            JSONObject folder = folders.getJSONObject(i);
+//
+//                            // set the contents of folder to a folder instance
+//                            Folder folderItem = getFolderInfo(folder);
+//                            // set the instance to the ListViewAdapter
+//                            myAdapter.addItem(i, folderItem);
+//                            if (!isList&i==0){
+//                                //add a row on folder table of localDB for the newly-created folder
+//                                db.addFolder(folderItem);
+//                            }
+//                        }
+//                    }
+//                    db.getAllFolders();
+//                }// result is ok
 
             }catch (JSONException e){
                 e.printStackTrace();
             }
-
-            myAdapter.notifyDataSetChanged();
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
 
         }
 

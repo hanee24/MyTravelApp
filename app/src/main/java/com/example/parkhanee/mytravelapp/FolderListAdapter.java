@@ -67,8 +67,8 @@ public class FolderListAdapter extends BaseAdapter{
             Folder f = folderArrayList.get(position);
             holder.tvName.setText(f.getName());
             holder.tvDesc.setText(f.getDesc());
-            String start = f.getDate_start();
-            String end = f.getDate_end();
+            String start = f.getDate_start().substring(0,10);
+            String end = f.getDate_end().substring(0,10);
             String str = start+" ~ "+end;
             holder.tvDate.setText(str);
         }else{
