@@ -131,8 +131,8 @@ public class FolderActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            Log.d(TAG, "onPreExecute: ");
-            db.getAllFolders(folder.getUser_id()); // TODO: 2016. 9. 22. check the result
+            // print the number of folders at local DB before deleting
+            Log.d(TAG, "onPreExecute: folders "+String.valueOf(db.getAllFolders(folder.getUser_id()).size()));
         }
 
         @Override
@@ -148,7 +148,8 @@ public class FolderActivity extends AppCompatActivity {
                 //check the whole result
                 str_result = result.toString();
                 Log.d(TAG, "onPostExecute: "+str_result);
-                db.getAllFolders(folder.getUser_id()); // TODO: 2016. 9. 22. check the result
+                // print the number of folders at local DB after deleting
+                Log.d(TAG, "onPostExecute: folders "+String.valueOf(db.getAllFolders(folder.getUser_id()).size()));
 
             }catch (JSONException e){
                 e.printStackTrace();

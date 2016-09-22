@@ -227,11 +227,12 @@ public class FolderListFragment extends Fragment {
             // fetch data from localDB and put them into postData hashMap.
             folders = db.getAllFolders(MainActivity.getUserId()); // TODO: 2016. 9. 22. 이렇게한번더 빼내줘야 ?
             PostDataParams = new HashMap<>();
-            userId = MainActivity.getUserId(); // get user id from shared preference
+
+            PostDataParams.put("user_id",MainActivity.getUserId()); // TODO: 2016. 9. 22. check
             PostDataParams.put("size",String.valueOf(folders.size()));
             for (int i=0; i< folders.size();i++){
                 Folder folder = folders.get(i);
-                PostDataParams.put("user_id"+i,userId);
+                //PostDataParams.put("user_id"+i,userId);
                 PostDataParams.put("folder_id"+i,String.valueOf(folder.getId()));
                 PostDataParams.put("folder_name"+i,folder.getName());
                 PostDataParams.put("description"+i,folder.getDesc());
@@ -240,7 +241,7 @@ public class FolderListFragment extends Fragment {
                 PostDataParams.put("created"+i,folder.getCreated());
             }
 
-            String stringUrl = "http://hanea8199.vps.phps.kr/syncfolderlist_process.php"; // TODO: 2016. 9. 21. update server side ..
+            String stringUrl = "http://hanea8199.vps.phps.kr/syncfolderlist_process.php";
             new SyncServer().execute(stringUrl); // connect to server
 
         } else {
