@@ -119,6 +119,15 @@ public class FolderUpdateActivity extends AppCompatActivity {
     public void mOnClick(View view){
         switch (view.getId()){
             case R.id.save :
+
+                // TODO: 2016. 9. 22. save update to local db
+                Folder folder1 = folder;
+                folder1.setName(et_name.getText().toString());
+                folder1.setDesc(et_desc.getText().toString());
+                folder1.setDate_start(et_start.getTag().toString());
+                folder1.setDate_end(et_end.getTag().toString());
+                db.updateFolder(folder1);
+
                 modifyFolderPostDataParams.put("folder_id",String.valueOf(folder.getId()));
                 // get modified data from EditTexts
                 modifyFolderPostDataParams.put("name",et_name.getText().toString());
@@ -127,13 +136,6 @@ public class FolderUpdateActivity extends AppCompatActivity {
                 modifyFolderPostDataParams.put("end",et_end.getTag().toString());
                 myClickHandler();
 
-                // update local db with new info
-                Folder folder1 = folder;
-                folder1.setName(et_name.getText().toString());
-                folder1.setDesc(et_desc.getText().toString());
-                folder1.setDate_start(et_start.getText().toString());
-                folder1.setDate_end(et_end.getText().toString());
-                db.updateFolder(folder1);
                 break;
             case R.id.cancel :
                 finish();
@@ -147,6 +149,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
     // check if the network has connected before executing AsyncTask network connection to server
     public void myClickHandler() {
 
+        //save update to server if there is network connection
         String stringUrl; //server url
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -158,6 +161,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
             
         } else {
             Toast.makeText(FolderUpdateActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 

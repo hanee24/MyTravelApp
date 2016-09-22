@@ -83,6 +83,7 @@ public class FolderListFragment extends Fragment {
             public void onClick(View view) {
 
                 myClickHandler();
+                Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -224,6 +225,7 @@ public class FolderListFragment extends Fragment {
             // 2. synchronize server
 
             // fetch data from localDB and put them into postData hashMap.
+            folders = db.getAllFolders(MainActivity.getUserId()); // TODO: 2016. 9. 22. 이렇게한번더 빼내줘야 ?
             PostDataParams = new HashMap<>();
             userId = MainActivity.getUserId(); // get user id from shared preference
             PostDataParams.put("size",String.valueOf(folders.size()));
@@ -275,9 +277,7 @@ public class FolderListFragment extends Fragment {
                 // add post parameters
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-
                 writer.write(getPostDataString(PostDataParams));
-
                 writer.flush();
                 writer.close();
                 os.close();
@@ -324,45 +324,12 @@ public class FolderListFragment extends Fragment {
 
                 //check the whole result
                 resultMsg = result.toString();
-                //System.out.println(resultMsg);
-                //resultMsg = header.getString("resultMsg");
+                Log.d(TAG, "onPostExecute: "+ resultMsg);
 
-//                if (resultCode==00) {
-//                    JSONObject body = result.getJSONObject("body");
-//                    totalCount = body.getInt("totalCount");
-//                    if (totalCount == 1) {
-//
-//                        JSONObject folder = body.getJSONObject("folders");
-//                        // set the contents of folder to a folder instance
-//                        Folder folderItem = getFolderInfo(folder);
-//                        myAdapter.clearItem();// to avoid duplicated data shown when refresh
-//                        // set the instance to the ListViewAdapter
-//                        myAdapter.addItem(0, folderItem);
-//
-////                        if (!isList){
-////                            //add a row on folder table of localDB for the newly-created folder
-////                            db.addFolder(folderItem);
-////                        }
-//
-//                    } else if (totalCount > 1) {
-//
-//                        JSONArray folders = body.getJSONArray("folders");
-//                        myAdapter.clearItem(); // to avoid duplicated data shown when refresh
-//                        for (int i = 0; i < totalCount; i++) {
-//                            JSONObject folder = folders.getJSONObject(i);
-//
-//                            // set the contents of folder to a folder instance
-//                            Folder folderItem = getFolderInfo(folder);
-//                            // set the instance to the ListViewAdapter
-//                            myAdapter.addItem(i, folderItem);
-//                            if (!isList&i==0){
-//                                //add a row on folder table of localDB for the newly-created folder
-//                                db.addFolder(folderItem);
-//                            }
-//                        }
-//                    }
-//                    db.getAllFolders();
-//                }// result is ok
+                if (resultCode!=00){
+                    Toast.makeText(getActivity(), "sync failed", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onPostExecute: "+resultMsg);
+                }
 
             }catch (JSONException e){
                 e.printStackTrace();
@@ -370,25 +337,25 @@ public class FolderListFragment extends Fragment {
 
         }
 
-        public Folder getFolderInfo(JSONObject folder) throws JSONException {
-            // sort folder information from a jsonObject sent from the server
-            String name = folder.getString("folder_name");
-            String desc  =  folder.getString("description");
-            String start = folder.getString("date_start").substring(0,10);
-            String end = folder.getString("date_end").substring(0,10);
-
-            // String start == 2016-09-20 , String str_start == 2016 - 09 - 20.
-            // trimming date format
-//            String str_start = start.substring(0,4)+" - "+start.substring(5,7)+" - "+start.substring(8,10);
-//            String str_end = end.substring(0,4)+" - "+end.substring(5,7)+" - "+end.substring(8,10);
-
-            int id = folder.getInt("folder_id");
-            String user_id = folder.getString("user_id");
-            String created = folder.getString("created").substring(0,10);
-
-            Folder folderItem = new Folder(id,name,user_id,desc,start,end,created);
-            return folderItem;
-        }
+//        public Folder getFolderInfo(JSONObject folder) throws JSONException {
+//            // sort folder information from a jsonObject sent from the server
+//            String name = folder.getString("folder_name");
+//            String desc  =  folder.getString("description");
+//            String start = folder.getString("date_start").substring(0,10);
+//            String end = folder.getString("date_end").substring(0,10);
+//
+//            // String start == 2016-09-20 , String str_start == 2016 - 09 - 20.
+//            // trimming date format
+////            String str_start = start.substring(0,4)+" - "+start.substring(5,7)+" - "+start.substring(8,10);
+////            String str_end = end.substring(0,4)+" - "+end.substring(5,7)+" - "+end.substring(8,10);
+//
+//            int id = folder.getInt("folder_id");
+//            String user_id = folder.getString("user_id");
+//            String created = folder.getString("created").substring(0,10);
+//
+//            Folder folderItem = new Folder(id,name,user_id,desc,start,end,created);
+//            return folderItem;
+//        }
     }
 
     private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
