@@ -47,7 +47,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
     private InputMethodManager imm;
     ProgressDialog dialog;
     HashMap<String, String> modifyFolderPostDataParams;
-    int folder_id;
+    static int folder_id;
     public static Folder folder;
     DBHelper db;
     String TAG = "FolderUpdateActivity";
@@ -140,6 +140,12 @@ public class FolderUpdateActivity extends AppCompatActivity {
             case R.id.cancel :
                 finish();
                 break;
+            case R.id.button9 :
+                Intent i = new Intent(FolderUpdateActivity.this,FolderShareActivity.class);
+                Bundle args = new Bundle();
+                args.putInt("folder_id",folder_id);
+                i.putExtras(args);
+                startActivity(i);
             default:
                 Log.d(TAG, "mOnClick: DEFAULT?");
                 break;

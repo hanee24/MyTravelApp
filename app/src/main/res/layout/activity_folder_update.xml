@@ -97,7 +97,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="공유 사용자 목록, 공유 신청하기, 공유한 친구 관리하기"
+                android:text="공유 사용자 목록,  공유한 친구 관리하기"
                 android:id="@+id/textView34"
                 android:layout_marginTop="37dp"
                 android:layout_below="@+id/textView33"
@@ -172,6 +172,21 @@
                 android:layout_toLeftOf="@+id/imageButton2"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"/>
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="폴더 공유 신청하기"
+                android:id="@+id/button9"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="15dp"
+
+                android:layout_below="@+id/textView34"
+                android:background="@color/accent_material_dark"
+                style="?android:attr/buttonStyleSmall"
+                android:onClick="mOnClick"/>
+
         </RelativeLayout>
     </ScrollView>
 
@@ -197,5 +212,6 @@
         android:layout_toRightOf="@+id/cancel"
         android:layout_margin="5dp"
         android:onClick="mOnClick"/>
+
 
 </RelativeLayout>
