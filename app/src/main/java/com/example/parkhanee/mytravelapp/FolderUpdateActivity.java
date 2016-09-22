@@ -47,7 +47,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
     private InputMethodManager imm;
     ProgressDialog dialog;
     HashMap<String, String> modifyFolderPostDataParams;
-    int position;
+    int folder_id;
     public static Folder folder;
     DBHelper db;
     String TAG = "FolderUpdateActivity";
@@ -60,11 +60,11 @@ public class FolderUpdateActivity extends AppCompatActivity {
         // get arguments from FolderActivity
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra("args");
-        position = bundle.getInt("position");
+        folder_id = bundle.getInt("folder_id");
 
         // get folder from local DB
         db = new DBHelper(FolderUpdateActivity.this);
-        folder = db.getFolder(position);
+        folder = db.getFolder(folder_id);
 
         //hide keyboard as default
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -165,96 +165,96 @@ public class FolderUpdateActivity extends AppCompatActivity {
         }
     }
 
-    private class FolderUpdateProcess extends AsyncTask<String, Void, String>{
+        private class FolderUpdateProcess extends AsyncTask<String, Void, String>{
 
-        @Override
-        protected void onPreExecute() {
-            dialog.setMessage("데이터를 가져오는 중입니다");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
-        }
+            @Override
+            protected void onPreExecute() {
+                dialog.setMessage("데이터를 가져오는 중입니다");
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }
 
-        @Override
-        protected void onPostExecute(String s) {
+            @Override
+            protected void onPostExecute(String s) {
 
-            int resultCode=99;
-            String resultMsg="";
+                int resultCode=99;
+                String resultMsg="";
 
-            try{
-                JSONObject result = new JSONObject(s);
-               //JSONObject header = result.getJSONObject("header");
-                resultCode = result.getInt("resultCode");
+                try{
+                    JSONObject result = new JSONObject(s);
+                   //JSONObject header = result.getJSONObject("header");
+                    resultCode = result.getInt("resultCode");
 
-                //check the whole result
-                resultMsg = result.toString();
-                Log.d(TAG, "onPostExecute: "+resultMsg);
+                    //check the whole result
+                    resultMsg = result.toString();
+                    Log.d(TAG, "onPostExecute: "+resultMsg);
 
-                if (resultCode==00) { // result is ok
-                    Log.d(TAG, "onPostExecute: Result is OK");
-                }else{
-                    Log.d(TAG, "onPostExecute: resultCode is not okay ? ");
+                    if (resultCode==00) { // result is ok
+                        Log.d(TAG, "onPostExecute: Result is OK");
+                    }else{
+                        Log.d(TAG, "onPostExecute: resultCode is not okay ? ");
+                    }
+
+                }catch (JSONException e){
+                    e.printStackTrace();
                 }
 
-            }catch (JSONException e){
-                e.printStackTrace();
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+
+                // finish folderModifyActivity since the modification is done.
+                finish();
             }
 
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
-            // finish folderModifyActivity since the modification is done.
-            finish();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                return downloadUrl(strings[0]);
-            } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
-            }
-        }
-
-        private String downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-            // Only display the first 500 characters of the retrieved
-            // web page content.
-            int len = 50000;
-
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-
-                // add post parameters
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(getPostDataString(modifyFolderPostDataParams));
-                writer.flush();
-                writer.close();
-                os.close();
-
-                conn.connect();
-                int response = conn.getResponseCode();
-                Log.d(TAG, "The server response is: " + response);
-                is = conn.getInputStream();
-
-                // Convert the InputStream into a string
-                String contentAsString = readIt(is, len);
-                return contentAsString;
-
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
-            } finally {
-                if (is != null) {
-                    is.close();
+            @Override
+            protected String doInBackground(String... strings) {
+                try {
+                    return downloadUrl(strings[0]);
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
                 }
             }
-        }
+
+            private String downloadUrl(String myurl) throws IOException {
+                InputStream is = null;
+                // Only display the first 500 characters of the retrieved
+                // web page content.
+                int len = 50000;
+
+                try {
+                    URL url = new URL(myurl);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000 /* milliseconds */);
+                    conn.setConnectTimeout(15000 /* milliseconds */);
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+
+                    // add post parameters
+                    OutputStream os = conn.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                    writer.write(getPostDataString(modifyFolderPostDataParams));
+                    writer.flush();
+                    writer.close();
+                    os.close();
+
+                    conn.connect();
+                    int response = conn.getResponseCode();
+                    Log.d(TAG, "The server response is: " + response);
+                    is = conn.getInputStream();
+
+                    // Convert the InputStream into a string
+                    String contentAsString = readIt(is, len);
+                    return contentAsString;
+
+                    // Makes sure that the InputStream is closed after the app is
+                    // finished using it.
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
+                }
+            }
 
         public String readIt(InputStream stream, int len) throws IOException {
             Reader reader = null;

@@ -156,7 +156,7 @@ public class FolderListFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent a = new Intent(getActivity(),FolderActivity.class);
                 Bundle args = new Bundle();
-                args.putInt("position",myAdapter.getItem(i).getId()); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
+                args.putInt("folder_id",myAdapter.getItem(i).getId()); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
 
                 a.putExtra("args",args);
                 startActivity(a);

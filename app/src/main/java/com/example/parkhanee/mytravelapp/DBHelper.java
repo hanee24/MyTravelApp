@@ -205,7 +205,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Deleting single folder
-    public void deleteFolder(Folder folder) {
+    public void deleteFolder(int id) {
 
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
@@ -213,12 +213,12 @@ public class DBHelper extends SQLiteOpenHelper {
         // 2. delete
         db.delete(TABLE_FOLDER,
                 KEY_ID+" = ?",
-                new String[] { String.valueOf(folder.getId()) });
+                new String[] { String.valueOf(id) });
 
         // 3. close
         db.close();
 
-        Log.d("deleteFolder", folder.toString());
+        Log.d("deleteFolder", String.valueOf(id));
 
     }
 }
