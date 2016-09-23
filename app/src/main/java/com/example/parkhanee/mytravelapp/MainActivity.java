@@ -285,11 +285,11 @@ public class MainActivity extends AppCompatActivity {
             if (ifFbLogged){
                 iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
             }else {
-                iv_icon.setImageResource(android.R.drawable.sym_def_app_icon);
+                iv_icon.setImageResource(R.drawable.road);
             }
         }else {
             tv_username.setVisibility(View.GONE);
-            iv_icon.setVisibility(View.GONE);
+            iv_icon.setVisibility(View.INVISIBLE);
             System.out.println("Main ! ifLogged");
             tv_login.setText("로그인 해 주세요");
             tv_username.setText("My Travel App");

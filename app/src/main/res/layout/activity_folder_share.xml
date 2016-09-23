@@ -15,7 +15,8 @@
         android:layout_toRightOf="@+id/imageView4"
         android:layout_below="@+id/textView35"
         android:layout_marginRight="16dp"
-        android:hint="사용자 아이디 또는 페이스북 이름으로 검색"/>
+        android:hint="사용자 아이디 또는 페이스북 이름으로 검색"
+        android:layout_marginTop="10dp"/>
 
     <ImageView
         android:layout_width="20dp"
@@ -33,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="사용자 찾기"
+        android:text="폴더 공유 신청하기"
         android:id="@+id/textView35"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"/>
@@ -68,4 +69,15 @@
         android:layout_marginTop="15dp"
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView6"
+        android:layout_toLeftOf="@+id/textView35"
+        android:src="@drawable/shared_folder"
+        android:layout_alignTop="@+id/textView35"
+        android:layout_alignBottom="@+id/textView35"
+        android:scaleType="fitXY"
+        android:layout_marginRight="10dp"/>
 </RelativeLayout>

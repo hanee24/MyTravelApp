@@ -1,5 +1,6 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -36,15 +37,16 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FolderShareActivity extends AppCompatActivity {
+public class FolderShareActivity extends Activity {
 
     static int folder_id;
     EditText et_search;
-    private ListView listView;
-    private FolderShareAdapter myAdapter;
+    //FolderShareAdapter myAdapter;
     ProgressDialog dialog;
     String TAG = "FolderShareActivity";
-    HashMap<String,String > postDataParams;
+    HashMap<String,String> postDataParams;
+    private ListView listView;
+    private FolderShareAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +58,9 @@ public class FolderShareActivity extends AppCompatActivity {
         folder_id = args.getInt("folder_id");
 
         et_search = (EditText) findViewById(R.id.editText10);
+        mAdapter = new FolderShareAdapter(FolderShareActivity.this);
         listView = (ListView) findViewById(R.id.listView3);
-        myAdapter = new FolderShareAdapter(FolderShareActivity.this);
-        listView.setAdapter(myAdapter);
+        listView.setAdapter(mAdapter);
         dialog = new ProgressDialog(FolderShareActivity.this);
         postDataParams  = new HashMap<>();
         postDataParams.put("sender",MainActivity.getUserId());
@@ -74,7 +76,7 @@ public class FolderShareActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                mAdapter.getFilter().filter(charSequence.toString());
             }
 
             @Override
@@ -86,8 +88,8 @@ public class FolderShareActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // TODO: 2016. 9. 22. get user_receiver_id      // myAdapter.getItem(position).getUserId
-                // TODO: 2016. 9. 22. and? ??
+                // TODO: 2016. 9. 22. get user_receiver_id
+                // TODO: 2016. 9. 22. and? 폴더 공유 신청하기 dialog??
             }
         });
 
@@ -143,14 +145,15 @@ public class FolderShareActivity extends AppCompatActivity {
                 JSONObject body = result.getJSONObject("body");
                 JSONArray users = body.getJSONArray("users");
 
-                myAdapter.clearItem();
+                mAdapter.clearItem();
                 for (int i=0;i<users.length();i++){
                     JSONObject u = users.getJSONObject(i);
                     String f = u.getString("isFB");
                     Boolean isFB = f.equals("1");
-                    myAdapter.addItem(i,new User(u.getString("user_name"),isFB));
+                    User user = new User(u.getString("user_name"),isFB);
+                    mAdapter.addItem(i,user);
                 }
-                //myAdapter.notifyDataSetChanged();
+                mAdapter.notifyDataSetChanged();
 
             }catch (JSONException e){
                 e.printStackTrace();

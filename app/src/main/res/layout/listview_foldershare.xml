@@ -11,7 +11,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:padding="5dp"
+        android:padding="10dp"
         android:src="@android:drawable/sym_def_app_icon"/>
 
     <TextView
@@ -29,12 +29,12 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:id="@+id/imageButton5"
-        android:src="@drawable/shared_folder"
+        android:src="@drawable/add"
         android:scaleType="fitXY"
         android:background="#00ffffff"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="16dp"
-        android:padding="5dp"/>
+        android:padding="7dp"/>
 </LinearLayout>
