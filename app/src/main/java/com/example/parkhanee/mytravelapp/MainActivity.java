@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }else {
             tv_username.setVisibility(View.GONE);
-            iv_icon.setVisibility(View.INVISIBLE);
+            iv_icon.setVisibility(View.GONE);
             System.out.println("Main ! ifLogged");
             tv_login.setText("로그인 해 주세요");
             tv_username.setText("My Travel App");

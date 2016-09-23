@@ -48,4 +48,15 @@
         android:paddingTop="5dp"
         android:visibility="visible"/>
 
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/imageView7"
+        android:scaleType="fitXY"
+        android:visibility="visible"
+        android:padding="2dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
 </RelativeLayout>

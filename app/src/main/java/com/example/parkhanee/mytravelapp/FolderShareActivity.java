@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,15 +86,6 @@ public class FolderShareActivity extends Activity {
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // TODO: 2016. 9. 22. get user_receiver_id
-                // TODO: 2016. 9. 22. and? 폴더 공유 신청하기 dialog??
-            }
-        });
-
-
     }
 
     // check if the network has connected before executing AsyncTask network connection to server
@@ -150,7 +142,7 @@ public class FolderShareActivity extends Activity {
                     JSONObject u = users.getJSONObject(i);
                     String f = u.getString("isFB");
                     Boolean isFB = f.equals("1");
-                    User user = new User(u.getString("user_name"),isFB);
+                    User user = new User(u.getString("user_id"),u.getString("user_name"),isFB);
                     mAdapter.addItem(i,user);
                 }
                 mAdapter.notifyDataSetChanged();

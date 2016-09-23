@@ -1,6 +1,7 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +9,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -57,29 +60,23 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public View getView(int position, View v, ViewGroup viewGroup) {
-        Log.d(TAG, "getView: position "+String.valueOf(position));
-        Log.d(TAG, "getView: users size "+String.valueOf(users.size()));
+    public View getView(final int position, View v, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         ViewHolder holder;
         if (v == null) {
-            Log.d(TAG, "getView: v == null");
             holder = new ViewHolder();
             v = inflater.inflate(R.layout.listview_foldershare, null);
             holder.tvUserName = (TextView) v.findViewById(R.id.textView36);
             holder.icon = (ImageView) v.findViewById(R.id.imageView5);
+            holder.share = (ImageButton) v.findViewById(R.id.imageButton5);
             v.setTag(holder);
         } else {
-            Log.d(TAG, "getView: v!=null");
             holder = (ViewHolder) v.getTag(); // we call the view created before to not create a view in each time
         }
-        Log.d(TAG, "getView: 2");
 
         if (users.size()>0){
-            Log.d(TAG, "getView: users.size()>0");
             User user = users.get(position);
             holder.tvUserName.setText(user.getUser_name());
-            Log.d(TAG, "getView: 3");
             if (user.getFB()){
                 //set fb icon on the image view
                 holder.icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
@@ -88,7 +85,17 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
                 holder.icon.setImageResource(R.drawable.road);
             }
         }
-        Log.d(TAG, "getView: 4");
+
+        holder.share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String receiver = users.get(position).getUser_name();
+                Toast.makeText(context, receiver+"  "+users.get(position).getUser_id(), Toast.LENGTH_SHORT).show();
+                // TODO: 2016. 9. 23. make a dialog and send GCM
+            }
+        });
+
+
         return v;
     }
 
@@ -96,6 +103,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
     private static class ViewHolder{
         TextView tvUserName=null;
         ImageView icon=null;
+        ImageButton share=null;
     }
 
     @Override
@@ -126,7 +134,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
                     for (int i = 0; i < all_users.size(); i++) {
                         String data = all_users.get(i).getUser_name();
                         if (data.toLowerCase().contains(constraint.toString())){ //startsWith(constraint.toString())) {
-                            FilteredArrList.add(new User(all_users.get(i).getUser_name(),all_users.get(i).getFB()));
+                            FilteredArrList.add(new User(all_users.get(i).getUser_id(),all_users.get(i).getUser_name(),all_users.get(i).getFB()));
                         }
                     }
                     // set the Filtered result to return
