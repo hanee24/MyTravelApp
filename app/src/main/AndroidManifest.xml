@@ -69,9 +69,11 @@
 
         <activity android:name=".FolderActivity">
         </activity>
-        <activity android:name=".FolderUpdateActivity">
+        <activity android:name=".FolderUpdateActivity"
+                  android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".FolderShareActivity">
+        <activity android:name=".FolderShareActivity"
+                  android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
 

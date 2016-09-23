@@ -15,7 +15,7 @@
         android:layout_toRightOf="@+id/imageView4"
         android:layout_below="@+id/textView35"
         android:layout_marginRight="16dp"
-        android:hint="사용자 아이디로 검색"/>
+        android:hint="사용자 아이디 또는 페이스북 이름으로 검색"/>
 
     <ImageView
         android:layout_width="20dp"
@@ -55,7 +55,8 @@
         android:id="@+id/textView37"
         android:layout_alignTop="@+id/listView3"
         android:layout_marginTop="152dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -65,5 +66,6 @@
         android:id="@+id/textView38"
         android:layout_below="@+id/textView37"
         android:layout_marginTop="15dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
 </RelativeLayout>

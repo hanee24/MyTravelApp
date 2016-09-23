@@ -78,11 +78,12 @@ public class FolderActivity extends AppCompatActivity {
                     // Setting Positive "Yes" Button
                     alertDialog.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                        // TODO: 2016. 9. 22.  delete folder from local db
+                        //  delete folder from local db
                         db.deleteFolder(folder_id);
 
-                        // TODO: 2016. 9. 22.  delete folder from server db
+                        // delete folder from server db
                         myClickHandler();
+                        finish();
                         }
                     });
 
