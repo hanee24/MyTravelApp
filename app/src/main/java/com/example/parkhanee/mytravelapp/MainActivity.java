@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             String id = accessToken.getUserId();
-            String name = "null"; // TODO: 2016. 9. 15. could be a problem?
+            String name = "null"; // TODO: 2016. 9. 15. could it be a problem?
 
             login(id,name,true);
 
@@ -615,19 +615,24 @@ public class MainActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
+
+                // 1
+                // get register id from GCM server
+                // 'RegistrationIntentService' class is used instead in the official guide
                 String msg = "";
                 try {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
                     }
-                    regid = gcm.register("22");
+                    regid = gcm.register("944123553315"); // set sender ID here which can be obtained from FireBaseConsole - Setting - CloudMessaging
                     msg = "Device registered, registration ID=" + regid;
-                    Log.i("GCM",  msg);
-
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
-
                 }
+                Log.i("GCM",  msg);
+
+                // 2
+                // Send reg id and request to my server
                 setGcm(regid);
                 return msg;
             }
@@ -666,14 +671,6 @@ public class MainActivity extends AppCompatActivity {
                     conn.setConnectTimeout(15000 /* milliseconds */);
                     conn.setRequestMethod("POST");
                     conn.setDoInput(true);
-//                    conn.setRequestProperty("SOAPAction","");
-
-//                    conn.setRequestProperty("Connection", "Keep-Alive");
-////                    conn.setRequestProperty("Content-Type", "multipart/form-data");
-//                    conn.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
-//
-//                    conn.setRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5 ");
-//                    conn.setRequestProperty("Accept","*/*");
 
                     // add post parameters
                     OutputStream os = conn.getOutputStream();
