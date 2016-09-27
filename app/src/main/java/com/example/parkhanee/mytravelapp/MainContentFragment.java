@@ -266,13 +266,11 @@ public class MainContentFragment extends Fragment implements
     public void onResume() {
         super.onResume();
         isMain = true;
-        Log.d(TAG, "onResume: isMain");
     }
 
     @Override
     public void onPause() {
         super.onPause();
         isMain = false;
-        Log.d(TAG, "onPause: ! isMain");
     }
 }

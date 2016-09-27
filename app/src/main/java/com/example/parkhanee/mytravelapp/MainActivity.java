@@ -31,6 +31,7 @@ import com.facebook.AccessToken;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +47,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,12 +76,17 @@ public class MainActivity extends AppCompatActivity {
     HashMap<String, String> postDataParams;
     private static final String DEBUG_TAG = "MainActivity";
 
+    GoogleCloudMessaging gcm;
+    String regid;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_temp);
+
+        getRegId();
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -508,17 +515,18 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog alert = builder.create();
                 alert.show();*/
                 Toast.makeText(MainActivity.this,msg, Toast.LENGTH_SHORT).show();
-            }else{ // error occurred
-                switch (resultCode){
-                    case 11 : msg = "no info";
-                        break;
-                    case 12: msg = "id dup";
-                        break;
-                    default: msg = "unknown error";
-                        break;
-                }
-                Toast.makeText(MainActivity.this,msg, Toast.LENGTH_SHORT).show();
             }
+//            else{ // error occurred
+//                switch (resultCode){
+//                    case 11 : msg = "no info";
+//                        break;
+//                    case 12: msg = "id dup";
+//                        break;
+//                    default: msg = "unknown error";
+//                        break;
+//                }
+//                Toast.makeText(MainActivity.this,msg, Toast.LENGTH_SHORT).show();
+//            }
 
         }
 
@@ -603,6 +611,134 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
+    public void getRegId(){
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+                    }
+                    regid = gcm.register("22");
+                    msg = "Device registered, registration ID=" + regid;
+                    Log.i("GCM",  msg);
 
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+
+                }
+                setGcm(regid);
+                return msg;
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                //etRegId.setText(msg + "\n");
+            }
+        }.execute(null, null, null);
+    }
+
+    public void setGcm(final String regid){
+        final String TAG = "gcm";
+        new AsyncTask<Void,Void,String>(){
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    return downloadUrl("http://hanea8199.vps.phps.kr/test/gcm_test3.php");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            }
+
+            private String downloadUrl(String myurl) throws IOException {
+                InputStream is = null;
+                // Only display the first 500 characters of the retrieved
+                // web page content.
+                int len = 5000000;
+
+                try {
+                    URL url = new URL(myurl);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000 /* milliseconds */);
+                    conn.setConnectTimeout(15000 /* milliseconds */);
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+//                    conn.setRequestProperty("SOAPAction","");
+
+//                    conn.setRequestProperty("Connection", "Keep-Alive");
+////                    conn.setRequestProperty("Content-Type", "multipart/form-data");
+//                    conn.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
+//
+//                    conn.setRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5 ");
+//                    conn.setRequestProperty("Accept","*/*");
+
+                    // add post parameters
+                    OutputStream os = conn.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                    writer.write("regid="+regid);
+                    writer.close();
+                    os.close();
+
+                    conn.connect();
+                    int response = conn.getResponseCode();
+                    Log.d(TAG, "The server response is: " + response);
+                    is = conn.getInputStream();
+                    //is = conn.getErrorStream(); // check error msg from server
+
+                    // Convert the InputStream into a string
+                    String contentAsString = readIt(is, len);
+                    return contentAsString;
+
+                    // Makes sure that the InputStream is closed after the app is
+                    // finished using it.
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
+                }
+            }
+
+            public String readIt(InputStream stream, int len) throws IOException {
+                Reader reader = null;
+                reader = new InputStreamReader(stream, "UTF-8");
+                char[] buffer = new char[len];
+                reader.read(buffer);
+                return new String(buffer);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+
+//                int resultCode=99;
+                String resultMsg="";
+                String msg;
+                int totalCount=0;
+
+
+//                try{
+//                    JSONObject result = new JSONObject(s);
+//                    //JSONObject header = result.getJSONObject("header");
+////                    resultCode = result.getInt("resultCode");
+//
+//                    //check the whole result
+//                    resultMsg = result.toString();
+                    Log.d(TAG, "onPostExecute: "+ s);
+
+//                    if (resultCode!=00){
+//                        Toast.makeText(MainActivity.this, "sync failed", Toast.LENGTH_SHORT).show();
+//                        Log.d(TAG, "onPostExecute: "+resultMsg);
+//                    }
+
+//                }catch (JSONException e){
+//                    e.printStackTrace();
+//                }
+
+            }
+
+        }.execute(null, null, null);
+    }
 
 }
