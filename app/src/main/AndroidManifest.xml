@@ -82,39 +82,44 @@
         </activity>
 
         <!--<receiver-->
-            <!--android:name="com.google.android.gms.gcm.GcmReceiver"-->
-            <!--android:exported="true"-->
+            <!--android:name=".GcmBroadcastReceiver"-->
             <!--android:permission="com.google.android.c2dm.permission.SEND" >-->
             <!--<intent-filter>-->
                 <!--<action android:name="com.google.android.c2dm.intent.RECEIVE" />-->
-                <!--<category android:name="com.example.gcm" />-->
+                <!--<category android:name="com.hmkcode.android.gcm" />-->
             <!--</intent-filter>-->
         <!--</receiver>-->
+
         <!--<service-->
-            <!--android:name=".GcmBroadcastReceiver"-->
-            <!--android:exported="false" >-->
+            <!--android:name=".GcmMessageHandler"-->
+            <!--android:exported="false">-->
             <!--<intent-filter>-->
-                <!--<action android:name="com.google.android.c2dm.intent.RECEIVE" />-->
+                <!--<action android:name="com.google.android.gms.iid.InstanceID" />-->
             <!--</intent-filter>-->
         <!--</service>-->
         <receiver
-            android:name=".GcmBroadcastReceiver"
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="com.hmkcode.android.gcm" />
+                <category android:name="com.example.gcm" />
             </intent-filter>
         </receiver>
-
         <service
-            android:name=".GcmMessageHandler"
+            android:name=".MyGcmListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
-
-
     </application>
 
 </manifest>

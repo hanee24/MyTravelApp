@@ -13,4 +13,5 @@
     <string name="string_poi">찜한 관광지</string>
     <string name="string_map">오프라인 지도</string>
     <string name="string_main">My Travel App</string>
+    <string name="gcm_defaultSenderId">944123553315</string>
 </resources>
