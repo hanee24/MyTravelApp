@@ -59,4 +59,11 @@
         android:name="com.example.parkhanee.mytravelapp.FbLoginFragment"
         android:id="@+id/fragment_fb"
         tools:layout="@layout/fragment_fb_login"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
