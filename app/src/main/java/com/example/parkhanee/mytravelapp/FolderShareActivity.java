@@ -40,14 +40,16 @@ import java.util.Map;
 
 public class FolderShareActivity extends Activity {
 
-    static int folder_id;
+    public static int folder_id;
     EditText et_search;
     //FolderShareAdapter myAdapter;
-    ProgressDialog dialog;
+    public static ProgressDialog dialog;
     String TAG = "FolderShareActivity";
     HashMap<String,String> postDataParams;
     private ListView listView;
     private FolderShareAdapter mAdapter;
+    public static Folder folder;
+    DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,9 @@ public class FolderShareActivity extends Activity {
         Intent i = getIntent();
         Bundle args = i.getExtras();
         folder_id = args.getInt("folder_id");
+        db = new DBHelper(FolderShareActivity.this);
+        folder = db.getFolder(folder_id);
+
 
         et_search = (EditText) findViewById(R.id.editText10);
         mAdapter = new FolderShareAdapter(FolderShareActivity.this);
@@ -67,7 +72,7 @@ public class FolderShareActivity extends Activity {
         postDataParams.put("sender",MainActivity.getUserId());
         postDataParams.put("folder_id",String.valueOf(folder_id));
 
-        myNetworkHandler();
+        myNetworkHandler("http://hanea8199.vps.phps.kr/getuserlist_process.php"); // --> get user list process
 
         et_search.addTextChangedListener(new TextWatcher() {
             @Override
@@ -89,7 +94,7 @@ public class FolderShareActivity extends Activity {
     }
 
     // check if the network has connected before executing AsyncTask network connection to server
-    public void myNetworkHandler() {
+    public void myNetworkHandler(String url) {
         TextView tv_large = (TextView) findViewById(R.id.textView37);
         TextView tv_small = (TextView) findViewById(R.id.textView38);
 
@@ -100,20 +105,24 @@ public class FolderShareActivity extends Activity {
 
             tv_small.setVisibility(View.GONE);
             tv_large.setVisibility(View.GONE);
-            new GetUserListProcess().execute();
+            new AsyncProcess().execute(url);
 
         } else {
             Toast.makeText(FolderShareActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
-            // 인터넷없을때는 안됨 안내.
-            tv_large.setVisibility(View.VISIBLE);
-            tv_small.setVisibility(View.VISIBLE);
 
-            tv_large.setText("사용자 목록을 불러올 수 없습니다");
-            tv_small.setText("인터넷 연결을 확인해 주세요");
+            if (url.equals("http://hanea8199.vps.phps.kr/getuserlist_process.php")){
+                // 인터넷없을때는 안됨 안내.
+                tv_large.setVisibility(View.VISIBLE);
+                tv_small.setVisibility(View.VISIBLE);
+
+                tv_large.setText("사용자 목록을 불러올 수 없습니다");
+                tv_small.setText("인터넷 연결을 확인해 주세요");
+            }
         }
     }
 
-    private class GetUserListProcess extends AsyncTask<Void,Void,String>{
+    public class AsyncProcess extends AsyncTask<String,Void,String>{
+        String stringUrl;
 
         @Override
         protected void onPreExecute() {
@@ -157,9 +166,8 @@ public class FolderShareActivity extends Activity {
         }
 
         @Override
-        protected String doInBackground(Void... voids) {
-            String stringUrl= "http://hanea8199.vps.phps.kr/getuserlist_process.php";
-
+        protected String doInBackground(String... strings) {
+            stringUrl= strings[0];
             try {
                 return downloadUrl(stringUrl);
             } catch (IOException e) {

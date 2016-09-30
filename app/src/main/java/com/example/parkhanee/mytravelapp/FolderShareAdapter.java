@@ -1,6 +1,12 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,8 +20,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -26,6 +49,10 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
     private ArrayList<User> all_users;
     private ArrayList<User> users= new ArrayList<>();
     String TAG = "FolderShareAdapter";
+
+    ProgressDialog dialog;
+    HashMap<String,String> postDataParams;
+    DBHelper db;
 
     public FolderShareAdapter(Context context){
         this.context = context;
@@ -89,9 +116,44 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
         holder.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String receiver = users.get(position).getUser_name();
+                final String receiver = users.get(position).getUser_name();
+                final String receiver_id = users.get(position).getUser_id();
                 Toast.makeText(context, receiver+"  "+users.get(position).getUser_id(), Toast.LENGTH_SHORT).show();
-                // TODO: 2016. 9. 23. make a dialog and send GCM
+                final int folder_id = FolderShareActivity.folder_id;
+
+                // 2016. 9. 23. make a dialog and send GCM
+                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+//                adb.setView(alertDialogView);
+                adb.setTitle(receiver+"님 에게 "+FolderShareActivity.folder.getName()+" 폴더 공유 신청을 보내시겠습니까?");
+                adb.setIcon(android.R.drawable.ic_dialog_alert);
+
+                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+
+                        int unixTime = (int) System.currentTimeMillis() / 1000;
+                        postDataParams  = new HashMap<>();
+                        postDataParams.put("share_id",String.valueOf(unixTime)); //set unix time as share id
+                        postDataParams.put("folder_id",String.valueOf(folder_id));
+                        postDataParams.put("owner_id",MainActivity.getUserId());
+                        postDataParams.put("user_id",receiver_id);
+
+                        postDataParams.put("user_name",receiver);
+                        postDataParams.put("isFB",String.valueOf(users.get(position).getFB()));
+
+
+                        // send data to the server
+                        myNetworkHandler("http://hanea8199.vps.phps.kr/sharefolder_process.php");
+
+
+
+                    } });
+
+                adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel(); // TODO: 2016. 9. 30.  dialog.dismiss ?
+                    } });
+                adb.show();
             }
         });
 
@@ -153,5 +215,154 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
             }
         };
         return filter;
+    }
+
+    // check if the network has connected before executing AsyncTask network connection to server
+    public void myNetworkHandler(String url) {
+
+        ConnectivityManager connMgr = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            new AsyncProcess().execute(url);
+
+            db = new DBHelper(context);
+            db.addUser(new User(postDataParams.get("user_id"),postDataParams.get("user_name"),Boolean.valueOf(postDataParams.get("isFB"))));
+            db.addShare(new Share(postDataParams.get("share_id"),postDataParams.get("folder_id"),postDataParams.get("user_id"),"Requested",true));
+
+        } else {
+            Toast.makeText(context, "No network connection available.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public class AsyncProcess extends AsyncTask<String,Void,String> {
+        String stringUrl;
+
+        @Override
+        protected void onPreExecute() {
+            dialog = FolderShareActivity.dialog;
+            dialog.setMessage("잠시만 기다려 주세요");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String string) {
+
+            try{
+
+                // TODO: 2016. 9. 30. process result from server
+
+                JSONObject result = new JSONObject(string);
+                //check the whole result
+                String str_result = result.toString();
+                Log.d(TAG, "onPostExecute: "+str_result);
+
+
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            // 2016. 9. 30. show okay dialog
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+            builder1.setTitle("폴더 공유 신청 완료");
+            builder1.setMessage(postDataParams.get("user_name")+"님에게 폴더공유신청을 보냈습니다");
+            builder1.setCancelable(true);
+            builder1.setNeutralButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            stringUrl= strings[0];
+            try {
+                return downloadUrl(stringUrl);
+            } catch (IOException e) {
+                return "Unable to retrieve web page. URL may be invalid.";
+            }
+        }
+
+        private String downloadUrl(String myurl) throws IOException {
+            InputStream is = null;
+            // Only display the first 500 characters of the retrieved
+            // web page content.
+            int len = 50000;
+
+            try {
+                URL url = new URL(myurl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+
+                // add post parameters
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(getPostDataString(postDataParams));
+                writer.flush();
+                writer.close();
+                os.close();
+
+                conn.connect();
+                int response = conn.getResponseCode();
+                Log.d(TAG, "The server response is: " + response);
+                is = conn.getInputStream();
+
+                // Convert the InputStream into a string
+                String contentAsString = readIt(is, len);
+                return contentAsString;
+
+                // Makes sure that the InputStream is closed after the app is
+                // finished using it.
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        }
+
+        public String readIt(InputStream stream, int len) throws IOException {
+            Reader reader = null;
+            reader = new InputStreamReader(stream, "UTF-8");
+            char[] buffer = new char[len];
+            reader.read(buffer);
+            return new String(buffer);
+        }
+
+        private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+            //convert data  being sent to server as POST method into correct form
+            StringBuilder result = new StringBuilder();
+            boolean first = true;
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (first)
+                    first = false;
+                else
+                    result.append("&");
+
+                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
+
+            Log.d(TAG, "getPostDataString: "+result.toString());
+
+            return result.toString();
+        }
+
     }
 }

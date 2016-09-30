@@ -22,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +37,6 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GcmListenerService;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.json.JSONException;
@@ -55,7 +53,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -101,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_temp);
 
-        getRegId();
+//        getRegId();
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -796,11 +793,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setGcm(final String regid){
-        final String TAG = "gcm";
+
         new AsyncTask<Void,Void,String>(){
 
             @Override
             protected String doInBackground(Void... voids) {
+
                 try {
                     return downloadUrl("http://hanea8199.vps.phps.kr/test/gcm_test2.php");
                 } catch (IOException e) {
@@ -832,7 +830,7 @@ public class MainActivity extends AppCompatActivity {
 
                     conn.connect();
                     int response = conn.getResponseCode();
-                    Log.d(TAG, "The server response is: " + response);
+                    Log.d("gcm "+TAG, "The server response is: " + response);
                     is = conn.getInputStream();
                     //is = conn.getErrorStream(); // check error msg from server
 
@@ -859,31 +857,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(String s) {
-
-//                int resultCode=99;
-                String resultMsg="";
-                String msg;
-                int totalCount=0;
-
-
-//                try{
-//                    JSONObject result = new JSONObject(s);
-//                    //JSONObject header = result.getJSONObject("header");
-////                    resultCode = result.getInt("resultCode");
-//
-//                    //check the whole result
-//                    resultMsg = result.toString();
-                    Log.d(TAG, "onPostExecute: "+ s);
-
-//                    if (resultCode!=00){
-//                        Toast.makeText(MainActivity.this, "sync failed", Toast.LENGTH_SHORT).show();
-//                        Log.d(TAG, "onPostExecute: "+resultMsg);
-//                    }
-
-//                }catch (JSONException e){
-//                    e.printStackTrace();
-//                }
-
+                    Log.d("gcm "+TAG, "onPostExecute: "+ s);
             }
 
         }.execute(null, null, null);

@@ -7,7 +7,8 @@ public class User {
     private String user_name;
     private Boolean isFB;
     private String user_id;
-
+    private String lat;
+    private String lng;
 
     // constructors
     public User(String user_id,String user_name,Boolean isFB){
@@ -15,6 +16,15 @@ public class User {
         this.user_id = user_id;
         this.user_name = user_name;
         this.isFB = isFB;
+    }
+
+    public User(String user_id,String user_name,Boolean isFB,String lat, String lng){
+        super();
+        this.user_id = user_id;
+        this.user_name = user_name;
+        this.isFB = isFB;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     public User(){}
@@ -33,6 +43,14 @@ public class User {
         return isFB;
     }
 
+    public String getLat() {
+        return lat;
+    }
+
+    public String getLng() {
+        return lng;
+    }
+
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
@@ -43,6 +61,21 @@ public class User {
 
     public void setUser_name(String user_name) {
         this.user_name = user_name;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public void setLng(String lng) {
+        this.lng = lng;
+    }
+
+
+    @Override
+    public String toString() {
+        return "User [user_id=" + user_id + ", user_name=" + user_name + ", fb=" + isFB
+                + "]";
     }
 }
 

@@ -68,62 +68,27 @@ public class MyGcmListenerService extends GcmListenerService {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//                PendingIntent.FLAG_ONE_SHOT);
-//
-//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.road)
-//                .setContentTitle(title)
-//                .setTicker(title)
-//                .setContentText(message)
-//                .setAutoCancel(true)
-//                .setSound(defaultSoundUri)
-//                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-//                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.road))
-//                .setContentIntent(pendingIntent);
-//
-//        NotificationManager notificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        notificationManager.notify(11 /* ID of notification */, notificationBuilder.build());
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.road)
+                .setContentTitle(title)
+                .setTicker(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                // TODO: 2016. 9. 30. resize large icon
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.road))
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(11 /* ID of notification */, notificationBuilder.build());
 
 
-
-//        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        Notification.Builder mBuilder = new Notification.Builder(this);
-//        mBuilder.setSmallIcon(R.drawable.road);
-//        mBuilder.setTicker("Notification.Builder");
-//        mBuilder.setWhen(System.currentTimeMillis());
-//        mBuilder.setNumber(10);
-//        mBuilder.setContentTitle(title);
-//        mBuilder.setContentText(message);
-//        mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-//        mBuilder.setContentIntent(pendingIntent);
-//        mBuilder.setAutoCancel(true);
-//        mBuilder.setPriority(Notification.PRIORITY_MAX);
-//        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.road));
-//        nm.notify(111, mBuilder.build());
-
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder mCompatBuilder = new NotificationCompat.Builder(this);
-        mCompatBuilder.setSmallIcon(R.drawable.road);
-        mCompatBuilder.setTicker("NotificationCompat.Builder");
-        mCompatBuilder.setWhen(System.currentTimeMillis());
-        mCompatBuilder.setNumber(10);
-        mCompatBuilder.setContentTitle("NotificationCompat.Builder Title");
-        mCompatBuilder.setContentText("NotificationCompat.Builder Massage");
-        mCompatBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-        mCompatBuilder.setContentIntent(pendingIntent);
-        mCompatBuilder.setAutoCancel(true);
-
-        nm.notify(222, mCompatBuilder.build());
-
-
-        // TODO: 2016. 9. 29. check the notification process
     }
 }
