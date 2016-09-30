@@ -1,17 +1,24 @@
 package com.example.parkhanee.mytravelapp;
 
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.SyncStateContract;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,12 +32,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class FolderActivity extends AppCompatActivity {
 
@@ -44,6 +48,40 @@ public class FolderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
+
+        Log.d(TAG, "sendNotification: ");
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder mBuilder = new Notification.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.road);
+        mBuilder.setTicker("Notification.Builder");
+        mBuilder.setWhen(System.currentTimeMillis());
+        mBuilder.setNumber(10);
+        mBuilder.setContentTitle("Notification.Builder Title");
+        mBuilder.setContentText("Notification.Builder Massage");
+        mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+        mBuilder.setContentIntent(pendingIntent);
+        mBuilder.setAutoCancel(true);
+
+        nm.notify(111, mBuilder.build());
+
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//                PendingIntent.FLAG_ONE_SHOT);
+//
+//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+////                .setSmallIcon(R.drawable.common_ic_googleplayservices)
+//                .setContentTitle("title")
+//                .setContentText("notification test");
+//
+//        NotificationManager notificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        notificationManager.notify(11 /* ID of notification */, notificationBuilder.build());
 
         Intent a = getIntent();
         final Bundle bundle = a.getBundleExtra("args");

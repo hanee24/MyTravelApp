@@ -1,7 +1,10 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +13,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,6 +27,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +36,9 @@ import com.facebook.AccessToken;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.gcm.GcmListenerService;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.json.JSONException;
@@ -56,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static Boolean ifLogged;
     public static Boolean ifFbLogged=false;
-    String TAG = "MainActivity";
+    private static final String TAG = "MainActivity";
 
     public static SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
@@ -78,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
 
     GoogleCloudMessaging gcm;
     String regid;
+
+    //gcm quick start guide
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private ProgressBar mRegistrationProgressBar;
+    private boolean isReceiverRegistered;
 
 
     @Override
@@ -124,7 +139,130 @@ public class MainActivity extends AppCompatActivity {
         };
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+
+        // [START gcm quick start guide]
+        mRegistrationProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.d(TAG, "onReceive: sent token");
+                } else {
+                    Log.d(TAG, "onReceive: token error");
+                }
+            }
+        };
+
+        // gcm quick start guide
+        // Registering BroadcastReceiver
+//        registerReceiver();
+
+        // blog.saltfactory
+        registBroadcastReceiver();
+        getInstanceIdToken(); // it is originally within button onClick method in the post
+
+        // gcm quick start guide
+//        if (checkPlayServices()) {
+//            // Start IntentService to register this application with GCM.
+//            Intent intent = new Intent(this, RegistrationIntentService.class);
+//            startService(intent);
+//        }
+
     }
+
+    /**
+     * src from bolg.saltfactory.net
+     * Instance ID를 이용하여 디바이스 토큰을 가져오는 RegistrationIntentService를 실행한다.
+     * duplicated with getRegId AsyncTask
+     */
+    public void getInstanceIdToken() {
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+    }
+
+    /**
+     * src from bolg.saltfactory.net
+     * LocalBroadcast 리시버를 정의한다. 토큰을 획득하기 위한 READY, GENERATING, COMPLETE 액션에 따라 UI에 변화를 준다.
+     */
+    public void registBroadcastReceiver(){
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+
+
+                switch (action) {
+                    case QuickstartPreferences.REGISTRATION_READY:
+                        // 액션이 READY 일 경우
+//                        mRegistrationProgressBar.setVisibility(View.GONE);
+                        break;
+                    case QuickstartPreferences.REGISTRATION_GENERATING:
+                        // 액션이 GENERATING 일 경우
+//                        mRegistrationProgressBar.setVisibility(View.VISIBLE);
+                        Log.d(TAG, "onReceive: " + getString(R.string.registering_message_generating));
+                        break;
+                    case QuickstartPreferences.REGISTRATION_COMPLETE:
+                        // 액션이 COMPLETE 일 경우
+//                        mRegistrationProgressBar.setVisibility(View.GONE);
+//                        Log.d(TAG, "onReceive: " + getString(R.string.registering_message_complete));
+                        String token = intent.getStringExtra("token");
+//                        Log.d(TAG, "onReceive: " + token);
+                        isReceiverRegistered = true; // gcm quick start guide. is it correct to be placed here?
+                        break;
+                }
+
+            }
+        };
+    }
+
+    @Override
+    protected void onPause() {
+        // gcm quick start guide
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        isReceiverRegistered = false;
+        super.onPause();
+    }
+
+    // gcm quick start guide
+    private void registerReceiver(){
+        if(!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+            isReceiverRegistered = true;
+        }
+    }
+    /**
+     * gcm quick start guide
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+    // [FINISH gcm quick start guide]
+
 
     // This was added in order to manage Fragment BackStack
     @Override
@@ -319,6 +457,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // gcm quick start guide
+//        registerReceiver();
+
+        // blog.saltfactory
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_READY));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_GENERATING));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
 
     }
 
@@ -618,7 +766,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // 1
                 // get register id from GCM server
-                // 'RegistrationIntentService' class is used instead in the official guide
+                // 'RegistrationIntentService' class is used instead in the official guide <-- getInstanceIdToken()
                 String msg = "";
                 try {
                     if (gcm == null) {
@@ -630,6 +778,9 @@ public class MainActivity extends AppCompatActivity {
                     msg = "Error :" + ex.getMessage();
                 }
                 Log.i("GCM",  msg);
+
+
+
 
                 // 2
                 // Send reg id and request to my server
@@ -651,7 +802,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    return downloadUrl("http://hanea8199.vps.phps.kr/test/gcm_test3.php");
+                    return downloadUrl("http://hanea8199.vps.phps.kr/test/gcm_test2.php");
                 } catch (IOException e) {
                     e.printStackTrace();
                     return "Unable to retrieve web page. URL may be invalid.";
