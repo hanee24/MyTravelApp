@@ -14,7 +14,7 @@
         android:visibility="visible"
         android:padding="2dp"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="5dp"
         android:layout_marginBottom="4dp"/>
 
@@ -46,12 +46,13 @@
         android:textSize="13sp"
         android:layout_marginLeft="5dp"
         android:paddingTop="5dp"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        />
 
-    <ImageView
+    <ImageButton
         android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/imageView7"
+        android:layout_height="50dp"
+        android:id="@+id/imageHidden"
         android:scaleType="fitXY"
         android:visibility="visible"
         android:padding="2dp"

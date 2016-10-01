@@ -62,7 +62,10 @@ public class RegistrationIntentService extends IntentService {
             Log.i(TAG, "Registration Token: " + token);
 
             // TODO: Implement this method to send any registration to your app's servers.
-            myNetworkHandler(token);
+            if(MainActivity.ifLogged){
+                myNetworkHandler(token);
+            }
+
 
             // Subscribe to topic channels
             subscribeTopics(token);

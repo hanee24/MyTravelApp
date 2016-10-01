@@ -49,40 +49,6 @@ public class FolderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
 
-        Log.d(TAG, "sendNotification: ");
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification.Builder mBuilder = new Notification.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.road);
-        mBuilder.setTicker("Notification.Builder");
-        mBuilder.setWhen(System.currentTimeMillis());
-        mBuilder.setNumber(10);
-        mBuilder.setContentTitle("Notification.Builder Title");
-        mBuilder.setContentText("Notification.Builder Massage");
-        mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-        mBuilder.setContentIntent(pendingIntent);
-        mBuilder.setAutoCancel(true);
-
-        nm.notify(111, mBuilder.build());
-
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//                PendingIntent.FLAG_ONE_SHOT);
-//
-//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-////                .setSmallIcon(R.drawable.common_ic_googleplayservices)
-//                .setContentTitle("title")
-//                .setContentText("notification test");
-//
-//        NotificationManager notificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        notificationManager.notify(11 /* ID of notification */, notificationBuilder.build());
-
         Intent a = getIntent();
         final Bundle bundle = a.getBundleExtra("args");
         folder_id = bundle.getInt("folder_id");
