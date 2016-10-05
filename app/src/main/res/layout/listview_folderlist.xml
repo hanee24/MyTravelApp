@@ -40,4 +40,17 @@
         android:layout_alignLeft="@+id/folder_name"
         android:layout_marginBottom="5dp"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/tvShareState"
+        android:layout_above="@+id/folder_desc"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="46dp"
+        android:layout_marginEnd="46dp"
+        />
+
 </RelativeLayout>

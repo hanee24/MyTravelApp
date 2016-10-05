@@ -54,6 +54,7 @@
             android:layout_alignRight="@+id/listView2"
             android:layout_alignEnd="@+id/listView2"
             android:layout_marginRight="10dp"
-            android:layout_below="@+id/button8"/>
+            android:layout_below="@+id/button8"
+            android:visibility="gone"/>
     </RelativeLayout>
 </RelativeLayout>

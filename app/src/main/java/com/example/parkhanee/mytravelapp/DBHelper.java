@@ -563,7 +563,7 @@ public class DBHelper extends SQLiteOpenHelper {
         share.setUser_id(cursor.getString(2));
         share.setState(cursor.getString(3));
 
-        Log.d("getFolder("+id+")", share.toString());
+        Log.d("getShare("+id+")", share.toString());
 
         // 5. return folder
         return share;

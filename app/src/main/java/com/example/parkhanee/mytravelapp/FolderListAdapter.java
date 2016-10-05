@@ -15,6 +15,7 @@ import java.util.ArrayList;
  */
 public class FolderListAdapter extends BaseAdapter{
     private ArrayList<Folder> folderArrayList = new ArrayList<>();
+    private ArrayList<Boolean> isShared = new ArrayList<>();
     private Context context=null;
 
     public FolderListAdapter(Context context){
@@ -36,12 +37,14 @@ public class FolderListAdapter extends BaseAdapter{
         return i;
     }
 
-    public void addItem(Folder folder){
+    public void addItem(Folder folder, Boolean s){
         folderArrayList.add(folder);
+        isShared.add(s);
     }
 
-    public void addItem(int position,Folder folder){
+    public void addItem(int position,Folder folder,Boolean s){
         folderArrayList.add(position,folder);
+        isShared.add(s);
     }
 
     public void clearItem(){
@@ -58,6 +61,7 @@ public class FolderListAdapter extends BaseAdapter{
             holder.tvName = (TextView) v.findViewById(R.id.folder_name);
             holder.tvDesc = (TextView) v.findViewById(R.id.folder_desc);
             holder.tvDate = (TextView) v.findViewById(R.id.textView19);
+            holder.tvShared = (TextView) v.findViewById(R.id.tvShareState);
             v.setTag(holder);
 
         } else {
@@ -71,9 +75,11 @@ public class FolderListAdapter extends BaseAdapter{
             String end = f.getDate_end().substring(0,10);
             String str = start+" ~ "+end;
             holder.tvDate.setText(str);
-        }else{
-            // TODO: 2016. 9. 9. 아직 생성한 여행폴더가 없습니다 문구
-            //근데 그 문구르 ㄹ여기다 넣는게 아닌거같은데. 이건 아이템 하나마다 한번씩 다 지나가니까? 근데 아이템이 없으니까 한번만 지나가기때매 상관없나?? 안지나가나?
+            holder.tvShared.setVisibility(View.INVISIBLE);
+            if (isShared.get(position)){
+                holder.tvShared.setVisibility(View.VISIBLE);
+                holder.tvShared.setText("shared"); // TODO: 2016. 10. 5. set state which can be obtained from local db 'share' table..
+            }
         }
         return v;
     }
@@ -82,6 +88,7 @@ public class FolderListAdapter extends BaseAdapter{
         TextView tvName = null;
         TextView tvDesc = null;
         TextView tvDate = null;
+        TextView tvShared = null;
     }
 
 

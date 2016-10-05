@@ -195,11 +195,11 @@ public class FolderListFragment extends Fragment {
         NewFolderFragment.et_end.setTag(dateNow+" 00:00:00");
     }
 
-    public void setFolderList(List<Folder> folders){
-        myAdapter.clearItem(); // clear Adapter before fetch folder list
+    // must clear ListViewItem before calling this method !!
+    public void setFolderListView(List<Folder> folders, Boolean isShared){
         for (int i=0; i< folders.size();i++){
             Folder folder = folders.get(i);
-            myAdapter.addItem(folder);
+            myAdapter.addItem(folder,isShared);
         }
         myAdapter.notifyDataSetChanged();
     }
@@ -213,9 +213,13 @@ public class FolderListFragment extends Fragment {
 
         // 1. get folder list from local DB no matter there is network or not.
         List<Folder> folders = db.getMyFolders(MainActivity.getUserId());
-        setFolderList(folders);
+        // clear Adapter before fetch folder list
+        myAdapter.clearItem();
+        // my folders
+        setFolderListView(folders,false);
+        //shared folders
+        setFolderListView(db.getSharedFolders(MainActivity.getUserId()),true);
 
-        // TODO: 2016. 10. 4. sharedFolders는 어디에 출력해주지 ?
 
         // check if the network has connected
         ConnectivityManager connMgr = (ConnectivityManager)

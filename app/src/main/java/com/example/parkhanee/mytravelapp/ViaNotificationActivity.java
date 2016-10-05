@@ -21,6 +21,8 @@ public class ViaNotificationActivity extends AppCompatActivity {
         Share share = dbHelper.getShare(Integer.valueOf(share_id));
         dbHelper.close();
 
+        //폴더이름, 보낸 사용자 이름 보여주고 수락/거부 버튼
+
 
         Log.d(TAG, "onCreate: "+share.toString());
 
