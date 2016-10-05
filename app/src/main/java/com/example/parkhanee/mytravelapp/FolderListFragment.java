@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,8 +46,8 @@ import java.util.Map;
  * Created by parkhanee on 2016. 9. 6..
  */
 public class FolderListFragment extends Fragment {
-    TextView refresh;
-    String userId;
+//    TextView refresh;
+//    String userId;
 
     private FolderListAdapter myAdapter;
     public static Boolean isHidden;// tells if the drop-down "newFolder" fragment is hidden
@@ -55,8 +56,6 @@ public class FolderListFragment extends Fragment {
 
     String TAG = "FolderListFragment";
     HashMap<String, String> PostDataParams;
-
-    DBHelper db;
 
     @Nullable
     @Override
@@ -68,22 +67,23 @@ public class FolderListFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Toast.makeText(getActivity(), "onViewCreated", Toast.LENGTH_SHORT).show();
         myAdapter = new FolderListAdapter(getActivity());
         ListView listView = (ListView) view.findViewById(R.id.listView2);
         listView.setAdapter(myAdapter);
 //        dialog = new ProgressDialog(getContext());
-        db = new DBHelper(getActivity());
+        final DBHelper dbHelper = new DBHelper(getActivity());
 
-        refresh = (TextView) view.findViewById(R.id.refresh);
-        refresh.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-
-                myClickHandler();
-                Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        refresh = (TextView) view.findViewById(R.id.refresh);
+//        refresh.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View view) {
+//
+//                myClickHandler();
+//                Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
 
         btn_new = (Button) view.findViewById(R.id.button8);
@@ -131,7 +131,7 @@ public class FolderListFragment extends Fragment {
                     Date date = new Date();
                     System.out.println(dateFormat.format(date)); //2014/08/06 15:59:48
                     int unixTime = (int) System.currentTimeMillis() / 1000; //set unix time as folder id
-                    db.addFolder(new Folder(unixTime,name,MainActivity.getUserId(),desc,start_date,end_date,dateFormat.format(date)));
+                    dbHelper.addFolder(new Folder(unixTime,name,MainActivity.getUserId(),desc,start_date,end_date,dateFormat.format(date)));
                     Log.d(TAG, "created "+dateFormat.format(date));
 
                     // reset editTexts since the data within them has been sent
@@ -152,14 +152,28 @@ public class FolderListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent a = new Intent(getActivity(),FolderActivity.class);
-                Bundle args = new Bundle();
-                args.putInt("folder_id",myAdapter.getItem(position).getId()); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
 
-                a.putExtra("args",args);
-                startActivity(a);
+                int folder_id = myAdapter.getItem(position).getId();
+                FolderListAdapter.shareState state = myAdapter.getIsShared(position);
+
+                if (state == FolderListAdapter.shareState.REQUESTED){
+                    // 공유신청받은 폴더 아이템을 폴더리스트에서 클릭하면, 공유신청 gcm pendingIntent 와 같은 액티비티로 넘어감.
+                    Intent i = new Intent(getActivity(),ViaNotificationActivity.class);
+                    i.putExtra("share_id",dbHelper.getShareWithFolderId(folder_id).getShare_id());
+                    startActivity(i);
+
+                }else if (state == FolderListAdapter.shareState.MINE || state == FolderListAdapter.shareState.ACCEPTED){
+                    Intent a = new Intent(getActivity(),FolderActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt("folder_id",folder_id); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
+
+                    a.putExtra("args",args);
+                    startActivity(a);
+                }
             }
         });
+
+        dbHelper.close();
     }
 
 
@@ -169,6 +183,7 @@ public class FolderListFragment extends Fragment {
 
     @Override
     public void onResume() {
+        Toast.makeText(getActivity(), "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
         //fetch data to make folder list on RESUME because the new data should be fetched when a folder data has been updated
         myClickHandler();
@@ -204,7 +219,7 @@ public class FolderListFragment extends Fragment {
         myAdapter.notifyDataSetChanged();
     }
 
-    // must clear ListViewItem before calling this method !!
+        // must clear ListViewItem before calling this method !!
     public void setFolderListView(List<Folder> folders, List<FolderListAdapter.shareState> s){
         for (int i=0; i< folders.size();i++){
             Folder folder = folders.get(i);
@@ -219,23 +234,23 @@ public class FolderListFragment extends Fragment {
         * 1. 로컬디비에서 폴더목록 가져와서 출력
         * 2. (온라인) 로컬디비의 정보를 서버로 보내서 동기화 -- 새폴더 만들어서 목록 다시 불러오면 새폴더 서버로 동기화도 바로 처리됨.
         */
-
+        DBHelper db = new DBHelper(getActivity());
+        db.getReadableDatabase();
         // 1. get folder list from local DB no matter there is network or not.
         List<Folder> folders = db.getMyFolders(MainActivity.getUserId());
         // clear Adapter before fetch folder list
         myAdapter.clearItem();
-        // shared folders
+        // 1-1. shared folders
         setFolderListView(db.getSharedFolders(MainActivity.getUserId()),db.getSharedFoldersState(MainActivity.getUserId()));
-        // my folders
+        // 1-2. my folders
         setFolderListView(folders, FolderListAdapter.shareState.MINE);
 
+        // 2. synchronize server
         // check if the network has connected
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            // 2. synchronize server
-
             // fetch data from localDB and put them into postData hashMap.
             // get ONLY "MY" folders
             folders = db.getMyFolders(MainActivity.getUserId());
@@ -256,7 +271,7 @@ public class FolderListFragment extends Fragment {
 
             String stringUrl = "http://hanea8199.vps.phps.kr/syncfolderlist_process.php";
             new SyncServer().execute(stringUrl); // connect to server
-
+            db.close();
         } else {
             Toast.makeText(getActivity(), "Cannot proceed, No network connection available.", Toast.LENGTH_SHORT).show();
         }

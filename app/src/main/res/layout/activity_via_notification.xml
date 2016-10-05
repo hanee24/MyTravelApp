@@ -18,4 +18,24 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="133dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="수락"
+        android:id="@+id/accept"
+        android:layout_below="@+id/textView39"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="143dp"
+        android:onClick="mOnClick"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="거부"
+        android:id="@+id/reject"
+        android:layout_below="@+id/accept"
+        android:layout_alignLeft="@+id/accept"
+        android:layout_alignStart="@+id/accept"
+        android:onClick="mOnClick"/>
 </RelativeLayout>

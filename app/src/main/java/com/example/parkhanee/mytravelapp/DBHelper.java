@@ -526,7 +526,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    // Deleting single folder
+    // Deleting single folder and share!!
     public void deleteFolder(int id) {
 
         // 1. get reference to writable DB
@@ -537,10 +537,22 @@ public class DBHelper extends SQLiteOpenHelper {
                 KEY_ID+" = ?",
                 new String[] { String.valueOf(id) });
 
+        String DELETE_SHARE = "DELETE FROM " +TABLE_SHARE+
+                " WHERE EXISTS" +
+                "  ( SELECT *" +
+                "    FROM " +TABLE_SHARE+
+                "    WHERE "+s_KEY_FOLDER_ID+" = "+id+" )";
+
+//        db.delete(TABLE_SHARE,
+//                s_KEY_FOLDER_ID+" = ?",
+//                new String[] { String.valueOf(id) });
+
+        db.execSQL(DELETE_SHARE);
         // 3. close
         db.close();
 
         Log.d("deleteFolder", String.valueOf(id));
+        Log.d(TAG, "deleteFolder: "+DELETE_SHARE);
 
     }
 
