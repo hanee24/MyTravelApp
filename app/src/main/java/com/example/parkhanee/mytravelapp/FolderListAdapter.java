@@ -15,8 +15,12 @@ import java.util.ArrayList;
  */
 public class FolderListAdapter extends BaseAdapter{
     private ArrayList<Folder> folderArrayList = new ArrayList<>();
-    private ArrayList<Boolean> isShared = new ArrayList<>();
+    private ArrayList<shareState> isShared = new ArrayList<>();
     private Context context=null;
+
+    public enum shareState{
+        MINE, REQUESTED, ACCEPTED, DENIED
+    }
 
     public FolderListAdapter(Context context){
         this.context = context;
@@ -32,17 +36,21 @@ public class FolderListAdapter extends BaseAdapter{
         return folderArrayList.get(i);
     }
 
+    public shareState getIsShared(int i) {
+        return isShared.get(i);
+    }
+
     @Override
     public long getItemId(int i) {
         return i;
     }
 
-    public void addItem(Folder folder, Boolean s){
+    public void addItem(Folder folder, shareState s){
         folderArrayList.add(folder);
         isShared.add(s);
     }
 
-    public void addItem(int position,Folder folder,Boolean s){
+    public void addItem(int position,Folder folder, shareState s){
         folderArrayList.add(position,folder);
         isShared.add(s);
     }
@@ -62,6 +70,7 @@ public class FolderListAdapter extends BaseAdapter{
             holder.tvDesc = (TextView) v.findViewById(R.id.folder_desc);
             holder.tvDate = (TextView) v.findViewById(R.id.textView19);
             holder.tvShared = (TextView) v.findViewById(R.id.tvShareState);
+            holder.db = new DBHelper(context);
             v.setTag(holder);
 
         } else {
@@ -76,9 +85,11 @@ public class FolderListAdapter extends BaseAdapter{
             String str = start+" ~ "+end;
             holder.tvDate.setText(str);
             holder.tvShared.setVisibility(View.INVISIBLE);
-            if (isShared.get(position)){
+
+            // 공유받은폴더 상태 출력
+            if (shareState.MINE != isShared.get(position)){ // 공유받은 폴더 일 때
                 holder.tvShared.setVisibility(View.VISIBLE);
-                holder.tvShared.setText("shared"); // TODO: 2016. 10. 5. set state which can be obtained from local db 'share' table..
+                holder.tvShared.setText(isShared.get(position).toString()); // TODO: 2016. 10. 5. set state which can be obtained from local db 'share' table..
             }
         }
         return v;
@@ -89,6 +100,7 @@ public class FolderListAdapter extends BaseAdapter{
         TextView tvDesc = null;
         TextView tvDate = null;
         TextView tvShared = null;
+        DBHelper db = null;
     }
 
 

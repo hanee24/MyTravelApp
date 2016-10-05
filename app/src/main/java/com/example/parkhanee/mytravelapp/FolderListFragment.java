@@ -151,10 +151,10 @@ public class FolderListFragment extends Fragment {
         // direct to FolderActivity
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent a = new Intent(getActivity(),FolderActivity.class);
                 Bundle args = new Bundle();
-                args.putInt("folder_id",myAdapter.getItem(i).getId()); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
+                args.putInt("folder_id",myAdapter.getItem(position).getId()); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
 
                 a.putExtra("args",args);
                 startActivity(a);
@@ -196,10 +196,19 @@ public class FolderListFragment extends Fragment {
     }
 
     // must clear ListViewItem before calling this method !!
-    public void setFolderListView(List<Folder> folders, Boolean isShared){
+    public void setFolderListView(List<Folder> folders, FolderListAdapter.shareState s){
         for (int i=0; i< folders.size();i++){
             Folder folder = folders.get(i);
-            myAdapter.addItem(folder,isShared);
+            myAdapter.addItem(folder,s);
+        }
+        myAdapter.notifyDataSetChanged();
+    }
+
+    // must clear ListViewItem before calling this method !!
+    public void setFolderListView(List<Folder> folders, List<FolderListAdapter.shareState> s){
+        for (int i=0; i< folders.size();i++){
+            Folder folder = folders.get(i);
+            myAdapter.addItem(folder,s.get(i));
         }
         myAdapter.notifyDataSetChanged();
     }
@@ -215,11 +224,10 @@ public class FolderListFragment extends Fragment {
         List<Folder> folders = db.getMyFolders(MainActivity.getUserId());
         // clear Adapter before fetch folder list
         myAdapter.clearItem();
+        // shared folders
+        setFolderListView(db.getSharedFolders(MainActivity.getUserId()),db.getSharedFoldersState(MainActivity.getUserId()));
         // my folders
-        setFolderListView(folders,false);
-        //shared folders
-        setFolderListView(db.getSharedFolders(MainActivity.getUserId()),true);
-
+        setFolderListView(folders, FolderListAdapter.shareState.MINE);
 
         // check if the network has connected
         ConnectivityManager connMgr = (ConnectivityManager)

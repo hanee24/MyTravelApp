@@ -17,6 +17,8 @@ import java.util.List;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
+    private final String TAG = "DBHelper";
+
     // Database Version
     private static final int DATABASE_VERSION = 1;
     // Database Name
@@ -401,6 +403,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //  공유 받은 폴더 목록
     public List<Folder> getSharedFolders(String user_id) {
+
         List<Folder> folders = new LinkedList<Folder>();
 
         // select * from share where user_id = 현재사용자, 여기서 뽑아온 정보에서 folder_id에 맞는 폴더를 folder table에서 찾아 return
@@ -417,6 +420,8 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 String folder_id = cursor.getString(1);
+                String state = cursor.getString(3);   // TODO: 2016. 10. 5. return state as well !!
+
                 String f_query = "SELECT  * FROM " + TABLE_FOLDER+" WHERE "+KEY_ID+"='"+folder_id+"'";
                 SQLiteDatabase f_db = this.getWritableDatabase();
                 Cursor f_cursor = db.rawQuery(f_query, null);
@@ -445,6 +450,48 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // return folders
         return folders;
+    }
+
+    // 공유받은 폴더 "상태" 목록
+    public List<FolderListAdapter.shareState> getSharedFoldersState(String user_id) {
+
+        List<FolderListAdapter.shareState> states = new LinkedList<>();
+
+        // select * from share where user_id = 현재사용자, 여기서 뽑아온 정보에서 folder_id에 맞는 폴더를 folder table에서 찾아 return
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_SHARE+" WHERE "+s_KEY_USER_ID+"='"+user_id+"' ORDER BY "+s_KEY_ID+" DESC";
+
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build folder and add it to list
+        if (cursor.moveToFirst()) {
+            do {
+                String s = cursor.getString(3);   // TODO: 2016. 10. 5. return state as well !!
+                FolderListAdapter.shareState state = null;
+                switch (s){
+                    case "Requested" : state = FolderListAdapter.shareState.REQUESTED;
+                        break;
+                    case "Accepted" : state = FolderListAdapter.shareState.ACCEPTED;
+                        break;
+                    case "Denied" : state = FolderListAdapter.shareState.DENIED;
+                        break;
+                    default: state = FolderListAdapter.shareState.MINE;
+                        Log.d(TAG, "getSharedFoldersState: switch statement set to default, something is wrong");
+                        break;
+                }
+                states.add(state);
+
+            } while (cursor.moveToNext());
+        }
+
+        Log.d("getShredFoldersState()","size:"+String.valueOf(states.size()) +" "+ states.toString());
+
+        // return folders
+        return states;
     }
 
 
@@ -564,6 +611,42 @@ public class DBHelper extends SQLiteOpenHelper {
         share.setState(cursor.getString(3));
 
         Log.d("getShare("+id+")", share.toString());
+
+        // 5. return folder
+        return share;
+    }
+
+
+    public Share getShareWithFolderId(int folder_id){
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_SHARE, // a. table
+                        s_COLUMNS, // b. column names
+                        s_KEY_FOLDER_ID+"  = ?", // c. selections
+                        new String[] { String.valueOf(folder_id) }, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build folder object
+        Share share = new Share();
+        // CursorIndexOutOfBoundsException: Index 0 requested, with a size of 0
+        // when the folder index is wrong so that no folder has called
+        share.setShare_id(cursor.getString(0));
+        share.setFolder_id(cursor.getString(1));
+        share.setUser_id(cursor.getString(2));
+        share.setState(cursor.getString(3));
+
+        Log.d("getShareWithFolderId("+folder_id+")", share.toString());
 
         // 5. return folder
         return share;
