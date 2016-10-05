@@ -8,17 +8,17 @@ public class Folder {
     private String desc;
     private String date_start, date_end, created;
     private int id;
-    private String user_id;
+    private String owner_id;
 
 
-    public Folder (int id,String name,String user_id, String desc,String start, String end, String created){
+    public Folder (int id,String name,String owner_id, String desc,String start, String end, String created){
         super();
         this.id = id;
         this.name = name;
         this.desc = desc;
         date_end = end;
         date_start = start;
-        this.user_id = user_id;
+        this.owner_id = owner_id;
         this.created = created;
     }
 
@@ -53,8 +53,8 @@ public class Folder {
         return created;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getOwner_id() {
+        return owner_id;
     }
 
     public void setId(int id) {
@@ -81,14 +81,14 @@ public class Folder {
         this.created = created;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setOwner_id(String owner_id) {
+        this.owner_id = owner_id;
     }
 
 
     @Override
     public String toString() {
-       return "Folder [folder_id=" + id + ", folder_name=" + name + ", desc=" + desc
+       return "Folder [folder_id=" + id + ", folder_name=" + name + ", desc=" + desc+ ", start="+date_start+ ", end=" +date_end+ ", owner_id="+owner_id+ ", created="+created
                 + "]";
     }
 }

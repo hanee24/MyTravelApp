@@ -8,13 +8,15 @@
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <!-- [START gcm_permission] -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <!-- [END gcm_permission] -->
 
-    <permission android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE"
-                android:protectionLevel="signature" />
-    <uses-permission android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE" />
+    <permission
+        android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE"/>
 
     <application
         android:allowBackup="true"
@@ -55,9 +57,8 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            tools:replace="android:theme"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            />
+            tools:replace="android:theme"/>
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
@@ -80,30 +81,33 @@
 
         <activity android:name=".FolderActivity">
         </activity>
-        <activity android:name=".FolderUpdateActivity"
-                  android:windowSoftInputMode="stateHidden">
+        <activity
+            android:name=".FolderUpdateActivity"
+            android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".FolderShareActivity"
-                  android:windowSoftInputMode="stateHidden">
+        <activity
+            android:name=".FolderShareActivity"
+            android:windowSoftInputMode="stateHidden">
         </activity>
 
         <!-- [gcm_receiver] -->
-        <!--GCM 리시버는 특별히 구현할 필요가 없다. GCM 라이브러리 안에 이미 구현체가 있기 때문에 정의만하면 된다. -->
+        <!-- GCM 리시버는 특별히 구현할 필요가 없다. GCM 라이브러리 안에 이미 구현체가 있기 때문에 정의만하면 된다. -->
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="com.example.gcm" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+
+                <category android:name="com.example.gcm"/>
             </intent-filter>
         </receiver>
         <!-- [gcm_listener_service] -->
         <service
             android:name=".MyGcmListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter android:priority="10000">
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
         <!-- [instanceId_listener_service] -->
@@ -111,13 +115,16 @@
             android:name=".MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
         </service>
         <!-- [gcm_registration_service] -->
         <service
             android:name=".RegistrationIntentService"
             android:exported="false"/>
+
+        <activity android:name=".ViaNotificationActivity">
+        </activity>
     </application>
 
 </manifest>

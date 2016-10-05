@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
-    private ProgressBar mRegistrationProgressBar;
     private boolean isReceiverRegistered;
 
 
@@ -141,11 +140,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         // [START gcm quick start guide]
-        mRegistrationProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
                 SharedPreferences sharedPreferences =
                         PreferenceManager.getDefaultSharedPreferences(context);
                 boolean sentToken = sharedPreferences

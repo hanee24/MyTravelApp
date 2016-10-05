@@ -212,8 +212,10 @@ public class FolderListFragment extends Fragment {
         */
 
         // 1. get folder list from local DB no matter there is network or not.
-        List<Folder> folders = db.getAllFolders(MainActivity.getUserId());
+        List<Folder> folders = db.getMyFolders(MainActivity.getUserId());
         setFolderList(folders);
+
+        // TODO: 2016. 10. 4. sharedFolders는 어디에 출력해주지 ?
 
         // check if the network has connected
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -223,14 +225,15 @@ public class FolderListFragment extends Fragment {
             // 2. synchronize server
 
             // fetch data from localDB and put them into postData hashMap.
-            folders = db.getAllFolders(MainActivity.getUserId()); // TODO: 2016. 9. 22. 이렇게한번더 빼내줘야 ?
+            // get ONLY "MY" folders
+            folders = db.getMyFolders(MainActivity.getUserId());
             PostDataParams = new HashMap<>();
 
-            PostDataParams.put("user_id",MainActivity.getUserId()); // TODO: 2016. 9. 22. check
+            PostDataParams.put("user_id",MainActivity.getUserId()); // 로그인한 사용자 아이디
             PostDataParams.put("size",String.valueOf(folders.size()));
             for (int i=0; i< folders.size();i++){
                 Folder folder = folders.get(i);
-                //PostDataParams.put("user_id"+i,userId);
+                PostDataParams.put("owner_id"+i,String.valueOf(folder.getOwner_id())); // 각 폴더 생성한 사용자 아이디
                 PostDataParams.put("folder_id"+i,String.valueOf(folder.getId()));
                 PostDataParams.put("folder_name"+i,folder.getName());
                 PostDataParams.put("description"+i,folder.getDesc());
@@ -243,7 +246,7 @@ public class FolderListFragment extends Fragment {
             new SyncServer().execute(stringUrl); // connect to server
 
         } else {
-            Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Cannot proceed, No network connection available.", Toast.LENGTH_SHORT).show();
         }
     }
 

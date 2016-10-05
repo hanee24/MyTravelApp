@@ -8,17 +8,15 @@ public class Share {
     private String folder_id;
     private String user_id;
     private String state;
-    private Boolean isMine;
 
     // constructors
     public Share(){}
 
-    public Share(String share_id,String folder_id,String user_id,String state, Boolean isMine){
+    public Share(String share_id,String folder_id,String user_id,String state){
         this.share_id = share_id;
         this.folder_id = folder_id;
         this.user_id = user_id;
         this.state = state;
-        this.isMine = isMine;
     }
 
     //getters and setters
@@ -39,10 +37,6 @@ public class Share {
         return state;
     }
 
-    public Boolean getMine() {
-        return isMine;
-    }
-
     public void setShare_id(String share_id) {
         this.share_id = share_id;
     }
@@ -59,14 +53,11 @@ public class Share {
         this.state = state;
     }
 
-    public void setMine(Boolean mine) {
-        isMine = mine;
-    }
 
     // toString
     @Override
     public String toString() {
-        return "Share [share_id=" + share_id + ",foler_id=" + folder_id + ", state=" + state+", isMine="+isMine
+        return "Share [share_id=" + share_id + ",foler_id=" + folder_id + ", user_id="+user_id+ ", state=" + state
                 + "]";
     }
 }

@@ -55,7 +55,7 @@ public class FolderActivity extends AppCompatActivity {
 
         // get folder from local DB
         db = new DBHelper(FolderActivity.this);
-        db.getAllFolders(MainActivity.getUserId());
+        //db.getAllFolders(MainActivity.getUserId());
 
         // initiate views
         tv_name = (TextView)findViewById(R.id.folderName);
@@ -137,7 +137,7 @@ public class FolderActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             // print the number of folders at local DB before deleting
-            Log.d(TAG, "onPreExecute: folders "+String.valueOf(db.getAllFolders(folder.getUser_id()).size()));
+            Log.d(TAG, "onPreExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
         }
 
         @Override
@@ -154,7 +154,7 @@ public class FolderActivity extends AppCompatActivity {
                 str_result = result.toString();
                 Log.d(TAG, "onPostExecute: "+str_result);
                 // print the number of folders at local DB after deleting
-                Log.d(TAG, "onPostExecute: folders "+String.valueOf(db.getAllFolders(folder.getUser_id()).size()));
+                Log.d(TAG, "onPostExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
 
             }catch (JSONException e){
                 e.printStackTrace();

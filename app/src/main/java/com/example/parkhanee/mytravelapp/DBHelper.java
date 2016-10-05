@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,23 +46,21 @@ public class DBHelper extends SQLiteOpenHelper {
         String CREATE_FOLDER_TABLE = "CREATE TABLE folder( "+
                 "folder_id int NOT NULL PRIMARY KEY, "+
                 "folder_name varchar(40) NOT NULL, "+
-                "user_id varchar(40) NOT NULL,"+
+                "owner_id varchar(40) NOT NULL,"+
                 "description varchar(100),"+
                 "date_start datetime,"+
                 "date_end datetime,"+
                 "created datetime not null,"+
-                "FOREIGN KEY (user_id) REFERENCES user(user_id) on delete cascade on update cascade"+
+                "FOREIGN KEY (owner_id) REFERENCES user(user_id) on delete cascade on update cascade"+
                 ")";// CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
 
         // SQL statement to create share table
         String CREATE_SHARE_TABLE = "CREATE TABLE share (" +
                 "share_id int(11) NOT NULL PRIMARY KEY," +
                 "folder_id int(11) NOT NULL," +
-                "user_id varchar(40) NOT NULL," +
+                "user_id varchar(40) NOT NULL," + // 공유받은 사용자!!!!!!!!! owner_id는 folder 테이블에 있음 !
                 "state varchar(40) NOT NULL, "+//ENUM('Requested','Accepted','Denied') NOT NULL," +
-                "isMine boolean NOT NULL," +
                 "FOREIGN KEY (user_id) REFERENCES user(user_id) on delete cascade on update cascade," +
-//                "FOREIGN KEY (owner_id) REFERENCES user(user_id) on delete cascade on update cascade," +
                 "FOREIGN KEY (folder_id) REFERENCES folder(folder_id) on delete cascade on update cascade" +
                 ")";
 
@@ -116,10 +116,16 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(u_KEY_LNG,user.getLng());
 
 
-        // 3. insert
-        db.insert(TABLE_USER, // table
-                null, //nullColumnHack
-                values); // key/value -> keys = column names/ values = column values
+        try {
+            // 3. insert
+            db.insertOrThrow(TABLE_USER, // table
+                    null, //nullColumnHack
+                    values); // key/value -> keys = column names/ values = column values
+        } catch (SQLiteException e){
+            // catch exception when trying to add existing user
+            e.printStackTrace();
+        }
+
 
         // 4. close
         db.close();
@@ -253,7 +259,7 @@ public class DBHelper extends SQLiteOpenHelper {
     // folder Table Columns names
     private static final String KEY_ID = "folder_id";
     private static final String KEY_NAME = "folder_name";
-    private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_USER_ID = "owner_id";
     private static final String KEY_DESC = "description";
     private static final String KEY_START = "date_start";
     private static final String KEY_END = "date_end";
@@ -270,14 +276,14 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ID, folder.getId()); // get id
         values.put(KEY_NAME, folder.getName()); // get folder name
-        values.put(KEY_USER_ID,folder.getUser_id());
+        values.put(KEY_USER_ID,folder.getOwner_id());
         values.put(KEY_DESC,folder.getDesc());
         values.put(KEY_START,folder.getDate_start());
         values.put(KEY_END,folder.getDate_end());
         values.put(KEY_CREATED,folder.getCreated());
 
         // 3. insert
-        db.insert(TABLE_FOLDER, // table
+        db.insertOrThrow(TABLE_FOLDER, // table
                 null, //nullColumnHack
                 values); // key/value -> keys = column names/ values = column values
 
@@ -311,7 +317,7 @@ public class DBHelper extends SQLiteOpenHelper {
         // when the folder index is wrong so that no folder has called
         folder.setId(Integer.parseInt(cursor.getString(0)));
         folder.setName(cursor.getString(1));
-        folder.setUser_id(cursor.getString(2));
+        folder.setOwner_id(cursor.getString(2));
         folder.setDesc(cursor.getString(3));
         folder.setDate_start(cursor.getString(4));
         folder.setDate_end(cursor.getString(5));
@@ -324,11 +330,12 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Get All Folders
+    // TODO: 2016. 10. 4. is it ever going to be  used?
     public List<Folder> getAllFolders(String user_id) {
         List<Folder> folders = new LinkedList<Folder>();
 
         // 1. build the query
-        String query = "SELECT  * FROM " + TABLE_FOLDER+" WHERE "+KEY_USER_ID+"='"+user_id+"' ORDER BY "+KEY_ID+" DESC";
+        String query = "SELECT  * FROM " + TABLE_FOLDER+" ORDER BY "+KEY_ID+" DESC"; //WHERE "+KEY_USER_ID+"='"+user_id+"' ORDER BY "+KEY_ID+" DESC";
 
         // 2. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
@@ -341,7 +348,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 folder = new Folder();
                 folder.setId(Integer.parseInt(cursor.getString(0)));
                 folder.setName(cursor.getString(1));
-                folder.setUser_id(cursor.getString(2));
+                folder.setOwner_id(cursor.getString(2));
                 folder.setDesc(cursor.getString(3));
                 folder.setDate_start(cursor.getString(4));
                 folder.setDate_end(cursor.getString(5));
@@ -358,6 +365,89 @@ public class DBHelper extends SQLiteOpenHelper {
         return folders;
     }
 
+    public List<Folder> getMyFolders(String user_id) {
+        List<Folder> folders = new LinkedList<Folder>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_FOLDER+" WHERE "+KEY_USER_ID+"='"+user_id+"' ORDER BY "+KEY_ID+" DESC";
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build folder and add it to list
+        Folder folder = null;
+        if (cursor.moveToFirst()) {
+            do {
+                folder = new Folder();
+                folder.setId(Integer.parseInt(cursor.getString(0)));
+                folder.setName(cursor.getString(1));
+                folder.setOwner_id(cursor.getString(2));
+                folder.setDesc(cursor.getString(3));
+                folder.setDate_start(cursor.getString(4));
+                folder.setDate_end(cursor.getString(5));
+                folder.setCreated(cursor.getString(6));
+
+                // Add folder to folders
+                folders.add(folder);
+            } while (cursor.moveToNext());
+        }
+
+        Log.d("getMyFolders()","size:"+String.valueOf(folders.size()) +" "+ folders.toString());
+
+        // return folders
+        return folders;
+    }
+
+    //  공유 받은 폴더 목록
+    public List<Folder> getSharedFolders(String user_id) {
+        List<Folder> folders = new LinkedList<Folder>();
+
+        // select * from share where user_id = 현재사용자, 여기서 뽑아온 정보에서 folder_id에 맞는 폴더를 folder table에서 찾아 return
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_SHARE+" WHERE "+s_KEY_USER_ID+"='"+user_id+"' ORDER BY "+s_KEY_ID+" DESC";
+
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build folder and add it to list
+        if (cursor.moveToFirst()) {
+            do {
+                String folder_id = cursor.getString(1);
+                String f_query = "SELECT  * FROM " + TABLE_FOLDER+" WHERE "+KEY_ID+"='"+folder_id+"'";
+                SQLiteDatabase f_db = this.getWritableDatabase();
+                Cursor f_cursor = db.rawQuery(f_query, null);
+
+                Folder folder = null;
+                if (f_cursor.moveToFirst()) {
+                    do {
+                        folder = new Folder();
+                        folder.setId(Integer.parseInt(f_cursor.getString(0)));
+                        folder.setName(f_cursor.getString(1));
+                        folder.setOwner_id(f_cursor.getString(2));
+                        folder.setDesc(f_cursor.getString(3));
+                        folder.setDate_start(f_cursor.getString(4));
+                        folder.setDate_end(f_cursor.getString(5));
+                        folder.setCreated(f_cursor.getString(6));
+
+                        // Add folder to folders
+                        folders.add(folder);
+                    } while (f_cursor.moveToNext());
+                }
+
+            } while (cursor.moveToNext());
+        }
+
+        Log.d("getShredFolders()","size:"+String.valueOf(folders.size()) +" "+ folders.toString());
+
+        // return folders
+        return folders;
+    }
+
+
     // Updating single folder
     public int updateFolder(Folder folder) {
 
@@ -368,7 +458,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_ID, folder.getId()); // get id
         values.put(KEY_NAME, folder.getName()); // get folder name
-        values.put(KEY_USER_ID,folder.getUser_id());
+        values.put(KEY_USER_ID,folder.getOwner_id());
         values.put(KEY_DESC,folder.getDesc());
         values.put(KEY_START,folder.getDate_start());
         values.put(KEY_END,folder.getDate_end());
@@ -411,18 +501,16 @@ public class DBHelper extends SQLiteOpenHelper {
      * Share Table
      * CRUD operations (create, read "select", update, delete)
      */
-    // folder table name
+    // table name
     private static final String TABLE_SHARE = "share";
 
-    // folder Table Columns names
+    // Table Columns names
     private static final String s_KEY_ID = "share_id";
     private static final String s_KEY_FOLDER_ID = "folder_id";
-//    private static final String s_KEY_OWNER_ID = "owner_id"; // 한 기기를 사용하는 사용자가 여럿일수있으니까 ..넣어야 하는데 귀찮다
     private static final String s_KEY_USER_ID = "user_id";
     private static final String s_KEY_STATE = "state";
-    private static final String s_KEY_MY = "isMine";
 
-    private static final String[] s_COLUMNS = {s_KEY_ID,s_KEY_FOLDER_ID,s_KEY_USER_ID,s_KEY_STATE,s_KEY_MY};
+    private static final String[] s_COLUMNS = {s_KEY_ID,s_KEY_FOLDER_ID,s_KEY_USER_ID,s_KEY_STATE};
 
     public void addShare(Share share){
         Log.d("addShare",share.toString());
@@ -435,11 +523,10 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(s_KEY_FOLDER_ID, share.getFolder_id()); // get folder name
         values.put(s_KEY_USER_ID,share.getUser_id());
         values.put(s_KEY_STATE,share.getState());
-        values.put(s_KEY_MY,share.getMine());
 
 
         // 3. insert
-        db.insert(TABLE_SHARE, // table
+        db.insertOrThrow(TABLE_SHARE, // table
                 null, //nullColumnHack
                 values); // key/value -> keys = column names/ values = column values
 
@@ -454,7 +541,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // 2. build query
         Cursor cursor =
-                db.query(TABLE_FOLDER, // a. table
+                db.query(TABLE_SHARE, // a. table
                         s_COLUMNS, // b. column names
                         s_KEY_ID+"  = ?", // c. selections
                         new String[] { String.valueOf(id) }, // d. selections args
@@ -475,7 +562,6 @@ public class DBHelper extends SQLiteOpenHelper {
         share.setFolder_id(cursor.getString(1));
         share.setUser_id(cursor.getString(2));
         share.setState(cursor.getString(3));
-        share.setMine(Boolean.valueOf(cursor.getString(4)));
 
         Log.d("getFolder("+id+")", share.toString());
 
@@ -503,7 +589,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 share.setFolder_id(cursor.getString(1));
                 share.setUser_id(cursor.getString(2));
                 share.setState(cursor.getString(3));
-                share.setMine(Boolean.valueOf(cursor.getString(4)));
 
                 // Add folder to folders
                 shares.add(share);
@@ -516,7 +601,34 @@ public class DBHelper extends SQLiteOpenHelper {
         return shares;
     }
 
-    // TODO: 2016. 9. 30. update share
-    // TODO: 2016. 9. 30. delete share
+    // Updating single folder
+    public int updateShare(Share share) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(s_KEY_ID, share.getShare_id()); // get id
+        values.put(s_KEY_FOLDER_ID, share.getFolder_id()); // get folder name
+        values.put(s_KEY_USER_ID,share.getUser_id());
+        values.put(s_KEY_STATE,share.getState());
+
+        // 3. updating row
+        int i = db.update(TABLE_SHARE, //table
+                values, // column/value
+                s_KEY_ID+" = ?", // selections
+                new String[] { String.valueOf(share.getShare_id()) }); //selection args
+
+        // 4. close
+        db.close();
+
+        Log.d("updateShare", share.toString());
+
+        return i;
+
+    }
+
+    // TODO: 2016. 9. 30. delete Share
 
 }

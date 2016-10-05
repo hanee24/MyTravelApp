@@ -127,7 +127,7 @@ public class RegistrationIntentService extends IntentService {
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 5000000;
+            int len = 100;
 
             try {
                 URL url = new URL(myurl);

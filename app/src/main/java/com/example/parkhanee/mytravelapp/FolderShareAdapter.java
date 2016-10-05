@@ -135,8 +135,8 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
                         postDataParams  = new HashMap<>();
                         postDataParams.put("share_id",String.valueOf(unixTime)); //set unix time as share id
                         postDataParams.put("folder_id",String.valueOf(folder_id));
-                        postDataParams.put("owner_id",MainActivity.getUserId());
-                        postDataParams.put("user_id",receiver_id);
+                        postDataParams.put("owner_id",MainActivity.getUserId()); // 현재 로그인된 사용자
+                        postDataParams.put("user_id",receiver_id); // 공유신청 받는 사용자 == 리스트뷰에서 클릭된 아이템에 해당하는 사용자
 
                         postDataParams.put("user_name",receiver);
                         postDataParams.put("isFB",String.valueOf(users.get(position).getFB()));
@@ -225,18 +225,21 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
 
-            new AsyncProcess().execute(url);
+            // 폴더 공유 신청 하기
+            new ShareFolderProcess().execute(url);
 
+            // 폴더 공유 신청 보내면서 신청받는 user, share 정보 로컬디비에 저장하기
             db = new DBHelper(context);
+            // TODO: 2016. 10. 1. do not addUser if exists
             db.addUser(new User(postDataParams.get("user_id"),postDataParams.get("user_name"),Boolean.valueOf(postDataParams.get("isFB"))));
-            db.addShare(new Share(postDataParams.get("share_id"),postDataParams.get("folder_id"),postDataParams.get("user_id"),"Requested",true));
+            db.addShare(new Share(postDataParams.get("share_id"),postDataParams.get("folder_id"),postDataParams.get("user_id"),"Requested"));
 
         } else {
-            Toast.makeText(context, "No network connection available.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Cannot send invitation, No network connection available.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public class AsyncProcess extends AsyncTask<String,Void,String> {
+    public class ShareFolderProcess extends AsyncTask<String,Void,String> {
         String stringUrl;
 
         @Override
@@ -251,15 +254,10 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
         protected void onPostExecute(String string) {
 
             try{
-
-                // TODO: 2016. 9. 30. process result from server
-
                 JSONObject result = new JSONObject(string);
                 //check the whole result
                 String str_result = result.toString();
                 Log.d(TAG, "onPostExecute: "+str_result);
-
-
 
             }catch (JSONException e){
                 e.printStackTrace();

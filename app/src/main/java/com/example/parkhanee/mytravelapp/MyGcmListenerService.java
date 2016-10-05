@@ -14,12 +14,15 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import java.util.HashMap;
+
 /**
  * Created by parkhanee on 2016. 9. 28..
  */
 public class MyGcmListenerService extends GcmListenerService {
     private static final String TAG = "MyGcmListenerService";
 
+    DBHelper dbHelper;
 
     /**
      * Called when message is received.
@@ -32,27 +35,28 @@ public class MyGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String title = data.getString("title");
-        String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Title: " + title);
-        Log.d(TAG, "Message: " + message);
-
-
+        
         // [START_EXCLUDE]
         /**
          * Production applications would usually process the message here.
          * Eg: - Syncing with server.
          *     - Store message in local database.
          *     - Update UI.
+         *
+         *     폴더공유신청 받은정보를 로컬디비에 저장하기
          */
+
+        dbHelper = new DBHelper(this);
+        dbHelper.addUser(new User(data.getString("owner_id"),data.getString("owner_name"),Boolean.valueOf(data.getString("isFB")),data.getString("lat"),data.getString("lng")));
+        dbHelper.addFolder(new Folder(Integer.parseInt(data.getString("folder_id")),data.getString("folder_name"),data.getString("owner_id"),data.getString("desc"),data.getString("start"),data.getString("end"),data.getString("created")));
+        dbHelper.addShare(new Share(data.getString("share_id"),data.getString("folder_id"),MainActivity.getUserId(),data.getString("state")));
 
         /**
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
         // GCM으로 받은 메세지를 디바이스에 알려주는 sendNotification()을 호출한다.
-        sendNotification(title, message);
+        sendNotification(data.getString("owner_id"),data.getString("share_id"));
         // [END_EXCLUDE]
     }
     // [END receive_message]
@@ -60,13 +64,14 @@ public class MyGcmListenerService extends GcmListenerService {
     /**
      * 실제 디바에스에 GCM 으로부터 받은 메세지를 알려주는 함수이다. 디바이스 Notification Center에 나타난다.
      * Create and show a simple notification containing the received GCM message.
-     * @param title GCM message title
-     * @param message GCM message received.
      */
-    private void sendNotification(String title, String message) {
+    private void sendNotification(String owner_id,String share_id) {
         Log.d(TAG, "sendNotification: ");
-        Intent intent = new Intent(this, MainActivity.class);
+        String title = "폴더 공유 요청";
+        String message = owner_id+"님으로 부터 폴더 공유요청이 도착하였습니다.";
+        Intent intent = new Intent(this, ViaNotificationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("share_id",share_id);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -80,7 +85,6 @@ public class MyGcmListenerService extends GcmListenerService {
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                // TODO: 2016. 9. 30. resize large icon
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.road))
                 .setContentIntent(pendingIntent);
 
@@ -88,7 +92,6 @@ public class MyGcmListenerService extends GcmListenerService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(11 /* ID of notification */, notificationBuilder.build());
-
 
     }
 }
