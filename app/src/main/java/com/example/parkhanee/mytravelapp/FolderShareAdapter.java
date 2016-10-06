@@ -230,7 +230,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
 
             // 폴더 공유 신청 보내면서 신청받는 user, share 정보 로컬디비에 저장하기
             db = new DBHelper(context);
-            // TODO: 2016. 10. 1. do not addUser if exists
+
             db.addUser(new User(postDataParams.get("user_id"),postDataParams.get("user_name"),Boolean.valueOf(postDataParams.get("isFB"))));
             db.addShare(new Share(postDataParams.get("share_id"),postDataParams.get("folder_id"),postDataParams.get("user_id"),"Requested"));
 

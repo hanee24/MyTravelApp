@@ -139,7 +139,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
         TextView tv = (TextView) header.findViewById(R.id.textView34);
         if (shareList.size()==0){
             tv.setVisibility(View.GONE);
-            listView.setVisibility(View.GONE);
+//            listView.setVisibility(View.GONE);
 
             Log.d(TAG, "setShareList: shareList.size ==0");
         }else{

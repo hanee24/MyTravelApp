@@ -58,7 +58,6 @@ public class ShareListAdapter  extends BaseAdapter {
 
     @Override
     public View getView(int i, View v, ViewGroup viewGroup) {
-        Log.d(TAG, "getView: "+String.valueOf(i));
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         ViewHolder holder;
         if (v == null) {
@@ -75,9 +74,11 @@ public class ShareListAdapter  extends BaseAdapter {
         holder.tvUserName.setText(userArrayList.get(i).getUser_name());
         holder.tvState.setText(shareArrayList.get(i).getState());
         if (userArrayList.get(i).getFB()){
+            Log.d(TAG, "getView: FB==true"+String.valueOf(i));
             //set fb icon on the image view
             holder.icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
         }else{
+            Log.d(TAG, "getView: FB==false"+String.valueOf(i));
             // set default app icon
             holder.icon.setImageResource(R.drawable.road);
         }

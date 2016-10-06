@@ -113,11 +113,12 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(u_KEY_ID, user.getUser_id()); // get id
         values.put(u_KEY_NAME, user.getUser_name());
-        values.put(u_KEY_FB,user.getFB());
+        Boolean isFB = user.getFB();
+        values.put(u_KEY_FB,isFB);
         values.put(u_KEY_LAT,user.getLat());
         values.put(u_KEY_LNG,user.getLng());
 
-
+        Log.d(TAG, "addUser: values : "+values.toString());
         try {
             // 3. insert
             db.insertOrThrow(TABLE_USER, // table
@@ -159,11 +160,16 @@ public class DBHelper extends SQLiteOpenHelper {
         // when the folder index is wrong so that no folder has called
         user.setUser_id(cursor.getString(0));
         user.setUser_name(cursor.getString(1));
-        user.setFB(Boolean.valueOf(cursor.getString(2))); // TODO: 2016. 9. 30. check if it works
+
         user.setLat(cursor.getString(3));
         user.setLng(cursor.getString(4));
+        Boolean fb=false;
+        if (cursor.getString(2).equals("1")){
+            fb = true;
+        }
+        user.setFB(fb);
 
-        Log.d("getUser("+id+")", user.toString());
+        Log.d("getUser 3 ("+id+")", user.toString());
 
         // 5. return user
         return user;
@@ -187,10 +193,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 user = new User();
                 user.setUser_id(cursor.getString(0));
                 user.setUser_name(cursor.getString(1));
-                user.setFB(Boolean.valueOf(cursor.getString(2))); // TODO: 2016. 9. 30. check if it works
                 user.setLat(cursor.getString(3));
                 user.setLng(cursor.getString(4));
-
+                Boolean fb = false;
+                if (cursor.getString(2).equals("1")){ fb = true; }
+                user.setFB(fb);
                 // Add folder to folders
                 users.add(user);
             } while (cursor.moveToNext());
