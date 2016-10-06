@@ -47,12 +47,16 @@ public class ViaNotificationActivity extends AppCompatActivity {
                 finish();
                 dbHelper.close();
                 break;
-            // TODO: 2016. 10. 5. accept 하고 폴더액티비티로 갔다가 폴더목록으로 돌아오면 state가 바뀐게 반영이 안되어있는 문제
             case R.id.reject : // 공유 거부 하고 로컬디비에 저장
                 share.setState("Denied");
                 dbHelper.updateShare(share);
-//                Intent o = new Intent(ViaNotificationActivity.this,FolderListFragment.class);
-//                startActivity(o);
+//                dbHelper.deleteFolder(Integer.parseInt(share.getFolder_id()));
+                // TODO: 2016. 10. 6. 바로 지우지말고 일단 DINiED 상태로 남겨서 '거부한 목록' 보이기. 거기서 지워야 로컬디비에서 정보 완전히 지우기.
+
+                Toast.makeText(ViaNotificationActivity.this, "폴더 공유를 거부하였습니다", Toast.LENGTH_SHORT).show();
+
+                // TODO: 2016. 10. 6. 거부한 정보 서버에 업뎃.
+
                 finish();
                 dbHelper.close();
                 break;

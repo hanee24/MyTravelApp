@@ -67,7 +67,6 @@ public class FolderListFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Toast.makeText(getActivity(), "onViewCreated", Toast.LENGTH_SHORT).show();
         myAdapter = new FolderListAdapter(getActivity());
         ListView listView = (ListView) view.findViewById(R.id.listView2);
         listView.setAdapter(myAdapter);
@@ -183,7 +182,6 @@ public class FolderListFragment extends Fragment {
 
     @Override
     public void onResume() {
-        Toast.makeText(getActivity(), "onResume", Toast.LENGTH_SHORT).show();
         super.onResume();
         //fetch data to make folder list on RESUME because the new data should be fetched when a folder data has been updated
         myClickHandler();

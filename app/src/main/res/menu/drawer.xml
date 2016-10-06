@@ -27,6 +27,9 @@
             android:id="@+id/folder"
             android:title="@string/string_folder"/>
         <item
+            android:id="@+id/share"
+            android:title="@string/string_share"/>
+        <item
             android:id="@+id/poi"
             android:title="@string/string_poi"/>
         <item

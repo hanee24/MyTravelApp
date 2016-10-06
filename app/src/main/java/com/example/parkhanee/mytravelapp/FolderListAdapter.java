@@ -57,6 +57,7 @@ public class FolderListAdapter extends BaseAdapter{
 
     public void clearItem(){
         folderArrayList.clear();
+        isShared.clear();
     }
 
     @Override
@@ -89,7 +90,7 @@ public class FolderListAdapter extends BaseAdapter{
             // 공유받은폴더 상태 출력
             if (shareState.MINE != isShared.get(position)){ // 공유받은 폴더 일 때
                 holder.tvShared.setVisibility(View.VISIBLE);
-                holder.tvShared.setText(isShared.get(position).toString()); // TODO: 2016. 10. 5. set state which can be obtained from local db 'share' table..
+                holder.tvShared.setText(isShared.get(position).toString());
             }
         }
         return v;

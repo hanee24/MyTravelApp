@@ -529,6 +529,8 @@ public class DBHelper extends SQLiteOpenHelper {
     // Deleting single folder and share!!
     public void deleteFolder(int id) {
 
+        getAllShares();
+
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -553,6 +555,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Log.d("deleteFolder", String.valueOf(id));
         Log.d(TAG, "deleteFolder: "+DELETE_SHARE);
+        Log.d(TAG, "deleteFolder: check getAllShares");
+        getAllShares();
 
     }
 
