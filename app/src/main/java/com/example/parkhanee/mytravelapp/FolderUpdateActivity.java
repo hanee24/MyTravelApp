@@ -18,6 +18,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -31,11 +32,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,6 +59,8 @@ public class FolderUpdateActivity extends AppCompatActivity {
 
     private ListView listView;
     private ShareListAdapter mAdapter;
+    View header;
+    View footer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,18 @@ public class FolderUpdateActivity extends AppCompatActivity {
         db = new DBHelper(FolderUpdateActivity.this);
         folder = db.getFolder(folder_id);
 
+        // list view
+        mAdapter = new ShareListAdapter(FolderUpdateActivity.this);
+        listView = (ListView) findViewById(R.id.shareList);
+        listView.setAdapter(mAdapter);
+
+        // 스크롤뷰 안에 기본정보, 공유정보(shareListView)를 넣으려고 했는데 스크롤 뷰 안에 리스트뷰가 안들어가져서 전체 리스트뷰 안에 위 , 아래 요소를 header, footer로 묶어버렸다
+        header =  getLayoutInflater().inflate(R.layout.activity_folder_update_header, null, false);
+        footer =  getLayoutInflater().inflate(R.layout.activity_folder_update_footer, null, false);
+        listView.addHeaderView(header);
+        listView.addFooterView(footer);
+
+
         //hide keyboard as default
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         setLayout();
@@ -82,12 +100,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
             }
         },100);
 
-        // list view
-        mAdapter = new ShareListAdapter(FolderUpdateActivity.this);
-        listView = (ListView) findViewById(R.id.shareList);
-        listView.setAdapter(mAdapter);
-
-        ImageButton btn_start = (ImageButton) findViewById(R.id.imageButton2);
+        ImageButton btn_start = (ImageButton) header.findViewById(R.id.imageButton2);
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,7 +108,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton btn_end = (ImageButton) findViewById(R.id.imageButton3);
+        ImageButton btn_end = (ImageButton) header.findViewById(R.id.imageButton3);
         btn_end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,20 +121,44 @@ public class FolderUpdateActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setShareList();
+
     }
 
     public void setShareList(){
-        // TODO: 2016. 10. 6.  Adapter . clear item
-        // TODO: 2016. 10. 6.  Adapter . add item
-        // TODO: 2016. 10. 6.  Adapter . notify set changed
+        // get share, user from local db
+        // TODO: 2016. 10. 6. 같은폴더를 같은유저에게 공유신청했을 때 share정보 duplicated 문제 .. 이것때문에 user도 같은애가 여러번 불려온다
+        ArrayList<Share> shareList = db.getShareWithFolderId(folder_id);
+        ArrayList<User> userList= new ArrayList<>();
+        for (int i=0; i < shareList.size(); i++){
+            User user = db.getUser(shareList.get(i).getUser_id());
+            userList.add(user);
+        }
+
+        mAdapter.clearItem();
+        // user, share정보 없으면 set Visibility GONE
+        TextView tv = (TextView) header.findViewById(R.id.textView34);
+        if (shareList.size()==0){
+            tv.setVisibility(View.GONE);
+            listView.setVisibility(View.GONE);
+
+            Log.d(TAG, "setShareList: shareList.size ==0");
+        }else{
+            Log.d(TAG, "setShareList: userList("+String.valueOf(userList.size())+") : "+userList.toString());
+
+            tv.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.VISIBLE);
+
+            mAdapter.setItem(shareList,userList);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     public void setLayout(){
         // initiate views
-        et_name = (EditText) findViewById(R.id.editText6);
-        et_desc = (EditText) findViewById(R.id.editText7);
-        et_start = (EditText) findViewById(R.id.editText8);
-        et_end = (EditText) findViewById(R.id.editText9);
+        et_name = (EditText) header.findViewById(R.id.editText6);
+        et_desc = (EditText) header.findViewById(R.id.editText7);
+        et_start = (EditText) header.findViewById(R.id.editText8);
+        et_end = (EditText) header.findViewById(R.id.editText9);
         dialog = new ProgressDialog(FolderUpdateActivity.this);
         modifyFolderPostDataParams = new HashMap<>();
 
@@ -185,7 +222,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
 
             stringUrl = "http://hanea8199.vps.phps.kr/modifyfolder_process.php";
             new FolderUpdateProcess().execute(stringUrl);
-            
+
         } else {
             Toast.makeText(FolderUpdateActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
             finish();

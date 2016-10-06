@@ -133,7 +133,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public User getUser(int id){
+    public User getUser(String id){
 
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
@@ -633,7 +633,8 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public Share getShareWithFolderId(int folder_id){
+    public ArrayList<Share> getShareWithFolderId(int folder_id){
+        ArrayList<Share> shares = new ArrayList<>();
 
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
@@ -653,20 +654,27 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursor != null)
             cursor.moveToFirst();
 
-        // 4. build folder object
-        Share share = new Share();
-        // CursorIndexOutOfBoundsException: Index 0 requested, with a size of 0
-        // when the folder index is wrong so that no folder has called
-        share.setShare_id(cursor.getString(0));
-        share.setFolder_id(cursor.getString(1));
-        share.setUser_id(cursor.getString(2));
-        share.setState(cursor.getString(3));
+        // 4. build object
+        Share share = null;
+        if (cursor.moveToFirst()) {
+            do {
+                share = new Share();
+                share.setShare_id(cursor.getString(0));
+                share.setFolder_id(cursor.getString(1));
+                share.setUser_id(cursor.getString(2));
+                share.setState(cursor.getString(3));
 
-        Log.d("getShareWithFolderId("+folder_id+")", share.toString());
+                // Add folder to folders
+                shares.add(share);
+            } while (cursor.moveToNext());
+        }
 
-        // 5. return folder
-        return share;
+        Log.d("getShareWithFolderId("+folder_id+")", shares.toString());
+
+        // 5. return share
+        return shares;
     }
+
 
     // Get All Folders
     public List<Share> getAllShares() {

@@ -158,7 +158,7 @@ public class FolderListFragment extends Fragment {
                 if (state == FolderListAdapter.shareState.REQUESTED){
                     // 공유신청받은 폴더 아이템을 폴더리스트에서 클릭하면, 공유신청 gcm pendingIntent 와 같은 액티비티로 넘어감.
                     Intent i = new Intent(getActivity(),ViaNotificationActivity.class);
-                    i.putExtra("share_id",dbHelper.getShareWithFolderId(folder_id).getShare_id());
+                    i.putExtra("share_id",dbHelper.getShareWithFolderId(folder_id).get(0).getShare_id()); // 공유받은 폴더에 해당하는 share row 는 하나밖에 없으니까 get(0) !
                     startActivity(i);
 
                 }else if (state == FolderListAdapter.shareState.MINE || state == FolderListAdapter.shareState.ACCEPTED){

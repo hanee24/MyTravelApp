@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FolderUpdateActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentRight="false"
+        android:id="@+id/mRelativeLayout">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText6"
+            android:singleLine="true"
+            android:imeOptions="actionNext"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@+id/textView26"
+            android:layout_toRightOf="@+id/textView26"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="여행 시작 날짜"
+            android:id="@+id/textView30"
+            android:layout_below="@+id/editText7"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="설명"
+            android:id="@+id/textView28"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/editText6"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"/>
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/imageButton3"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/calendar"
+            android:scaleType="fitXY"
+            android:background="#00ffffff"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@+id/editText9"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="공유 정보"
+            android:id="@+id/textView33"
+            android:layout_below="@+id/editText9"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="제목"
+            android:id="@+id/textView26"
+            android:layout_alignParentTop="false"
+            android:layout_below="@+id/textView32"
+            android:layout_marginTop="10dp"/>
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/imageButton2"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/calendar"
+            android:scaleType="fitXY"
+            android:background="#00ffffff"
+            android:layout_alignParentLeft="true"
+            android:layout_alignTop="@+id/editText8"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText9"
+            android:singleLine="true"
+            android:imeOptions="actionNext"
+            android:layout_alignParentLeft="false"
+            android:layout_alignTop="@+id/textView31"
+            android:layout_toRightOf="@+id/textView31"
+            android:layout_toLeftOf="@+id/imageButton3"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="기본 정보"
+            android:id="@+id/textView32"
+            android:layout_centerHorizontal="true"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="여행 종료 날짜"
+            android:id="@+id/textView31"
+            android:layout_below="@+id/editText8"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="10dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText7"
+            android:singleLine="true"
+            android:imeOptions="actionNext"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@+id/textView28"
+            android:layout_toRightOf="@+id/textView28"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText8"
+            android:singleLine="true"
+            android:imeOptions="actionNext"
+            android:layout_alignParentLeft="false"
+            android:layout_alignTop="@+id/textView30"
+            android:layout_toRightOf="@+id/textView30"
+            android:layout_toLeftOf="@+id/imageButton2"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text=" 아이디                                              상태"
+            android:id="@+id/textView34"
+            android:layout_below="@+id/textView33"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

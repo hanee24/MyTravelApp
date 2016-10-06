@@ -6,17 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by parkhanee on 2016. 10. 6..
  */
 public class ShareListAdapter  extends BaseAdapter {
+
     Context context = null;
     ArrayList<Share> shareArrayList = new ArrayList<>();
     ArrayList<User> userArrayList = new ArrayList<>();
@@ -44,12 +43,12 @@ public class ShareListAdapter  extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return shareArrayList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return shareArrayList.get(i);
     }
 
     @Override
@@ -59,13 +58,14 @@ public class ShareListAdapter  extends BaseAdapter {
 
     @Override
     public View getView(int i, View v, ViewGroup viewGroup) {
+        Log.d(TAG, "getView: "+String.valueOf(i));
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         ViewHolder holder;
         if (v == null) {
             holder = new ViewHolder();
             v = inflater.inflate(R.layout.listview_sharelist, null);
-            holder.tvUserName = (TextView) v.findViewById(R.id.textView36);
-            holder.icon = (ImageView) v.findViewById(R.id.imageView5);
+            holder.tvUserName = (TextView) v.findViewById(R.id.textView40);
+            holder.icon = (ImageView) v.findViewById(R.id.imageView7);
             holder.tvState = (TextView) v.findViewById(R.id.textView41);
             v.setTag(holder);
         } else {
