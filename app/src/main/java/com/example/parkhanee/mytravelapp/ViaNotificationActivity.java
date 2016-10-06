@@ -57,6 +57,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
 
                 // TODO: 2016. 10. 6. 거부한 정보 서버에 업뎃.
 
+
                 finish();
                 dbHelper.close();
                 break;

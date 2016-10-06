@@ -108,7 +108,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
                 //set fb icon on the image view
                 holder.icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
             }else{
-                // TODO: 2016. 9. 22. set default app icon
+                // set default app icon
                 holder.icon.setImageResource(R.drawable.road);
             }
         }
@@ -151,7 +151,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
 
                 adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel(); // TODO: 2016. 9. 30.  dialog.dismiss ?
+                        dialog.cancel();
                     } });
                 adb.show();
             }

@@ -94,15 +94,6 @@
                 android:layout_below="@+id/textView32"
                 android:layout_marginTop="10dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="공유 사용자 목록,  공유한 친구 관리하기"
-                android:id="@+id/textView34"
-                android:layout_marginTop="37dp"
-                android:layout_below="@+id/textView33"
-                android:layout_centerHorizontal="true"/>
-
             <ImageButton
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -182,10 +173,28 @@
                 android:layout_centerHorizontal="true"
                 android:layout_margin="15dp"
 
-                android:layout_below="@+id/textView34"
                 android:background="@color/accent_material_dark"
                 style="?android:attr/buttonStyleSmall"
-                android:onClick="mOnClick"/>
+                android:onClick="mOnClick"
+                android:layout_below="@+id/shareList"/>
+
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/shareList"
+                android:layout_below="@+id/textView34"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text=" 아이디                                              상태"
+                android:id="@+id/textView34"
+                android:layout_below="@+id/textView33"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"/>
 
         </RelativeLayout>
     </ScrollView>

@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -52,6 +53,9 @@ public class FolderUpdateActivity extends AppCompatActivity {
     DBHelper db;
     String TAG = "FolderUpdateActivity";
 
+    private ListView listView;
+    private ShareListAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,11 @@ public class FolderUpdateActivity extends AppCompatActivity {
             }
         },100);
 
+        // list view
+        mAdapter = new ShareListAdapter(FolderUpdateActivity.this);
+        listView = (ListView) findViewById(R.id.shareList);
+        listView.setAdapter(mAdapter);
+
         ImageButton btn_start = (ImageButton) findViewById(R.id.imageButton2);
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +102,18 @@ public class FolderUpdateActivity extends AppCompatActivity {
                 showDatePickerDialog(view);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setShareList();
+    }
+
+    public void setShareList(){
+        // TODO: 2016. 10. 6.  Adapter . clear item
+        // TODO: 2016. 10. 6.  Adapter . add item
+        // TODO: 2016. 10. 6.  Adapter . notify set changed
     }
 
     public void setLayout(){
@@ -120,7 +141,7 @@ public class FolderUpdateActivity extends AppCompatActivity {
         switch (view.getId()){
             case R.id.save :
 
-                // TODO: 2016. 9. 22. save update to local db
+                // save update to local db
                 Folder folder1 = folder;
                 folder1.setName(et_name.getText().toString());
                 folder1.setDesc(et_desc.getText().toString());
