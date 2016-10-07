@@ -123,6 +123,8 @@
 
         <activity android:name=".ViaNotificationActivity">
         </activity>
+        <activity android:name=".WriteActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -66,10 +66,26 @@ public class DBHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY (folder_id) REFERENCES folder(folder_id) on delete cascade on update cascade" +
                 ")";
 
+        String CREATE_POSTING_TABLE = "CREATE TABLE `posting` (" +
+                "  `posting_id` int(11) NOT NULL," +
+                "  `folder_id` int(11) NOT NULL," +
+                "  `user_id` varchar(40) NOT NULL," +
+                "  `created` datetime NOT NULL," +
+                "  `type` enum('note','picture','note_picture','poi','map') NOT NULL DEFAULT 'note',\n" +
+                "  `note` text," +
+                "  `modified` datetime DEFAULT NULL," +
+                "  `posting_title` text NOT NULL," +
+                "  PRIMARY KEY (`posting_id`)," +
+                "  KEY `user_id` (`user_id`)," +
+                "  KEY `folder_id` (`folder_id`)," +
+                "  CONSTRAINT `posting_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,\n" +
+                "  CONSTRAINT `posting_ibfk_2` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`folder_id`) ON DELETE CASCADE ON UPDATE CASCADE\n" +
+                ")";
         // create tables
         sqLiteDatabase.execSQL(CREATE_USER_TABLE);
         sqLiteDatabase.execSQL(CREATE_FOLDER_TABLE);
         sqLiteDatabase.execSQL(CREATE_SHARE_TABLE);
+        sqLiteDatabase.execSQL(CREATE_POSTING_TABLE);
     }
 
     @Override

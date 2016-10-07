@@ -46,7 +46,7 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:id="@+id/imageButton"
-        android:src="@drawable/edit"
+        android:src="@drawable/settings"
         android:background="#00ffffff"
         android:scaleType="fitXY"
         android:onClick="mOnClick"
@@ -58,7 +58,7 @@
         />
 
     <ImageButton
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="27dp"
         android:id="@+id/imageButton4"
         android:src="@drawable/garbage"
@@ -72,4 +72,15 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"/>
+
+    <ImageButton
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/writeButton"
+        android:layout_alignTop="@+id/imageButton"
+        android:layout_toLeftOf="@+id/imageButton"
+        android:src="@drawable/write"
+        android:scaleType="fitXY"
+        android:background="#00ffffff"
+        android:onClick="mOnClick"/>
 </RelativeLayout>

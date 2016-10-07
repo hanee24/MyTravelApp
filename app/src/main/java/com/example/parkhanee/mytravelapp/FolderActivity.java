@@ -65,7 +65,7 @@ public class FolderActivity extends AppCompatActivity {
 
     public void mOnClick(View view){
         switch (view.getId()){
-            case R.id.imageButton : // edit imageButton
+            case R.id.imageButton : // write imageButton
                 Intent i = new Intent(FolderActivity.this,FolderUpdateActivity.class);
                 Bundle bundle1 = new Bundle();
                 bundle1.putInt("folder_id",folder_id);
@@ -100,6 +100,14 @@ public class FolderActivity extends AppCompatActivity {
 
                 // Showing Alert Message
                 alertDialog.show();
+                break;
+            case R.id.writeButton : // write imageButton
+                // go to WriteActivity
+                Intent p = new Intent(FolderActivity.this,WriteActivity.class);
+                Bundle bundle2 = new Bundle();
+                bundle2.putInt("folder_id",folder_id);
+                p.putExtra("args",bundle2);
+                startActivity(p);
                 break;
         }
     }
