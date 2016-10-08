@@ -306,9 +306,14 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(KEY_CREATED,folder.getCreated());
 
         // 3. insert
-        db.insertOrThrow(TABLE_FOLDER, // table
-                null, //nullColumnHack
-                values); // key/value -> keys = column names/ values = column values
+        try {
+            db.insertOrThrow(TABLE_FOLDER, // table
+                    null, //nullColumnHack
+                    values); // key/value -> keys = column names/ values = column values
+        }catch (SQLiteException e){
+            e.printStackTrace();
+        }
+
 
         // 4. close
         db.close();

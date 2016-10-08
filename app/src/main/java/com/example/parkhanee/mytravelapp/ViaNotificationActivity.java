@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,41 +58,25 @@ public class ViaNotificationActivity extends AppCompatActivity {
         // TODO: 2016. 10. 6. 수락 / 거부한 정보 서버에 업뎃.
 
         switch (view.getId()){
-            case R.id.accept : // 공유 수락 하고 로컬디비에 저장
+            case R.id.accept : // 공유 수락
+                // 로컬이비에 수락 정보 저장
                 share.setState("Accepted");
                 dbHelper.updateShare(share);
 
                 Toast.makeText(ViaNotificationActivity.this, "폴더 공유를 수락하였습니다", Toast.LENGTH_SHORT).show();
 
+                // 서버로 수락 정보 보내기
                 MyNetworkHandler("Accept");
-
-                Intent i = new Intent(ViaNotificationActivity.this,FolderActivity.class);
-                Bundle args = new Bundle();
-                args.putInt("folder_id",Integer.parseInt(share.getFolder_id()));
-                i.putExtra("args",args);
-                startActivity(i);
-                finish();
-                dbHelper.close();
                 break;
-            case R.id.reject : // 공유 거부 하고 로컬디비에 저장
+            case R.id.reject : // 공유 거부
                 share.setState("Denied");
                 dbHelper.updateShare(share);
 
                 MyNetworkHandler("Denied");
-
-//                dbHelper.deleteFolder(Integer.parseInt(share.getFolder_id()));
-                // TODO: 2016. 10. 6. 바로 지우지말고 일단 DENIED 상태로 남겨서 '거부한 목록' 보이기. 거기서 지워야 로컬디비에서 정보 완전히 지우기.
-
-                Toast.makeText(ViaNotificationActivity.this, "폴더 공유를 거부하였습니다", Toast.LENGTH_SHORT).show();
-
-
-
-
-                finish();
-                dbHelper.close();
                 break;
         }
     }
+
 
     // check if the network has connected before executing AsyncTask network connection to server
     public void MyNetworkHandler(String state) {
@@ -110,21 +97,67 @@ public class ViaNotificationActivity extends AppCompatActivity {
         ProgressDialog dialog;
         String state;
 
+//        @Override
+//        protected void onPreExecute() {
+//            dialog = new ProgressDialog(ViaNotificationActivity.this);
+//            dialog.setMessage("잠시만 기다려 주세요");
+//            dialog.setCanceledOnTouchOutside(false);
+//            dialog.show();
+//        }
+
         @Override
-        protected void onPreExecute() {
-            dialog = new ProgressDialog(ViaNotificationActivity.this);
-            dialog.setMessage("잠시만 기다려 주세요");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
+        protected void onPostExecute(String s) {
+
+            String str_result="";
+
+            try{
+                JSONObject result = new JSONObject(s);
+
+                //check the whole result
+                str_result = result.toString();
+                Log.d(TAG, "onPostExecute: "+str_result);
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+//
+//            if (dialog.isShowing()) {
+//                dialog.dismiss();
+//            }
+
+
+            if (state.equals("Denied")){
+                afterDeny();
+            }else {
+                afterAccept();
+            }
         }
 
-        // TODO: 2016. 10. 6. postExecute
+        private void afterAccept(){
+            // 수락했으니까 해당 폴더의 폴더액티비티로 넘어가기
+            Intent i = new Intent(ViaNotificationActivity.this,FolderActivity.class);
+            Bundle args = new Bundle();
+            args.putInt("folder_id",Integer.parseInt(share.getFolder_id()));
+            i.putExtra("args",args);
+            startActivity(i);
+            finish();
+            dbHelper.close();
+        }
+
+        private void afterDeny(){
+//          dbHelper.deleteFolder(Integer.parseInt(share.getFolder_id()));
+            // TODO: 2016. 10. 6. 바로 지우지말고 일단 DENIED 상태로 남겨서 '거부한 목록' 보이기. 거기서 지워야 로컬디비에서 정보 완전히 지우기.
+
+            Toast.makeText(ViaNotificationActivity.this, "폴더 공유를 거부하였습니다", Toast.LENGTH_SHORT).show();
+            finish();
+            dbHelper.close();
+        }
+
 
         @Override
         protected String doInBackground(String... strings) {
             state = strings[0];
             try {
-                return downloadUrl("http://hanea8199.vps.phps.kr/update_share_state_process");
+                return downloadUrl("http://hanea8199.vps.phps.kr/update_share_state.php");
             } catch (IOException e) {
                 return "Unable to retrieve web page. URL may be invalid.";
             }
@@ -147,6 +180,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
                 // add post parameters
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                postDataParams = new HashMap<>();
                 postDataParams.put("share_id",share.getShare_id());
                 postDataParams.put("state",state);
                 writer.write(getPostDataString(postDataParams));
