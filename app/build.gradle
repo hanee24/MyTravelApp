@@ -36,6 +36,7 @@ dependencies {
     compile 'com.android.support:support-v4:24.1.1'
     compile 'com.google.android.gms:play-services-appindexing:9.4.0'
     compile 'com.google.android.gms:play-services-gcm:9.4.0'
-    compile files('build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.16.0/jars/classes.jar')
+   //compile files('build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.16.0/jars/classes.jar')
+    compile files('build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.16.1/jars/classes.jar')//왜들어갔지이거 이거때문에 빌드에러 뜨는것같은데
 }
 apply plugin: 'com.google.gms.google-services'

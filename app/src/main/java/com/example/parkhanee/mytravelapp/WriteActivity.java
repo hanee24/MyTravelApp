@@ -58,22 +58,28 @@ public class WriteActivity extends AppCompatActivity {
     public void mOnClick(View view){
         switch (view.getId()){
             case R.id.save :
+                String title = ((EditText) findViewById(R.id.posting_title)).getText().toString();
+                String note = ((EditText) findViewById(R.id.posting_body)).getText().toString();
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = new Date();
+                String now = dateFormat.format(date);
                 // save data to local db
                 dbHelper = new DBHelper(WriteActivity.this);
-
+                String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set unix time as folder id
+                dbHelper.addPosting(new Posting(unixTime,folder_id,MainActivity.getUserId(),"note",title, note, now,now));
 
                 // send data to server
                 postDataParams = new HashMap<>();
+                postDataParams.put("posting_id",unixTime);
                 postDataParams.put("folder_id",folder_id);
                 postDataParams.put("user_id",MainActivity.getUserId()); // TODO: 2016. 10. 7. is this going to cause an error? when MainActivity may not initiated?
                 // TODO: 2016. 10. 7. manage posting type when it can add images
                 postDataParams.put("type","note");
                 // get text from editTexts
-                postDataParams.put("posting_title", ((EditText) findViewById(R.id.posting_title)).getText().toString());
-                postDataParams.put("note",((EditText) findViewById(R.id.posting_body)).getText().toString());
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date date = new Date();
-                postDataParams.put("created",dateFormat.format(date)); // TODO: 2016. 10. 7. server! save it as modified if it's not created but modified
+                postDataParams.put("posting_title", title);
+                postDataParams.put("note",note);
+
+                postDataParams.put("created",now); // TODO: 2016. 10. 7. server! save it as modified if it's not created but modified
 
                 myNetworkHandler();
                 break;

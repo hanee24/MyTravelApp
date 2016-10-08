@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class FolderActivity extends AppCompatActivity {
@@ -43,6 +45,8 @@ public class FolderActivity extends AppCompatActivity {
     TextView tv_name,tv_desc, tv_date;
     DBHelper db;
     String TAG = "FolderActivity";
+    ListView listView;
+    FolderContentsAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,12 @@ public class FolderActivity extends AppCompatActivity {
         tv_name = (TextView)findViewById(R.id.folderName);
         tv_desc = (TextView) findViewById(R.id.description);
         tv_date = (TextView) findViewById(R.id.textView25);
+
+        mAdapter = new FolderContentsAdapter(FolderActivity.this);
+        listView = (ListView) findViewById(R.id.listView4);
+        listView.setAdapter(mAdapter);
     }
+
 
     public void mOnClick(View view){
         switch (view.getId()){
@@ -120,6 +129,11 @@ public class FolderActivity extends AppCompatActivity {
         tv_desc.setText(folder.getDesc());
         String date = folder.getDate_start().substring(0,10)+" ~ "+folder.getDate_end().substring(0,10);
         tv_date.setText(date);
+
+        // get Posting info from local db and set it into listView
+        ArrayList<Posting> postings = db.getMyPostings(folder_id);
+        mAdapter.addItem(postings);
+        mAdapter.notifyDataSetChanged();
     }
 
     // check if the network has connected before executing AsyncTask network connection to server

@@ -8,7 +8,7 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="120dp"
         android:id="@+id/imageView3"
         android:layout_alignParentTop="true"
         android:background="#ff8a65"/>
@@ -19,11 +19,10 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Folder Name"
         android:id="@+id/folderName"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:textColor="@color/accent_material_light"
         android:textStyle="bold"
-        android:layout_marginTop="100dp"/>
+        android:layout_below="@+id/imageButton4"
+        android:layout_centerHorizontal="true"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,8 +42,8 @@
         android:layout_centerHorizontal="true"/>
 
     <ImageButton
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:id="@+id/imageButton"
         android:src="@drawable/settings"
         android:background="#00ffffff"
@@ -58,8 +57,8 @@
         />
 
     <ImageButton
-        android:layout_width="25dp"
-        android:layout_height="27dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:id="@+id/imageButton4"
         android:src="@drawable/garbage"
         android:scaleType="fitXY"
@@ -74,8 +73,8 @@
         android:layout_marginBottom="10dp"/>
 
     <ImageButton
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:id="@+id/writeButton"
         android:layout_alignTop="@+id/imageButton"
         android:layout_toLeftOf="@+id/imageButton"
@@ -83,4 +82,13 @@
         android:scaleType="fitXY"
         android:background="#00ffffff"
         android:onClick="mOnClick"/>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView4"
+        android:layout_below="@+id/imageView3"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
 </RelativeLayout>

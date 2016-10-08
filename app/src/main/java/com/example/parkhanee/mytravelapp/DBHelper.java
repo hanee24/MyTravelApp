@@ -70,16 +70,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 "  `posting_id` int(11) NOT NULL," +
                 "  `folder_id` int(11) NOT NULL," +
                 "  `user_id` varchar(40) NOT NULL," +
-                "  `created` datetime NOT NULL," +
-                "  `type` enum('note','picture','note_picture','poi','map') NOT NULL DEFAULT 'note',\n" +
-                "  `note` text," +
-                "  `modified` datetime DEFAULT NULL," +
+                "  `type` varchar(40) NOT NULL DEFAULT 'note'," +
                 "  `posting_title` text NOT NULL," +
+                "  `note` text," +
+                "  `created` datetime NOT NULL," +
+                "  `modified` datetime DEFAULT NULL," +
                 "  PRIMARY KEY (`posting_id`)," +
-                "  KEY `user_id` (`user_id`)," +
-                "  KEY `folder_id` (`folder_id`)," +
-                "  CONSTRAINT `posting_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,\n" +
-                "  CONSTRAINT `posting_ibfk_2` FOREIGN KEY (`folder_id`) REFERENCES `folder` (`folder_id`) ON DELETE CASCADE ON UPDATE CASCADE\n" +
+                "   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE," +
+                "   FOREIGN KEY (`folder_id`) REFERENCES `folder` (`folder_id`) ON DELETE CASCADE ON UPDATE CASCADE" +
                 ")";
         // create tables
         sqLiteDatabase.execSQL(CREATE_USER_TABLE);
@@ -760,5 +758,124 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // TODO: 2016. 9. 30. delete Share
+
+
+    /**
+     * POSTING Table
+     * CRUD operations (create, read "select", update, delete)
+     */
+    //  table name
+    private static final String TABLE_POSTING = "posting";
+
+    // folder Table Columns names
+    private static final String p_KEY_ID = "posting_id";
+    private static final String p_KEY_FOLDER_ID = KEY_ID;
+    private static final String p_KEY_USER_ID = u_KEY_ID;
+    private static final String p_KEY_TYPE = "type";
+    private static final String p_KEY_TITLE = "posting_title";
+    private static final String p_KEY_NOTE = "note";
+    private static final String p_KEY_CREATED = "created";
+    private static final String p_KEY_MODIFIED = "modified";
+
+
+    private static final String[] p_COLUMNS = {p_KEY_ID,p_KEY_FOLDER_ID,p_KEY_USER_ID,p_KEY_TYPE,p_KEY_TITLE,p_KEY_NOTE,p_KEY_CREATED,p_KEY_MODIFIED};
+
+    public void addPosting(Posting posting){
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(p_KEY_ID,posting.getPosting_id());
+        values.put(p_KEY_FOLDER_ID,posting.getFolder_id());
+        values.put(p_KEY_USER_ID,posting.getUser_id());
+        values.put(p_KEY_TYPE,posting.getType());
+        values.put(p_KEY_TITLE,posting.getPosting_title());
+        values.put(p_KEY_NOTE,posting.getNote());
+        values.put(p_KEY_CREATED,posting.getCreated());
+        values.put(p_KEY_MODIFIED,posting.getModified());
+
+        Log.d(TAG, "addPosting: values : "+values.toString());
+        try {
+            // 3. insert
+            db.insertOrThrow(TABLE_POSTING, // table
+                    null, //nullColumnHack
+                    values); // key/value -> keys = column names/ values = column values
+        } catch (SQLiteException e){
+            // catch exception when trying to add existing user
+            e.printStackTrace();
+        }
+
+        // 4. close
+        db.close();
+    }
+
+    // Get All Users
+    public ArrayList<Posting> getAllPosting() {
+        ArrayList<Posting> postings = new ArrayList<>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_POSTING;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build folder and add it to list
+        Posting posting = null;
+        if (cursor.moveToFirst()) {
+            do {
+                posting = new Posting();
+                posting.setPosting_id(cursor.getString(0));
+                posting.setFolder_id(cursor.getString(1));
+                posting.setUser_id(cursor.getString(2));
+                posting.setType(cursor.getString(3));
+                posting.setPosting_title(cursor.getString(4));
+                posting.setNote(cursor.getString(5));
+                posting.setCreated(cursor.getString(6));
+                posting.setModified(cursor.getString(7));
+                postings.add(posting);
+            } while (cursor.moveToNext());
+        }
+
+        Log.d("getAllPostings()", postings.toString());
+
+        return postings;
+    }
+
+    public ArrayList<Posting> getMyPostings(int folder_id) {
+        ArrayList<Posting> postings = new ArrayList<>();
+
+        // 1. build the query
+        String query = "SELECT  * FROM " + TABLE_POSTING+" WHERE folder_id="+folder_id;
+
+        // 2. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        // 3. go over each row, build folder and add it to list
+        Posting posting = null;
+        if (cursor.moveToFirst()) {
+            do {
+                posting = new Posting();
+                posting.setPosting_id(cursor.getString(0));
+                posting.setFolder_id(cursor.getString(1));
+                posting.setUser_id(cursor.getString(2));
+                posting.setType(cursor.getString(3));
+                posting.setPosting_title(cursor.getString(4));
+                posting.setNote(cursor.getString(5));
+                posting.setCreated(cursor.getString(6));
+                posting.setModified(cursor.getString(7));
+                postings.add(posting);
+            } while (cursor.moveToNext());
+        }
+
+        Log.d("getMyPostings()", postings.toString());
+
+        return postings;
+    }
+
+
 
 }
