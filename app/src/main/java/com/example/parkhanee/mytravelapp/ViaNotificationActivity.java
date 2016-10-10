@@ -55,7 +55,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
 
     public void mOnClick(View view){
 
-        // TODO: 2016. 10. 6. 수락 / 거부한 정보 서버에 업뎃.
+        //  수락 / 거부한 정보 서버에 업뎃.
 
         switch (view.getId()){
             case R.id.accept : // 공유 수락
@@ -66,7 +66,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
                 Toast.makeText(ViaNotificationActivity.this, "폴더 공유를 수락하였습니다", Toast.LENGTH_SHORT).show();
 
                 // 서버로 수락 정보 보내기
-                MyNetworkHandler("Accept");
+                MyNetworkHandler("Accepted");
                 break;
             case R.id.reject : // 공유 거부
                 share.setState("Denied");
@@ -181,6 +181,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                 postDataParams = new HashMap<>();
+                postDataParams.put("user_id",share.getUser_id());
                 postDataParams.put("share_id",share.getShare_id());
                 postDataParams.put("state",state);
                 writer.write(getPostDataString(postDataParams));
