@@ -17,6 +17,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -45,7 +48,7 @@ public class FolderActivity extends AppCompatActivity {
     TextView tv_name,tv_desc, tv_date;
     DBHelper db;
     String TAG = "FolderActivity";
-    ListView listView;
+    RecyclerView recyclerView;
     FolderContentsAdapter mAdapter;
 
     @Override
@@ -66,9 +69,11 @@ public class FolderActivity extends AppCompatActivity {
         tv_desc = (TextView) findViewById(R.id.description);
         tv_date = (TextView) findViewById(R.id.textView25);
 
-        mAdapter = new FolderContentsAdapter(FolderActivity.this);
-        listView = (ListView) findViewById(R.id.listView4);
-        listView.setAdapter(mAdapter);
+        mAdapter = new FolderContentsAdapter();
+        recyclerView = (RecyclerView) findViewById(R.id.listView4);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // TODO: 2016. 10. 12. may need to use different kind of LayoutManager
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator()); // TODO: 2016. 10. 12. may need to use different kind
     }
 
 

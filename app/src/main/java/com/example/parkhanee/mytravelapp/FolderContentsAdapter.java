@@ -1,10 +1,12 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -12,26 +14,60 @@ import java.util.ArrayList;
 /**
  * Created by parkhanee on 2016. 10. 7..
  */
-public class FolderContentsAdapter extends BaseAdapter {
+public class FolderContentsAdapter extends RecyclerView.Adapter<FolderContentsAdapter.ViewHolder> {
     private ArrayList<Posting> postings = new ArrayList<>();
-    private Context context;
 
-    public FolderContentsAdapter(Context context){
-        this.context = context;
+    public FolderContentsAdapter(ArrayList<Posting> postings) {
+        this.postings = postings;
     }
+
+    public FolderContentsAdapter(){}
+
+    // Create new views (invoked by the layout manager)
     @Override
-    public int getCount() {
+    public FolderContentsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // create a new view
+        View itemLayoutView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.listview_folder_contents, null);
+        // create ViewHolder
+        ViewHolder viewHolder = new ViewHolder(itemLayoutView);
+        return viewHolder;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(FolderContentsAdapter.ViewHolder holder, int position) {
+        // - get data from your itemsData at this position
+        // - replace the contents of the view with that itemsData
+        if (postings.size()>0){
+            Posting p = postings.get(position);
+            String iii = p.getPosting_title();
+            holder.tvTitle.setText(iii);
+            holder.tvNote.setText(p.getNote());
+            holder.tvCreated.setText(p.getCreated());
+            holder.tvUserId.setText(p.getUser_id());
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         return postings.size();
     }
 
-    @Override
-    public Object getItem(int i) {
-        return postings.get(i);
-    }
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-    @Override
-    public long getItemId(int i) {
-        return i;
+        public TextView tvTitle = null;
+        public TextView tvNote = null;
+        public TextView tvCreated = null;
+        public TextView tvUserId = null;
+
+        public ViewHolder(View itemLayoutView) {
+            super(itemLayoutView);
+            tvTitle = (TextView) itemLayoutView.findViewById(R.id.title);
+            tvNote = (TextView) itemLayoutView.findViewById(R.id.note);
+            tvCreated = (TextView) itemLayoutView.findViewById(R.id.created);
+            tvUserId = (TextView) itemLayoutView.findViewById(R.id.userId);
+        }
     }
 
     public void addItem(Posting posting){
@@ -47,42 +83,4 @@ public class FolderContentsAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    @Override
-    public View getView(int i, View v, ViewGroup viewGroup) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-        ViewHolder holder;
-        if (v == null) {
-            holder = new ViewHolder();
-            v = inflater.inflate(R.layout.listview_folder_contents, null);
-            holder.tvTitle = (TextView) v.findViewById(R.id.title);
-            holder.tvNote = (TextView) v.findViewById(R.id.note);
-            holder.tvCreated = (TextView) v.findViewById(R.id.created);
-            holder.tvUserId = (TextView) v.findViewById(R.id.userId);
-            holder.db = new DBHelper(context);
-            v.setTag(holder);
-
-        } else {
-            holder = (ViewHolder) v.getTag(); // we call the view created before to not create a view in each time
-        }
-
-        if (postings.size()>0){
-            Posting p = postings.get(i);
-            String iii = p.getPosting_title();
-            holder.tvTitle.setText(iii);
-            holder.tvNote.setText(p.getNote());
-            holder.tvCreated.setText(p.getCreated());
-            holder.tvUserId.setText(p.getUser_id());
-        }
-
-        return v;
-    }
-
-    private static class ViewHolder{
-
-        TextView tvTitle = null;
-        TextView tvNote = null;
-        TextView tvCreated = null;
-        TextView tvUserId = null;
-        DBHelper db = null;
-    }
 }
