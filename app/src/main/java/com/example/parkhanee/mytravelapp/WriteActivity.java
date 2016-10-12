@@ -1,22 +1,35 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.RequiresPermission;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,6 +55,12 @@ public class WriteActivity extends AppCompatActivity {
     private final String TAG = "WriteActivity";
     DBHelper dbHelper;
 
+    private ImageView imageView;
+    static final int REQUEST_GALLERY = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 12;
+    private Bitmap bitmap;
+    String mCurrentPhotoPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +71,7 @@ public class WriteActivity extends AppCompatActivity {
         Bundle bundle = i.getBundleExtra("args");
         folder_id = String.valueOf(bundle.getInt("folder_id"));
 
-
+        imageView = (ImageView) findViewById(R.id.image);
     }
 
     public void mOnClick(View view){
@@ -78,16 +97,131 @@ public class WriteActivity extends AppCompatActivity {
                 // get text from editTexts
                 postDataParams.put("posting_title", title);
                 postDataParams.put("note",note);
-
-                postDataParams.put("created",now); // TODO: 2016. 10. 7. server! save it as modified if it's not created but modified
+                postDataParams.put("created",now);
 
                 myNetworkHandler();
                 break;
             case R.id.cancel :
                 finish();
                 break;
+            case R.id.addPicture : // 사진 추가하기
+                final CharSequence[] items = {
+                        "사진 촬영", "사진 앨범에서 선택"
+                };
+
+                // show an alert window
+                AlertDialog.Builder builder = new AlertDialog.Builder(WriteActivity.this);
+                builder.setTitle("사진 추가하기")
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i){
+                                    case 0 : // 사진 촬영
+                                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//                                            // save the full-size photo : 빈 이미지파일을 만들고 카메라 인텐트를 호출하면 찍은 사진이 그 이미지파일로 간다
+//                                            // Create the File where the photo should go
+//                                            File photoFile = null;
+//                                            try {
+//                                                photoFile = createImageFile();
+//                                            } catch (IOException ex) {
+//                                                // Error occurred while creating the File
+//
+//                                            }
+//                                            // Continue only if the File was successfully created
+//                                            if (photoFile != null) {
+//                                                Log.d(TAG, "onClick: "+getExternalFilesDir(Environment.DIRECTORY_PICTURES) );
+//                                                Uri photoURI = FileProvider.getUriForFile(WriteActivity.this,
+//                                                        "com.example.android.fileprovider",
+//                                                        photoFile);
+//                                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                                                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//                                            }
+//
+//                                        }
+                                        break;
+                                    case 1 : // 사진 앨범에서 선택
+                                        Intent intent = new Intent();
+                                        intent.setType("image/*");
+                                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                        startActivityForResult(intent, REQUEST_GALLERY);
+                                        break;
+                                }
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                break;
         }
     }
+
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == REQUEST_GALLERY && resultCode == Activity.RESULT_OK) {
+            try {
+//                // We need to recycle unused bitmaps
+//                if (bitmap != null) {
+//                    bitmap.recycle();
+//                }
+                InputStream stream = getContentResolver().openInputStream(
+                        data.getData());
+                bitmap = BitmapFactory.decodeStream(stream);
+                assert stream != null;
+                stream.close();
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK){
+            /*
+                The Android Camera application encodes the photo in the return Intent delivered to onActivityResult()
+                as a small Bitmap in the extras, under the key "data".
+             */
+            Bundle extras = data.getExtras();
+            bitmap = (Bitmap) extras.get("data");
+            imageView.setImageBitmap(bitmap);
+
+            // add the photo to a gallery
+//            galleryAddPic();
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "HANEE_" + timeStamp + "_";
+        /*
+         getExternalFilesDir method returns a directory within which the photos remain private to my app only.
+         and the photos will be deleted when the user uninstalls the app
+         ( https://developer.android.com/training/camera/photobasics.html#TaskScalePhoto )
+         */
+        File storageDir =  Environment.getExternalStorageDirectory();
+        //Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        // getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+
+        return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
 
     public void myNetworkHandler() {
 
@@ -109,7 +243,7 @@ public class WriteActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             dialog = new ProgressDialog(WriteActivity.this);
-            dialog.setMessage("데이터를 가져오는 중입니다");
+            dialog.setMessage("잠시만 기다려 주세요");
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
         }

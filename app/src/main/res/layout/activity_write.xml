@@ -39,23 +39,25 @@
         android:hint="내용을 입력하세요"
         android:lines="6"/>
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="사진 추가하기"
-        android:id="@+id/textView43"
+        android:id="@+id/addPicture"
         android:layout_below="@+id/posting_body"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="52dp"/>
+        android:layout_marginTop="52dp"
+        android:onClick="mOnClick"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="5dp">
+        android:layout_marginBottom="5dp"
+        android:id="@+id/linearLayout">
 
         <Button
             android:layout_width="wrap_content"
@@ -79,5 +81,14 @@
             android:layout_alignBottom="@+id/cancel"
             android:layout_weight="1"/>
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/image"
+        android:scaleType="fitXY"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignLeft="@+id/textView42"
+        android:layout_alignStart="@+id/textView42"/>
 
 </RelativeLayout>
