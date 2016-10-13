@@ -3,6 +3,7 @@ package com.example.parkhanee.mytravelapp;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,7 +30,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -130,10 +133,10 @@ public class WriteActivity extends AppCompatActivity {
 //                                            }
 //                                            // Continue only if the File was successfully created
 //                                            if (photoFile != null) {
-//                                                Log.d(TAG, "onClick: "+getExternalFilesDir(Environment.DIRECTORY_PICTURES) );
 //                                                Uri photoURI = FileProvider.getUriForFile(WriteActivity.this,
 //                                                        "com.example.android.fileprovider",
 //                                                        photoFile);
+//                                                Log.d(TAG, "onClick: photoURI "+photoURI);
 //                                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                                                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 //                                            }
@@ -181,7 +184,13 @@ public class WriteActivity extends AppCompatActivity {
              */
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(bitmap);
+            // Create an image file name
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "HANEE_" + timeStamp + ".jpg";
+            String path = saveToInternalStorage(bitmap,imageFileName);
+            Log.d(TAG, "onActivityResult: path "+path);
+            loadImageFromStorage(path,imageFileName);
+//            imageView.setImageBitmap(bitmap);
 
             // add the photo to a gallery
 //            galleryAddPic();
@@ -190,6 +199,49 @@ public class WriteActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // for saving image into Internal memory
+    private String saveToInternalStorage(Bitmap bitmapImage,String imageFileName){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+
+        // Create imageDir
+        File mypath=new File(directory,imageFileName);
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
+    }
+
+    // for loading image from Internal memory
+    private void loadImageFromStorage(String path, String fileName)
+    {
+
+        try {
+            File f=new File(path, fileName );  //File f=new File(path, "profile.jpg");
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
+            imageView.setImageBitmap(b);
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    // for saving image into SD card
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -214,6 +266,7 @@ public class WriteActivity extends AppCompatActivity {
         return image;
     }
 
+    // for saving image into SD card
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
