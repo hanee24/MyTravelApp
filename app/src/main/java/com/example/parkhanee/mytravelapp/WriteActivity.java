@@ -25,10 +25,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,6 +69,7 @@ public class WriteActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 12;
     private Bitmap bitmap;
     String mCurrentPhotoPath;
+    String imageFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +193,7 @@ public class WriteActivity extends AppCompatActivity {
             bitmap = (Bitmap) extras.get("data");
             // Create an image file name
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "HANEE_" + timeStamp + ".jpg";
+            imageFileName = "HANEE_" + timeStamp + ".jpg";
             String path = saveToInternalStorage(bitmap,imageFileName);
             Log.d(TAG, "onActivityResult: path "+path);
             loadImageFromStorage(path,imageFileName);
@@ -286,6 +293,7 @@ public class WriteActivity extends AppCompatActivity {
             String stringUrl = "http://hanea8199.vps.phps.kr/write_process.php";
             new WriteProcess().execute(stringUrl); // connect to server
 
+            new ImageUploadTask().execute();
         } else {
             Toast.makeText(WriteActivity.this, "Cannot proceed, No network connection available.", Toast.LENGTH_SHORT).show();
         }
@@ -400,6 +408,102 @@ public class WriteActivity extends AppCompatActivity {
             Log.d(TAG, "getPostDataString: "+result.toString());
 
             return result.toString();
+        }
+
+    }
+
+    /**
+     * The class connects with server and uploads the photo
+     *
+     *
+     */
+    class ImageUploadTask extends AsyncTask<Void, Void, String> {
+        private String webAddressToPost = "http://hanea8199.vps.phps.kr/uploadImage/temp.php";
+
+        // private ProgressDialog dialog;
+//        private ProgressDialog dialog = new ProgressDialog(WriteActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                URL url = new URL(webAddressToPost);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+
+                MultipartEntity entity = new MultipartEntity(
+                        HttpMultipartMode.BROWSER_COMPATIBLE);
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                byte[] data = bos.toByteArray();
+                ByteArrayBody bab = new ByteArrayBody(data, "test.jpg");
+                entity.addPart("file", bab);
+//                entity.addPart("imageFileName", new StringBody("test.jpg"));
+
+                conn.addRequestProperty("Content-length", entity.getContentLength() + "");
+                conn.addRequestProperty(entity.getContentType().getName(), entity.getContentType().getValue());
+
+                OutputStream os = conn.getOutputStream();
+                entity.writeTo(conn.getOutputStream());
+                os.close();
+                conn.connect();
+
+                int response = conn.getResponseCode();
+                Log.d(TAG, "[ImageUploadTask] The server response is: " + response);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    Log.d(TAG, "[ImageUploadTask] doInBackground: http_ok");
+                    return readStream(conn.getInputStream());
+                }else {
+                    Log.d(TAG, "[ImageUploadTask] doInBackground: connection error");
+                    return readStream(conn.getErrorStream());
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                // something went wrong. connection with the server error
+            }
+
+            return "[ImageUploadTask] something is wrong with the http result";
+        }
+
+
+        private String readStream(InputStream in) {
+            BufferedReader reader = null;
+            StringBuilder builder = new StringBuilder();
+            try {
+                reader = new BufferedReader(new InputStreamReader(in));
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return builder.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            Log.d(TAG, "[ImageUploadTask] onPostExecute: result "+result);
+            Toast.makeText(getApplicationContext(), "[ImageUploadTask] file uploaded",
+                    Toast.LENGTH_LONG).show();
         }
 
     }

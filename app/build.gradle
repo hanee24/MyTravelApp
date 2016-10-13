@@ -40,5 +40,6 @@ dependencies {
     compile files('build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.16.1/jars/classes.jar')//왜들어갔지이거 이거때문에 빌드에러 뜨는것같은데
     compile 'com.android.support:recyclerview-v7:24.2.1';
     compile 'com.android.support:cardview-v7:24.2.1';
+    compile 'org.apache.httpcomponents:httpmime:4.2.3' // may be not a recent version.
 }
 apply plugin: 'com.google.gms.google-services'
