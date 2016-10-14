@@ -853,7 +853,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ArrayList<Posting> postings = new ArrayList<>();
 
         // 1. build the query
-        String query = "SELECT  * FROM " + TABLE_POSTING+" WHERE folder_id="+folder_id;
+        String query = "SELECT  * FROM " + TABLE_POSTING+" WHERE folder_id="+folder_id+" ORDER BY "+p_KEY_MODIFIED+" DESC";
 
         // 2. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();

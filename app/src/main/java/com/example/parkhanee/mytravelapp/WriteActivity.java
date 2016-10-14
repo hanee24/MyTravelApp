@@ -70,6 +70,7 @@ public class WriteActivity extends AppCompatActivity {
     private Bitmap bitmap;
     String mCurrentPhotoPath;
     String imageFileName;
+    String user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +83,7 @@ public class WriteActivity extends AppCompatActivity {
         folder_id = String.valueOf(bundle.getInt("folder_id"));
 
         imageView = (ImageView) findViewById(R.id.image);
+        user_id = MainActivity.getUserId();
     }
 
     public void mOnClick(View view){
@@ -94,7 +96,7 @@ public class WriteActivity extends AppCompatActivity {
                 String now = dateFormat.format(date);
                 // save data to local db
                 dbHelper = new DBHelper(WriteActivity.this);
-                String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set unix time as folder id
+                String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set unix time as posting Id
                 dbHelper.addPosting(new Posting(unixTime,folder_id,MainActivity.getUserId(),"note",title, note, now,now));
 
                 // send data to server
@@ -103,7 +105,12 @@ public class WriteActivity extends AppCompatActivity {
                 postDataParams.put("folder_id",folder_id);
                 postDataParams.put("user_id",MainActivity.getUserId()); // TODO: 2016. 10. 7. is this going to cause an error? when MainActivity may not initiated?
                 // TODO: 2016. 10. 7. manage posting type when it can add images
-                postDataParams.put("type","note");
+                if (bitmap !=null){
+                    Log.d(TAG, "mOnClick: bitmap is not null");
+                    postDataParams.put("type","picture");
+                }else {
+                    postDataParams.put("type","note");
+                }
                 // get text from editTexts
                 postDataParams.put("posting_title", title);
                 postDataParams.put("note",note);
@@ -169,39 +176,46 @@ public class WriteActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == REQUEST_GALLERY && resultCode == Activity.RESULT_OK) {
-            try {
+        if (resultCode == Activity.RESULT_OK){
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            imageFileName = user_id+"_" + timeStamp + ".jpg";
+
+            if (requestCode == REQUEST_GALLERY ) {
+                try {
 //                // We need to recycle unused bitmaps
 //                if (bitmap != null) {
 //                    bitmap.recycle();
 //                }
-                InputStream stream = getContentResolver().openInputStream(
-                        data.getData());
-                bitmap = BitmapFactory.decodeStream(stream);
-                assert stream != null;
-                stream.close();
-                imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK){
+                    InputStream stream = getContentResolver().openInputStream(
+                            data.getData());
+                    bitmap = BitmapFactory.decodeStream(stream);
+                    assert stream != null;
+                    stream.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (requestCode == REQUEST_IMAGE_CAPTURE ){
             /*
                 The Android Camera application encodes the photo in the return Intent delivered to onActivityResult()
                 as a small Bitmap in the extras, under the key "data".
              */
-            Bundle extras = data.getExtras();
-            bitmap = (Bitmap) extras.get("data");
-            // Create an image file name
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            imageFileName = "HANEE_" + timeStamp + ".jpg";
-            String path = saveToInternalStorage(bitmap,imageFileName);
-            Log.d(TAG, "onActivityResult: path "+path);
-            loadImageFromStorage(path,imageFileName);
-//            imageView.setImageBitmap(bitmap);
+                Bundle extras = data.getExtras();
+                bitmap = (Bitmap) extras.get("data");
+                // Create an image file name
 
-            // add the photo to a gallery
+                String path = saveToInternalStorage(bitmap,imageFileName);
+                Log.d(TAG, "onActivityResult: path "+path);
+//            loadImageFromStorage(path,imageFileName);
+                // add the photo to a gallery
 //            galleryAddPic();
+            }
+            imageView.setImageBitmap(bitmap);
+
         }
+
+
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -293,7 +307,11 @@ public class WriteActivity extends AppCompatActivity {
             String stringUrl = "http://hanea8199.vps.phps.kr/write_process.php";
             new WriteProcess().execute(stringUrl); // connect to server
 
-            new ImageUploadTask().execute();
+            if (bitmap!=null){
+                // execute ImageUploadTask only when there is a bitmap image selected from gallery of taken from camera
+                new ImageUploadTask().execute();
+            }
+
         } else {
             Toast.makeText(WriteActivity.this, "Cannot proceed, No network connection available.", Toast.LENGTH_SHORT).show();
         }
@@ -418,7 +436,7 @@ public class WriteActivity extends AppCompatActivity {
      *
      */
     class ImageUploadTask extends AsyncTask<Void, Void, String> {
-        private String webAddressToPost = "http://hanea8199.vps.phps.kr/uploadImage/temp.php";
+        private String webAddressToPost = "http://hanea8199.vps.phps.kr/uploadImage.php";
 
         // private ProgressDialog dialog;
 //        private ProgressDialog dialog = new ProgressDialog(WriteActivity.this);
@@ -442,9 +460,9 @@ public class WriteActivity extends AppCompatActivity {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                 byte[] data = bos.toByteArray();
-                ByteArrayBody bab = new ByteArrayBody(data, "test.jpg");
-                entity.addPart("file", bab);
-//                entity.addPart("imageFileName", new StringBody("test.jpg"));
+                ByteArrayBody bab = new ByteArrayBody(data, imageFileName);
+                entity.addPart("image", bab);
+                entity.addPart("posting_id", new StringBody(postDataParams.get("posting_id")));
 
                 conn.addRequestProperty("Content-length", entity.getContentLength() + "");
                 conn.addRequestProperty(entity.getContentType().getName(), entity.getContentType().getValue());

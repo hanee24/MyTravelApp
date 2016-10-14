@@ -4,6 +4,7 @@ package com.example.parkhanee.mytravelapp;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +27,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -100,7 +102,7 @@ public class FolderActivity extends AppCompatActivity {
                         db.deleteFolder(folder_id);
 
                         // delete folder from server db
-                        myClickHandler();
+                        myClickHandler(false); // isList==false, since it's folder deleting process
                         finish();
                         }
                     });
@@ -129,20 +131,25 @@ public class FolderActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // set folder info
         folder = db.getFolder(folder_id);
         tv_name.setText(folder.getName());
         tv_desc.setText(folder.getDesc());
         String date = folder.getDate_start().substring(0,10)+" ~ "+folder.getDate_end().substring(0,10);
         tv_date.setText(date);
 
-        // get Posting info from local db and set it into listView
-        ArrayList<Posting> postings = db.getMyPostings(folder_id);
-        mAdapter.addItem(postings);
-        mAdapter.notifyDataSetChanged();
+        // TODO: 2016. 10. 13. 서버에서 폴더정보 받아와서 리사이클러뷰 어뎁터 통해서 뿌려주기
+        myClickHandler(true /* isList */);
+
+//        // get Posting info from local db and set it into listView
+//        ArrayList<Posting> postings = db.getMyPostings(folder_id);
+//        mAdapter.addItem(postings);
+//        mAdapter.notifyDataSetChanged();
     }
 
     // check if the network has connected before executing AsyncTask network connection to server
-    public void myClickHandler() {
+    public void myClickHandler(Boolean isList) {
 
         //save update to server if there is network connection
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -150,21 +157,51 @@ public class FolderActivity extends AppCompatActivity {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
 
-            String stringUrl = "http://hanea8199.vps.phps.kr/deletefolder_process.php";
-            String postData = "folder_id="+String.valueOf(folder.getId()); // send folder id to server with POST method
-            new DeleteFolderProcess().execute(stringUrl,postData);
+            new mURLConnection().execute(isList);
 
         } else {
             Toast.makeText(FolderActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class DeleteFolderProcess extends AsyncTask<String, Void, String> {
+    private class mURLConnection extends AsyncTask<Boolean, Void, String> {
+
+        String TAG_SUB, stringUrl;
+        Boolean isList;
+        ProgressDialog dialog;
+
+        @Override
+        protected String doInBackground(Boolean... booleen) {
+            isList = booleen[0];
+            if (isList){
+                TAG_SUB = "[GetPostings]";
+                stringUrl = "http://hanea8199.vps.phps.kr/get_postings.php";
+            }else{
+                TAG_SUB = "[DeleteFolderProcess]";
+                stringUrl = "http://hanea8199.vps.phps.kr/deletefolder_process.php";
+            }
+
+            String postData = "folder_id="+String.valueOf(folder.getId());  // send folder id to server with POST method
+
+            try {
+
+                return downloadUrl(stringUrl,postData);
+            } catch (IOException e) {
+                return TAG_SUB + " Unable to retrieve web page. URL may be invalid.";
+            }
+        }
 
         @Override
         protected void onPreExecute() {
-            // print the number of folders at local DB before deleting
-            Log.d(TAG, "onPreExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
+//            if (isList){
+                dialog = new ProgressDialog(FolderActivity.this);
+                dialog.setMessage("잠시만 기다려 주세요");
+                dialog.show();
+//            }else{
+//                // print the number of folders at local DB before deleting
+//                Log.d(TAG, TAG_SUB + " onPreExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
+//            }
+
         }
 
         @Override
@@ -172,31 +209,90 @@ public class FolderActivity extends AppCompatActivity {
 
             int resultCode=98;
             String str_result="";
+            String resultMsg="";
+            int totalCount=0;
+            JSONObject bodyObject=null;
 
             try{
-                JSONObject result = new JSONObject(s);
-                resultCode = result.getInt("resultCode");
-
                 //check the whole result
-                str_result = result.toString();
-                Log.d(TAG, "onPostExecute: "+str_result);
-                // print the number of folders at local DB after deleting
-                Log.d(TAG, "onPostExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
+                JSONObject result = new JSONObject(s);
+                Log.d(TAG,  TAG_SUB +"onPostExecute: result "+result.toString());
+
+                if (isList){ // if it's [GetPostings] process
+                    JSONObject header = result.getJSONObject("header");
+                    resultMsg = header.getString("resultMsg");
+                    Log.d(TAG,  TAG_SUB + " onPostExecute: resultMsg "+resultMsg);
+
+                    // "body"로받은 오브젝트가 String 이면 totalCount = 0, JsonObject 이면 totalCount 받아서 설정해주기.
+                    Object body = result.get("body");
+                    if (body instanceof String) {// It's a string
+                        Log.d(TAG, "onPostExecute: bodyString "+ body);
+                        totalCount = 0;
+                    } else if (body instanceof JSONObject) {// It's an object
+                        bodyObject = (JSONObject) body;
+                        totalCount = bodyObject.getInt("totalCount");
+                    }
+
+                    if(totalCount > 0){
+                        JSONArray postingsArray=null;
+                        JSONObject postingsObject=null;
+                        // "postings" 로 받은 객체가 Array이면 totalCount >1 , Object 이면 totalCount ==1
+                        Object postings = bodyObject.get("postings");
+                        if (postings instanceof JSONArray) {// It's an Array
+                            postingsArray = (JSONArray) postings;
+                        } else if (postings instanceof JSONObject) {// It's an object
+                            postingsObject = (JSONObject) postings;
+                        }
+
+                        // clear items which mAdapter has before adding new postings list.
+                        mAdapter.clearItem();
+
+                        // get each posting object from postings, and set it into recyclerView.
+                        for (int i=0; i<totalCount; i++){
+                            JSONObject posting=null;
+                            if (postingsArray!=null){
+                                posting = postingsArray.getJSONObject(i);
+                            }else if (postingsObject !=null){
+                                posting = postingsObject;
+                            }else {
+                                Log.d(TAG, "onPostExecute: something is wrong! both postingsArray and Object are null");
+                            }
+
+                            // add posting to recycler view adapter
+                            Posting posting1 = new Posting();
+                            posting1.setPosting_id(posting.getString("posting_id"));
+                            posting1.setFolder_id(String.valueOf(folder_id));
+                            posting1.setUser_id(posting.getString("user_id"));
+                            posting1.setModified(posting.getString("modified"));
+                            posting1.setCreated(posting.getString("modified"));
+                            posting1.setType(posting.getString("type"));
+                            posting1.setPosting_title(posting.getString("title"));
+                            posting1.setNote(posting.getString("note"));
+                            mAdapter.addItem(posting1);
+                        }
+                        mAdapter.notifyDataSetChanged();
+
+                        Log.d(TAG, TAG_SUB +" onPostExecute: postings "+postings.toString());
+                    }
+
+                }else { // if it's [DeleteFolderProcess]
+                    // print the number of folders at local DB after deleting
+                    Log.d(TAG, TAG_SUB + " onPostExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
+                }
+
 
             }catch (JSONException e){
                 e.printStackTrace();
             }
 
+            // dismiss the progressDialog
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
         }
 
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                return downloadUrl(strings[0],strings[1]);
-            } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
-            }
-        }
+
 
         private String downloadUrl(String myurl,String postData) throws IOException {
             InputStream is = null;
@@ -222,7 +318,7 @@ public class FolderActivity extends AppCompatActivity {
 
                 conn.connect();
                 int response = conn.getResponseCode();
-                Log.d(TAG, "The server response is: " + response);
+                Log.d(TAG, TAG_SUB + " The server response is: " + response);
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
@@ -247,7 +343,7 @@ public class FolderActivity extends AppCompatActivity {
         }
 
 
-
     }
+
 
 }
