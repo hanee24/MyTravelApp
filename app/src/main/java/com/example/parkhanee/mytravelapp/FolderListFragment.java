@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +61,7 @@ public class FolderListFragment extends Fragment {
     HashMap<String, String> PostDataParams;
 
     SharedPreferences sharedPreferences;
+    List<FolderListAdapter.shareState> shareStates;
 
     @Nullable
     @Override
@@ -242,13 +245,13 @@ public class FolderListFragment extends Fragment {
         // 1. get folder list from local DB no matter there is network or not.
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
         String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
-        List<Folder> folders = db.getMyFolders(str);
+        List<Folder> folders;
         // clear Adapter before fetch folder list
         myAdapter.clearItem();
         // 1-1. shared folders
-            setFolderListView(db.getSharedFolders(str),db.getSharedFoldersState(str));
+//        setFolderListView(db.getSharedFolders(str),db.getSharedFoldersState(str));
         // 1-2. my folders
-        setFolderListView(folders, FolderListAdapter.shareState.MINE);
+//        setFolderListView(folders, FolderListAdapter.shareState.MINE);
 
         // 2. synchronize server
         // check if the network has connected
@@ -260,7 +263,6 @@ public class FolderListFragment extends Fragment {
             // get ONLY "MY" folders
             folders = db.getMyFolders(str);
             PostDataParams = new HashMap<>();
-
             PostDataParams.put("user_id",str); // 로그인한 사용자 아이디
             PostDataParams.put("size",String.valueOf(folders.size()));
             for (int i=0; i< folders.size();i++){
@@ -274,8 +276,22 @@ public class FolderListFragment extends Fragment {
                 PostDataParams.put("created"+i,folder.getCreated());
             }
 
+            // 공유받은 폴더의 아이디를 뽑아서 POST 로 보내줌 ! syncFolderProcess 랑 다 같이 보내서 php 파일에서 각자 필요한 것만 갖다쓰면 되니까
+            folders = db.getSharedFolders(str);
+            shareStates= db.getSharedFoldersState(str);
+            PostDataParams.put("shared_size",String.valueOf(folders.size()));
+            for (int j=0; j<folders.size();j++){
+                Folder folder = folders.get(j);
+                PostDataParams.put("shared_folder_id"+j,String.valueOf(folder.getId()));
+                PostDataParams.put("shared_state"+j,shareStates.get(j).toString()); // 서버로 보낼때는 state 상관없지만 리스트뷰에 뿌려줄때 보여줄려고 여기 넣어놓음! AsyncTask의 PostExecute 에서 씀
+            }
+
             String stringUrl = "http://hanea8199.vps.phps.kr/syncfolderlist_process.php";
             new SyncServer().execute(stringUrl); // connect to server
+
+            String url = "http://hanea8199.vps.phps.kr/sharedfolderlist.php";
+            new SyncServer().execute(url); // get shared folder info including folderName, desc, duration, ..
+
             db.close();
         } else {
             Toast.makeText(getActivity(), "Cannot proceed, No network connection available.", Toast.LENGTH_SHORT).show();
@@ -284,10 +300,14 @@ public class FolderListFragment extends Fragment {
 
 
     private class SyncServer extends AsyncTask<String, Void, String>{
+        Boolean isSync=false;
 
         @Override
         protected String doInBackground(String... strings) {
             try {
+                if (strings[0].equals("http://hanea8199.vps.phps.kr/syncfolderlist_process.php")){
+                    isSync = true;
+                }
                 return downloadUrl(strings[0]);
             } catch (IOException e) {
                 return "Unable to retrieve web page. URL may be invalid.";
@@ -350,46 +370,83 @@ public class FolderListFragment extends Fragment {
             String msg;
             int totalCount=0;
 
+                if (isSync){
+                    JSONObject result = null;
+                    try {
+                        result = new JSONObject(s);
+                        resultCode = result.getInt("resultCode");
 
-            try{
-                JSONObject result = new JSONObject(s);
-                //JSONObject header = result.getJSONObject("header");
-                resultCode = result.getInt("resultCode");
+                        //check the whole result
+                        resultMsg = result.toString();
+                        Log.d(TAG, "onPostExecute: "+ resultMsg);
 
-                //check the whole result
-                resultMsg = result.toString();
-                Log.d(TAG, "onPostExecute: "+ resultMsg);
+                        if (resultCode!=00){
+                            Toast.makeText(getActivity(), "sync failed", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onPostExecute: "+resultMsg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else {
 
-                if (resultCode!=00){
-                    Toast.makeText(getActivity(), "sync failed", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onPostExecute: "+resultMsg);
+                    DBHelper db = new DBHelper(getActivity());
+                    db.getReadableDatabase();
+                    // 1. get folder list from local DB no matter there is network or not.
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+                    String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+                    List<Folder> myFolders = db.getMyFolders(str);
+                    // clear Adapter before fetch folder list
+                    myAdapter.clearItem();
+
+                    JSONObject result = null;
+                    try {
+                        result = new JSONObject(s);
+                        //check the whole result
+                        String resultStr = result.toString();
+                        Log.d(TAG, "onPostExecute: "+ resultStr);
+
+                        JSONObject body = result.getJSONObject("body");
+                        totalCount = body.getInt("totalCount");
+                        if (totalCount>0){
+                            List<Folder> folderList = new LinkedList<>();
+                            JSONArray folders = body.getJSONArray("folders");
+                            for (int j=0;j<totalCount;j++){
+                                Folder folder = getFolderInfo((JSONObject) folders.get(j));
+                                folderList.add(j,folder);
+                            }
+                            // 1-1. shared folders
+                            setFolderListView(folderList,db.getSharedFoldersState(str));
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    // 1-2. my folders
+                    setFolderListView(myFolders, FolderListAdapter.shareState.MINE);
+                    myAdapter.notifyDataSetChanged();
                 }
-
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
 
         }
 
-//        public Folder getFolderInfo(JSONObject folder) throws JSONException {
-//            // sort folder information from a jsonObject sent from the server
-//            String name = folder.getString("folder_name");
-//            String desc  =  folder.getString("description");
-//            String start = folder.getString("date_start").substring(0,10);
-//            String end = folder.getString("date_end").substring(0,10);
-//
-//            // String start == 2016-09-20 , String str_start == 2016 - 09 - 20.
-//            // trimming date format
-////            String str_start = start.substring(0,4)+" - "+start.substring(5,7)+" - "+start.substring(8,10);
-////            String str_end = end.substring(0,4)+" - "+end.substring(5,7)+" - "+end.substring(8,10);
-//
-//            int id = folder.getInt("folder_id");
-//            String user_id = folder.getString("user_id");
-//            String created = folder.getString("created").substring(0,10);
-//
-//            Folder folderItem = new Folder(id,name,user_id,desc,start,end,created);
-//            return folderItem;
-//        }
+        public Folder getFolderInfo(JSONObject folder) throws JSONException {
+            // sort folder information from a jsonObject sent from the server
+            String name = folder.getString("folder_name");
+            String desc  =  folder.getString("description");
+            String start = folder.getString("date_start").substring(0,10);
+            String end = folder.getString("date_end").substring(0,10);
+
+            // String start == 2016-09-20 , String str_start == 2016 - 09 - 20.
+            // trimming date format
+//            String str_start = start.substring(0,4)+" - "+start.substring(5,7)+" - "+start.substring(8,10);
+//            String str_end = end.substring(0,4)+" - "+end.substring(5,7)+" - "+end.substring(8,10);
+
+            int id = folder.getInt("folder_id");
+            String user_id = folder.getString("user_id");
+            String created = folder.getString("created").substring(0,10);
+
+            Folder folderItem = new Folder(id,name,user_id,desc,start,end,created);
+            return folderItem;
+        }
     }
 
     private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
