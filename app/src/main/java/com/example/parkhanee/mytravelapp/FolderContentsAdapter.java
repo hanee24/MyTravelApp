@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 /**
@@ -41,11 +43,26 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<FolderContentsAd
         // - replace the contents of the view with that itemsData
         if (postings.size()>0){
             Posting p = postings.get(position);
+
             String iii = p.getPosting_title();
             holder.tvTitle.setText(iii);
             holder.tvNote.setText(p.getNote());
             holder.tvCreated.setText(p.getCreated());
             holder.tvUserId.setText(p.getUser_id());
+
+            if (p.getImage_path()==null){
+                holder.imageView.setVisibility(View.GONE);
+                holder.tvTitle.setBackgroundColor(holder.view.getResources().getColor(R.color.myWhite));
+                holder.tvTitle.setTextColor(holder.view.getResources().getColor(R.color.myBlack));
+            }else{
+                holder.imageView.setImageResource(R.drawable.loading);
+                // set image (which the server has) at imageView using Picasso library
+                holder.imageView.setVisibility(View.VISIBLE);
+                holder.tvTitle.setBackgroundColor(holder.view.getResources().getColor(R.color.transparentBlack));
+                holder.tvTitle.setTextColor(holder.view.getResources().getColor(R.color.myWhite));
+                Picasso.with(holder.view.getContext()).load(p.getImage_path()).into(holder.imageView); //set picture
+            }
+
         }
     }
 
@@ -60,6 +77,8 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<FolderContentsAd
         public TextView tvNote = null;
         public TextView tvCreated = null;
         public TextView tvUserId = null;
+        public ImageView imageView = null;
+        public View view;
 
         public ViewHolder(View itemLayoutView) {
             super(itemLayoutView);
@@ -67,6 +86,8 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<FolderContentsAd
             tvNote = (TextView) itemLayoutView.findViewById(R.id.note);
             tvCreated = (TextView) itemLayoutView.findViewById(R.id.created);
             tvUserId = (TextView) itemLayoutView.findViewById(R.id.userId);
+            imageView = (ImageView) itemLayoutView.findViewById(R.id.imageView8);
+            view = itemLayoutView;
         }
     }
 

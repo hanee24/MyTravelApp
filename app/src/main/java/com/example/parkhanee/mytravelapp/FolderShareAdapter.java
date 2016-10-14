@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -135,9 +136,8 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
                         postDataParams  = new HashMap<>();
                         postDataParams.put("share_id",String.valueOf(unixTime)); //set unix time as share id
                         postDataParams.put("folder_id",String.valueOf(folder_id));
-                        postDataParams.put("owner_id",MainActivity.getUserId()); // 현재 로그인된 사용자
+                        postDataParams.put("owner_id",getUserId()); // 현재 로그인된 사용자
                         postDataParams.put("user_id",receiver_id); // 공유신청 받는 사용자 == 리스트뷰에서 클릭된 아이템에 해당하는 사용자
-
                         postDataParams.put("user_name",receiver);
                         postDataParams.put("isFB",String.valueOf(users.get(position).getFB()));
 
@@ -159,6 +159,12 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
 
 
         return v;
+    }
+
+    private String getUserId(){
+        SharedPreferences sharedPreferences =  context.getSharedPreferences(context.getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(context.getString(R.string.userIdKey),null);
+        return str;
     }
 
 

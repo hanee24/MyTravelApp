@@ -268,6 +268,9 @@ public class FolderActivity extends AppCompatActivity {
                             posting1.setType(posting.getString("type"));
                             posting1.setPosting_title(posting.getString("title"));
                             posting1.setNote(posting.getString("note"));
+                            if ( ! posting.getString("image_path").equals("")){ // image_path 요소가 비어있지 않으면 posting1에 설정해줌.
+                                posting1.setImage_path(posting.getString("image_path"));
+                            }
                             mAdapter.addItem(posting1);
                         }
                         mAdapter.notifyDataSetChanged();
@@ -298,7 +301,7 @@ public class FolderActivity extends AppCompatActivity {
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 50000;
+            int len = 5000000;
 
             try {
                 URL url = new URL(myurl);

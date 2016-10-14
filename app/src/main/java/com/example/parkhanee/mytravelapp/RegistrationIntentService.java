@@ -103,13 +103,19 @@ public class RegistrationIntentService extends IntentService {
 //            PostDataParams = new HashMap<>();
 //            PostDataParams.put("token",token);
 //            PostDataParams.put("user_id",MainActivity.getUserId());
-            postData = "token="+token+"&user_id="+MainActivity.getUserId();
+            postData = "token="+token+"&user_id="+ getUserId();
             Log.d(TAG, "myNetworkHandler: postData "+postData);
             new SendRegistrationToServer().execute();
         } else {
             Toast.makeText(this, "["+TAG+"] No network connection available.", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "myNetworkHandler: No network connection available");
         }
+    }
+
+    private String getUserId(){
+        SharedPreferences sharedPreferences =  getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        return str;
     }
 
     private class SendRegistrationToServer extends AsyncTask<Void,Void,String>{

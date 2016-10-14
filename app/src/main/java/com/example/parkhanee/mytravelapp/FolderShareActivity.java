@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -69,7 +70,9 @@ public class FolderShareActivity extends Activity {
         listView.setAdapter(mAdapter);
         dialog = new ProgressDialog(FolderShareActivity.this);
         postDataParams  = new HashMap<>();
-        postDataParams.put("sender",MainActivity.getUserId());
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        postDataParams.put("sender",str);
         postDataParams.put("folder_id",String.valueOf(folder_id));
 
         myNetworkHandler("http://hanea8199.vps.phps.kr/getuserlist_process.php"); // --> get user list process

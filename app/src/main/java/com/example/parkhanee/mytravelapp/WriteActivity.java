@@ -2,17 +2,23 @@ package com.example.parkhanee.mytravelapp;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.content.FileProvider;
@@ -55,6 +61,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class WriteActivity extends AppCompatActivity {
 
@@ -83,7 +90,13 @@ public class WriteActivity extends AppCompatActivity {
         folder_id = String.valueOf(bundle.getInt("folder_id"));
 
         imageView = (ImageView) findViewById(R.id.image);
-        user_id = MainActivity.getUserId();
+        user_id = getUserId();
+    }
+
+    private String getUserId(){
+        SharedPreferences sharedPreferences =  getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        return str;
     }
 
     public void mOnClick(View view){
@@ -97,16 +110,16 @@ public class WriteActivity extends AppCompatActivity {
                 // save data to local db
                 dbHelper = new DBHelper(WriteActivity.this);
                 String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set unix time as posting Id
-                dbHelper.addPosting(new Posting(unixTime,folder_id,MainActivity.getUserId(),"note",title, note, now,now));
+                dbHelper.addPosting(new Posting(unixTime,folder_id,getUserId(),"note",title, note, now,now));
 
                 // send data to server
                 postDataParams = new HashMap<>();
                 postDataParams.put("posting_id",unixTime);
                 postDataParams.put("folder_id",folder_id);
-                postDataParams.put("user_id",MainActivity.getUserId()); // TODO: 2016. 10. 7. is this going to cause an error? when MainActivity may not initiated?
+                postDataParams.put("user_id",getUserId());
                 // TODO: 2016. 10. 7. manage posting type when it can add images
                 if (bitmap !=null){
-                    Log.d(TAG, "mOnClick: bitmap is not null");
+                    Log.d(TAG, "mOnClick save : bitmap is not null");
                     postDataParams.put("type","picture");
                 }else {
                     postDataParams.put("type","note");
@@ -182,27 +195,54 @@ public class WriteActivity extends AppCompatActivity {
             imageFileName = user_id+"_" + timeStamp + ".jpg";
 
             if (requestCode == REQUEST_GALLERY ) {
-                try {
-//                // We need to recycle unused bitmaps
+                //                // We need to recycle unused bitmaps
 //                if (bitmap != null) {
 //                    bitmap.recycle();
 //                }
-                    InputStream stream = getContentResolver().openInputStream(
-                            data.getData());
-                    bitmap = BitmapFactory.decodeStream(stream);
-                    assert stream != null;
-                    stream.close();
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                //InputStream stream = getContentResolver().openInputStream(data.getData());
+//                      bitmap = decodeSampledBitmapFromStream(stream,new Rect(0,0,100,100),100,100);// TODO: 2016. 10. 14. outOfMemory Error
+//
+//                    assert stream != null;
+//                    stream.close();
+
+
+//                Uri selectedImage = data.getData();
+//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+//                cursor.moveToFirst();
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                String picturePath = cursor.getString(columnIndex);
+//                cursor.close();
+//                bitmap = BitmapFactory.decodeFile(picturePath);
+
+
+                Uri selectedImage = data.getData();
+                String path = getPath(WriteActivity.this, selectedImage);
+//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//
+//                Cursor cursor = getContentResolver().query(selectedImage,
+//                        filePathColumn, null, null, null);
+//                cursor.moveToFirst();
+//
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                String picturePath = cursor.getString(columnIndex);
+//                cursor.close();
+
+                Log.d(TAG, "onActivityResult: decodeFile start");
+                //bitmap = BitmapFactory.decodeFile(path);
+                bitmap = decodeSampledBitmapFromFile(path,700,700); // TODO: 2016. 10. 14. adjust required width and height
+                Log.d(TAG, "onActivityResult: decodeFile end");
+
+
             } else if (requestCode == REQUEST_IMAGE_CAPTURE ){
             /*
                 The Android Camera application encodes the photo in the return Intent delivered to onActivityResult()
                 as a small Bitmap in the extras, under the key "data".
              */
                 Bundle extras = data.getExtras();
-                bitmap = (Bitmap) extras.get("data");
+                bitmap = (Bitmap) extras.get("data"); // TODO: 2016. 10. 14. what if this bitmap is too large ?  ..
                 // Create an image file name
 
                 String path = saveToInternalStorage(bitmap,imageFileName);
@@ -218,6 +258,78 @@ public class WriteActivity extends AppCompatActivity {
 
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // Load a Scaled Down Version of Bitmap into Memory
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        Log.d("bitmap", "calculateInSampleSize: height width");
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        Log.d("bitmap", "calculateInSampleSize: inSampleSize "+ inSampleSize);
+
+        return inSampleSize;
+    }
+
+    // Load a Scaled Down Version of Bitmap into Memory
+    public static Bitmap decodeSampledBitmapFromStream(InputStream stream, Rect rect,
+
+                                                         int reqWidth, int reqHeight) {
+
+        stream.mark(1000); // TODO: 2016. 10. 14. set a suitable limitation
+        
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(stream, rect, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        Log.d("bitmap", "decodeSampledBitmapFromStream: stream "+stream);
+        try {
+            stream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.d("bitmap", "decodeSampledBitmapFromStream: stream "+stream);
+        return BitmapFactory.decodeStream(stream, rect, options);
+    }
+
+    // Load a Scaled Down Version of Bitmap into Memory
+    public static Bitmap decodeSampledBitmapFromFile(String path, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFile(path, options);
     }
 
     // for saving image into Internal memory
@@ -524,5 +636,134 @@ public class WriteActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @author paulburke
+     */
+    public static String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @param selection (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

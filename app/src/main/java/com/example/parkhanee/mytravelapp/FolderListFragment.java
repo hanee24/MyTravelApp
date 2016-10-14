@@ -2,6 +2,7 @@ package com.example.parkhanee.mytravelapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -56,6 +57,8 @@ public class FolderListFragment extends Fragment {
 
     String TAG = "FolderListFragment";
     HashMap<String, String> PostDataParams;
+
+    SharedPreferences sharedPreferences;
 
     @Nullable
     @Override
@@ -130,7 +133,9 @@ public class FolderListFragment extends Fragment {
                     Date date = new Date();
                     System.out.println(dateFormat.format(date)); //2014/08/06 15:59:48
                     int unixTime = (int) System.currentTimeMillis() / 1000; //set unix time as folder id
-                    dbHelper.addFolder(new Folder(unixTime,name,MainActivity.getUserId(),desc,start_date,end_date,dateFormat.format(date)));
+                    sharedPreferences =  getActivity().getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+                    String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+                    dbHelper.addFolder(new Folder(unixTime,name,str,desc,start_date,end_date,dateFormat.format(date)));
                     Log.d(TAG, "created "+dateFormat.format(date));
 
                     // reset editTexts since the data within them has been sent
@@ -235,11 +240,13 @@ public class FolderListFragment extends Fragment {
         DBHelper db = new DBHelper(getActivity());
         db.getReadableDatabase();
         // 1. get folder list from local DB no matter there is network or not.
-        List<Folder> folders = db.getMyFolders(MainActivity.getUserId());
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        List<Folder> folders = db.getMyFolders(str);
         // clear Adapter before fetch folder list
         myAdapter.clearItem();
         // 1-1. shared folders
-        setFolderListView(db.getSharedFolders(MainActivity.getUserId()),db.getSharedFoldersState(MainActivity.getUserId()));
+            setFolderListView(db.getSharedFolders(str),db.getSharedFoldersState(str));
         // 1-2. my folders
         setFolderListView(folders, FolderListAdapter.shareState.MINE);
 
@@ -251,10 +258,10 @@ public class FolderListFragment extends Fragment {
         if (networkInfo != null && networkInfo.isConnected()) {
             // fetch data from localDB and put them into postData hashMap.
             // get ONLY "MY" folders
-            folders = db.getMyFolders(MainActivity.getUserId());
+            folders = db.getMyFolders(str);
             PostDataParams = new HashMap<>();
 
-            PostDataParams.put("user_id",MainActivity.getUserId()); // 로그인한 사용자 아이디
+            PostDataParams.put("user_id",str); // 로그인한 사용자 아이디
             PostDataParams.put("size",String.valueOf(folders.size()));
             for (int i=0; i< folders.size();i++){
                 Folder folder = folders.get(i);

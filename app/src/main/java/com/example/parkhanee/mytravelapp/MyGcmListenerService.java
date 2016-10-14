@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -51,7 +52,7 @@ public class MyGcmListenerService extends GcmListenerService {
             dbHelper = new DBHelper(this);
             dbHelper.addUser(new User(data.getString("owner_id"),data.getString("owner_name"),Boolean.valueOf(data.getString("isFB")),data.getString("lat"),data.getString("lng")));
             dbHelper.addFolder(new Folder(Integer.parseInt(data.getString("folder_id")),data.getString("folder_name"),data.getString("owner_id"),data.getString("desc"),data.getString("start"),data.getString("end"),data.getString("created")));
-            dbHelper.addShare(new Share(data.getString("share_id"),data.getString("folder_id"),MainActivity.getUserId(),data.getString("state")));
+            dbHelper.addShare(new Share(data.getString("share_id"),data.getString("folder_id"),getUserId(),data.getString("state")));
             dbHelper.close();
             /**
              * In some cases it may be useful to show a notification indicating to the user
@@ -137,5 +138,11 @@ public class MyGcmListenerService extends GcmListenerService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(id, notificationBuilder.build());
+    }
+
+    private String getUserId(){
+        SharedPreferences sharedPreferences =  getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        return str;
     }
 }
