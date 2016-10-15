@@ -114,15 +114,15 @@ public class MainContentFragment extends Fragment implements
                 mGoogleApiClient);
 
         // TODO: 2016. 10. 1. comment it in order to run an emulator
-        lat = myLocation.getLatitude();
-        lng = myLocation.getLongitude();
+//        lat = myLocation.getLatitude();
+//        lng = myLocation.getLongitude();
 
         String Lat = String.valueOf(lat);
         String Lgt = String.valueOf(lng);
         String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lgt+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
 
         // TODO: 2016. 10. 1. comment it in order to run an emulator
-        myClickHandler(url);
+//        myClickHandler(url);
 
 
         btn_nearby.setOnClickListener(new View.OnClickListener() {

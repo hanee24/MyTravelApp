@@ -43,7 +43,7 @@
             android:background="#00ffffff"
             android:divider="#00e0e0e0"
             android:dividerHeight="5dp"
-            />
+            android:visibility="visible"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -55,6 +55,6 @@
             android:layout_alignEnd="@+id/listView2"
             android:layout_marginRight="10dp"
             android:layout_below="@+id/button8"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
     </RelativeLayout>
 </RelativeLayout>

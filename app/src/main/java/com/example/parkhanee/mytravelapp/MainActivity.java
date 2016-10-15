@@ -345,7 +345,6 @@ public class MainActivity extends AppCompatActivity {
                 fragmentClass = AreaFragment.class;
                 break;
             case R.id.folder:
-                // TODO: 2016. 9. 8.  folderlist_process php 파일 실행시키고 그 데이터 받아와서 리스트뷰 통해서 뿌려주기
                 fragmentClass = FolderListFragment.class;
                 break;
             // TODO: 2016. 9. 8. create poi, map fragment
@@ -353,6 +352,9 @@ public class MainActivity extends AppCompatActivity {
 //                break;
 //            case R.id.map:
 //                break;
+            case R.id.share :
+                fragmentClass = FolderListFragment_Shared.class;
+                break;
             default:
                 fragmentClass = MainContentFragment.class;
                 System.out.println("selectDrawerItem default ?");
