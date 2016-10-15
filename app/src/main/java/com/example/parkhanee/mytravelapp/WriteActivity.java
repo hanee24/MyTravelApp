@@ -232,7 +232,7 @@ public class WriteActivity extends AppCompatActivity {
 
                 Log.d(TAG, "onActivityResult: decodeFile start");
                 //bitmap = BitmapFactory.decodeFile(path);
-                bitmap = decodeSampledBitmapFromFile(path,700,700); // TODO: 2016. 10. 14. adjust required width and height
+                bitmap = decodeSampledBitmapFromFile(path,1000,1000); // TODO: 2016. 10. 14. adjust required width and height
                 Log.d(TAG, "onActivityResult: decodeFile end");
 
 
@@ -329,7 +329,7 @@ public class WriteActivity extends AppCompatActivity {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
 
-        return BitmapFactory.decodeFile(path, options);
+        return BitmapFactory.decodeFile(path, options); // outOfMemoryError
     }
 
     // for saving image into Internal memory

@@ -55,14 +55,12 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<FolderContentsAd
                 holder.tvTitle.setBackgroundColor(holder.view.getResources().getColor(R.color.myWhite));
                 holder.tvTitle.setTextColor(holder.view.getResources().getColor(R.color.myBlack));
             }else{
-                holder.imageView.setImageResource(R.drawable.loading);
                 // set image (which the server has) at imageView using Picasso library
                 holder.imageView.setVisibility(View.VISIBLE);
                 holder.tvTitle.setBackgroundColor(holder.view.getResources().getColor(R.color.transparentBlack));
                 holder.tvTitle.setTextColor(holder.view.getResources().getColor(R.color.myWhite));
                 Picasso.with(holder.view.getContext()).load(p.getImage_path()).into(holder.imageView); //set picture
             }
-
         }
     }
 
