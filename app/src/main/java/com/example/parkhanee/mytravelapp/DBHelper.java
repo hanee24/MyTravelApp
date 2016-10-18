@@ -566,10 +566,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 new String[] { String.valueOf(id) });
 
         String DELETE_SHARE = "DELETE FROM " +TABLE_SHARE+
-                " WHERE EXISTS" +
-                "  ( SELECT *" +
-                "    FROM " +TABLE_SHARE+
-                "    WHERE "+s_KEY_FOLDER_ID+" = "+id+" )";
+                " WHERE "+s_KEY_FOLDER_ID+" = "+id ;
 
 //        db.delete(TABLE_SHARE,
 //                s_KEY_FOLDER_ID+" = ?",
@@ -762,7 +759,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    // TODO: 2016. 9. 30. delete Share
+    public void deleteShare(int id) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_SHARE,
+                s_KEY_ID+" = ?",
+                new String[] { String.valueOf(id) });
+
+        // 3. close
+        db.close();
+
+        Log.d("deleteShare", String.valueOf(id));
+
+    }
 
 
     /**

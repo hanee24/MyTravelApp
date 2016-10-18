@@ -71,6 +71,7 @@ public class FolderListAdapter extends BaseAdapter{
             holder.tvDesc = (TextView) v.findViewById(R.id.folder_desc);
             holder.tvDate = (TextView) v.findViewById(R.id.textView19);
             holder.tvShared = (TextView) v.findViewById(R.id.tvShareState);
+            holder.tvOwner = (TextView) v.findViewById(R.id.textView45);
             holder.db = new DBHelper(context);
             v.setTag(holder);
 
@@ -86,11 +87,14 @@ public class FolderListAdapter extends BaseAdapter{
             String str = start+" ~ "+end;
             holder.tvDate.setText(str);
             holder.tvShared.setVisibility(View.INVISIBLE);
-
-            // 공유받은폴더 상태 출력
+            holder.tvOwner.setVisibility(View.GONE);
+            // 공유받은폴더 상태, 공유폴더 주인아이디 출력
             if (shareState.MINE != isShared.get(position)){ // 공유받은 폴더 일 때
                 holder.tvShared.setVisibility(View.VISIBLE);
                 holder.tvShared.setText(isShared.get(position).toString());
+                holder.tvOwner.setVisibility(View.VISIBLE);
+                // TODO: 2016. 10. 15. textView에 ownerId출력
+                holder.tvOwner.setText("by "+f.getOwner_id());
             }
         }
         return v;
@@ -101,6 +105,7 @@ public class FolderListAdapter extends BaseAdapter{
         TextView tvDesc = null;
         TextView tvDate = null;
         TextView tvShared = null;
+        TextView tvOwner = null;
         DBHelper db = null;
     }
 

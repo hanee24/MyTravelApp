@@ -94,7 +94,7 @@ public class FolderListFragment_Shared  extends Fragment {
                     i.putExtra("share_id",dbHelper.getShareWithFolderId(folder_id).get(0).getShare_id()); // 공유받은 폴더에 해당하는 share row 는 하나밖에 없으니까 get(0) !
                     startActivity(i);
 
-                }else if (state == FolderListAdapter.shareState.MINE || state == FolderListAdapter.shareState.ACCEPTED){
+                }else if ( state == FolderListAdapter.shareState.ACCEPTED){
                     Intent a = new Intent(getActivity(),FolderActivity.class);
                     Bundle args = new Bundle();
                     args.putInt("folder_id",folder_id); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !

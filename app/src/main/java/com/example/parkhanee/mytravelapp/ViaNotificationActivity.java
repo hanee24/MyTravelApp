@@ -34,6 +34,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
     String TAG = "ViaNotificationActivity";
+    String share_id ;
     static Share share;
     HashMap<String,String> postDataParams;
 
@@ -43,7 +44,7 @@ public class ViaNotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_via_notification);
 
         Intent i = getIntent();
-        String share_id = i.getStringExtra("share_id");
+        share_id = i.getStringExtra("share_id");
         dbHelper = new DBHelper(this);
         share = dbHelper.getShare(Integer.valueOf(share_id));
 
@@ -69,9 +70,10 @@ public class ViaNotificationActivity extends AppCompatActivity {
                 MyNetworkHandler("Accepted");
                 break;
             case R.id.reject : // 공유 거부
-                share.setState("Denied");
-                dbHelper.updateShare(share);
-
+                // deleteShare
+                dbHelper.deleteFolder(Integer.parseInt(share_id));
+                // deleteFolder
+                dbHelper.deleteFolder(Integer.parseInt(share.getFolder_id()));
                 MyNetworkHandler("Denied");
                 break;
         }

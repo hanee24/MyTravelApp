@@ -159,24 +159,12 @@ public class FolderListFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
                 int folder_id = myAdapter.getItem(position).getId();
-                FolderListAdapter.shareState state = myAdapter.getIsShared(position);
-
-                if (state == FolderListAdapter.shareState.REQUESTED){
-                    // 공유신청받은 폴더 아이템을 폴더리스트에서 클릭하면, 공유신청 gcm pendingIntent 와 같은 액티비티로 넘어감.
-                    Intent i = new Intent(getActivity(),ViaNotificationActivity.class);
-                    i.putExtra("share_id",dbHelper.getShareWithFolderId(folder_id).get(0).getShare_id()); // 공유받은 폴더에 해당하는 share row 는 하나밖에 없으니까 get(0) !
-                    startActivity(i);
-
-                }else if (state == FolderListAdapter.shareState.MINE || state == FolderListAdapter.shareState.ACCEPTED){
-                    Intent a = new Intent(getActivity(),FolderActivity.class);
-                    Bundle args = new Bundle();
-                    args.putInt("folder_id",folder_id); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
-
-                    a.putExtra("args",args);
-                    startActivity(a);
-                }
+                Intent a = new Intent(getActivity(),FolderActivity.class);
+                Bundle args = new Bundle();
+                args.putInt("folder_id",folder_id); // 리스트뷰 포지션말고 폴더 포지션(아이디)을 넘겨야지 !
+                a.putExtra("args",args);
+                startActivity(a);
             }
         });
 
@@ -226,6 +214,8 @@ public class FolderListFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
         String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
         List<Folder> folders;
+
+        myAdapter.clearItem();
 
         folders = db.getMyFolders(str);
         FolderListAdapter.shareState s = FolderListAdapter.shareState.MINE;

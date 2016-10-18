@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="설명"
         android:id="@+id/folder_desc"
-        android:layout_below="@+id/textView19"
+        android:layout_below="@+id/folder_name"
         android:layout_alignLeft="@+id/folder_name"
         android:layout_marginBottom="10dp"/>
 
@@ -36,7 +36,7 @@
         android:text="16.09.02 ~ 16.09.08"
         android:id="@+id/textView19"
         android:layout_alignParentEnd="false"
-        android:layout_below="@+id/folder_name"
+        android:layout_below="@+id/folder_desc"
         android:layout_alignLeft="@+id/folder_name"
         android:layout_marginBottom="5dp"/>
 
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
+        android:text="state"
         android:id="@+id/tvShareState"
         android:layout_above="@+id/folder_desc"
         android:layout_alignParentRight="true"
@@ -52,5 +52,16 @@
         android:layout_marginRight="46dp"
         android:layout_marginEnd="46dp"
         />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="user"
+        android:id="@+id/textView45"
+        android:layout_alignBaseline="@+id/folder_name"
+        android:layout_alignBottom="@+id/folder_name"
+        android:layout_toRightOf="@+id/folder_name"
+        android:layout_toEndOf="@+id/folder_name"/>
 
 </RelativeLayout>

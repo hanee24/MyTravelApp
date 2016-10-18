@@ -32,10 +32,11 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="거부"
+        android:text="거절"
         android:id="@+id/reject"
+        android:onClick="mOnClick"
         android:layout_below="@+id/accept"
         android:layout_alignLeft="@+id/accept"
-        android:layout_alignStart="@+id/accept"
-        android:onClick="mOnClick"/>
+        android:layout_alignStart="@+id/accept"/>
+
 </RelativeLayout>
