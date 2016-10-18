@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.SyncStateContract;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,7 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class FolderActivity extends AppCompatActivity {
+public class FolderActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
 
     int folder_id;
     Folder folder;
@@ -52,6 +53,7 @@ public class FolderActivity extends AppCompatActivity {
     String TAG = "FolderActivity";
     RecyclerView recyclerView;
     FolderContentsAdapter mAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,9 @@ public class FolderActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this)); // TODO: 2016. 10. 12. may need to use different kind of LayoutManager
         recyclerView.setAdapter(mAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator()); // TODO: 2016. 10. 12. may need to use different kind
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
 
@@ -160,14 +165,24 @@ public class FolderActivity extends AppCompatActivity {
             new mURLConnection().execute(isList);
 
         } else {
+            // stopping swipe refresh
+            swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(FolderActivity.this, "No network connection available.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // swipeRefresh !! pull to refresh
+    @Override
+    public void onRefresh() {
+        // showing refresh animation before making http call
+        swipeRefreshLayout.setRefreshing(true);
+        myClickHandler(true);
     }
 
     private class mURLConnection extends AsyncTask<Boolean, Void, String> {
 
         String TAG_SUB, stringUrl;
-        Boolean isList;
+        Boolean isList; // true == fetch latest postings, false == delete folder
         ProgressDialog dialog;
 
         @Override
@@ -277,6 +292,9 @@ public class FolderActivity extends AppCompatActivity {
 
                         Log.d(TAG, TAG_SUB +" onPostExecute: postings "+postings.toString());
                     }
+
+                    // stopping swipe refresh
+                    swipeRefreshLayout.setRefreshing(false);
 
                 }else { // if it's [DeleteFolderProcess]
                     // print the number of folders at local DB after deleting

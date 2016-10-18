@@ -239,7 +239,7 @@ public class FolderListFragment_Shared  extends Fragment {
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
             reader.read(buffer);
-            return new String(buffer);
+            return new String(buffer); // TODO: 2016. 10. 18. out of memory error
         }
 
         @Override
@@ -263,15 +263,19 @@ public class FolderListFragment_Shared  extends Fragment {
 
                 JSONObject body = result.getJSONObject("body");
                 totalCount = body.getInt("totalCount");
+
+                DBHelper db = new DBHelper(getActivity());
+                db.getWritableDatabase();
+
                 if (totalCount>0){
                     List<Folder> folderList = new LinkedList<>();
                     JSONArray folders = body.getJSONArray("folders");
                     for (int j=0;j<totalCount;j++){
                         Folder folder = getFolderInfo((JSONObject) folders.get(j));
                         folderList.add(j,folder);
+                        db.updateFolder(folder); // update folder info on localDB
                     }
-                    DBHelper db = new DBHelper(getActivity());
-                    db.getReadableDatabase();
+
                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
                     String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
                     // 1-1. shared folders
