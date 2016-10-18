@@ -2,7 +2,7 @@
     <string name="app_name">My Travel App</string>
     <string name="title_activity_nearby_d1">NearbyD1Activity</string>
     <string name="travelApiKey">EhbtW6DbKWT%2BdDTSXCMIK0gvNEvTNh66inoT47CrOANRMxpY4K2wYdsrMH0LLKSg0isRPVIcIq99swJ2RJdMKg%3D%3D</string>
-    <string name="accessToken">pk.eyJ1IjoiaGFuZWUiLCJhIjoiY2lyYzB6Z3hhMDE4Mmc3bTNjMjYyNXl4biJ9.WyVfkt1NspbDHnGCkucgSw</string>
+    <string name="mapBoxAccessToken">pk.eyJ1IjoiaGFuZWUiLCJhIjoiY2lyYzB6Z3hhMDE4Mmc3bTNjMjYyNXl4biJ9.WyVfkt1NspbDHnGCkucgSw</string>
     <string name="facebook_app_id">588753471304328</string>
     <string name="fb_login_protocol_scheme">fb588753471304328</string>
     <string name="string_search">관광지 찾기</string>
@@ -19,4 +19,5 @@
     <string name="registering_message_complete">완료!</string>
     <string name="MyPREFERENCES">MyPrefs</string>
     <string name="userIdKey">userId</string>
+    <string name="weatherApiKey">e80313423a41ee0a3d5914ece9d56275</string>
 </resources>

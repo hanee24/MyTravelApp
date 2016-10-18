@@ -63,7 +63,7 @@ public class NearbyMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Mapbox access token only needs to be configured once in your app
-        MapboxAccountManager.start(this, getString(R.string.accessToken));
+        MapboxAccountManager.start(this, getString(R.string.mapBoxAccessToken));
 
         // This contains the MapView in XML and needs to be called after the account manager
         setContentView(R.layout.activity_nearby_map);

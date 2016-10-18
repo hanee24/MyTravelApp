@@ -15,17 +15,19 @@
         android:layout_marginBottom="15dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"/>
-    <TextView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:text="날씨"
-        android:textSize="50dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
         android:gravity="center_vertical|center_horizontal"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/textView2"
-        android:id="@+id/tv_weather"/>
+        android:id="@+id/iv_weather"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingLeft="80dp"
+        android:paddingRight="80dp"
+        android:paddingBottom="50dp"
+        android:paddingTop="10dp"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -38,7 +40,7 @@
         android:layout_marginBottom="20dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentEnd="false"
-        android:layout_below="@+id/tv_weather"
+        android:layout_below="@+id/iv_weather"
         android:layout_marginTop="40dp"/>
 
     <Button
@@ -58,6 +60,45 @@
         android:layout_height="wrap_content"
         android:name="com.example.parkhanee.mytravelapp.FbLoginFragment"
         android:id="@+id/fragment_fb"
-        tools:layout="@layout/fragment_fb_login"/>
+        tools:layout="@layout/fragment_fb_login"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="-"
+        android:id="@+id/tv_temp"
+        android:layout_above="@+id/tv_description"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="-"
+        android:id="@+id/tv_description"
+        android:layout_alignBottom="@+id/iv_weather"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="˚C"
+        android:id="@+id/textView44"
+        android:layout_alignTop="@+id/tv_temp"
+        android:layout_toRightOf="@+id/tv_temp"
+        android:layout_toEndOf="@+id/tv_temp"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/weatherProgressBar"
+        android:layout_above="@+id/tv_temp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"/>
 
 </RelativeLayout>

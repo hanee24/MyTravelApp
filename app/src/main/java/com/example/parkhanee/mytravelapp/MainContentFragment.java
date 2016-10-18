@@ -21,6 +21,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,9 +34,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 
 /**
  * Created by parkhanee on 2016. 9. 5..
@@ -45,11 +51,13 @@ public class MainContentFragment extends Fragment implements
     Button btn_nearby ;
     Button btn_folder;
     TextView location;
+    ProgressBar progressBar;
 
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
     public static Double lat;
     public static Double lng;
+
 
     View a;
 
@@ -72,6 +80,8 @@ public class MainContentFragment extends Fragment implements
         btn_nearby = (Button)view.findViewById(R.id.button);
         btn_folder = (Button) view.findViewById(R.id.button2);
         location = (TextView) view.findViewById(R.id.textView2);
+        progressBar = (ProgressBar) view.findViewById(R.id.weatherProgressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         a.setVisibility(View.GONE); //hide facebook login fragment
 
@@ -114,15 +124,14 @@ public class MainContentFragment extends Fragment implements
                 mGoogleApiClient);
 
         // TODO: 2016. 10. 1. comment it in order to run an emulator
-//        lat = myLocation.getLatitude();
-//        lng = myLocation.getLongitude();
+        lat = myLocation.getLatitude();
+        lng = myLocation.getLongitude();
 
         String Lat = String.valueOf(lat);
-        String Lgt = String.valueOf(lng);
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lgt+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
+        String Lng = String.valueOf(lng);
 
         // TODO: 2016. 10. 1. comment it in order to run an emulator
-//        myClickHandler(url);
+        myClickHandler(Lat,Lng);
 
 
         btn_nearby.setOnClickListener(new View.OnClickListener() {
@@ -191,13 +200,18 @@ public class MainContentFragment extends Fragment implements
         });
     }
 
-    public void myClickHandler(String url) { // check if the network has connected
+    public void myClickHandler(String Lat, String Lng) { // check if the network has connected
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
+
+            String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lng+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
             new getGeoCode().execute(url);
+            new getWeather().execute(Lat,Lng);
+
         } else {
+            location.setText("위치 정보를 찾을 수 없습니다. 네트워크 연결을 확인 해 주세요.");
             Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -261,7 +275,7 @@ public class MainContentFragment extends Fragment implements
             //split "s" , get second, third, forth words
             String[] str = s.split(" ");
             String ss = str[1]+" "+str[2]+" "+str[3];
-            location.setText(ss); //TODO : set text "cannot find location without network" when there is no network connection
+            location.setText(ss);
         }
     }
 
@@ -276,4 +290,213 @@ public class MainContentFragment extends Fragment implements
         super.onPause();
         isMain = false;
     }
+
+    public class WeatherHttpClient {
+
+        private String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
+        private String IMG_URL = "http://openweathermap.org/img/w/";
+
+        public String getWeatherData(String Lat, String Lgt) {
+            HttpURLConnection con = null ;
+            InputStream is = null;
+
+            try {
+                String url = BASE_URL+"lat="+Lat+"&lon="+Lgt+"&APPID="+getString(R.string.weatherApiKey);
+                con = (HttpURLConnection) ( new URL(url)).openConnection();
+                con.setRequestMethod("GET");
+                con.setDoInput(true);
+                con.setDoOutput(true);
+                con.connect();
+
+                int response = con.getResponseCode();
+                Log.d(TAG, "The server response is: " + response);
+
+                // Let's read the response
+                StringBuffer buffer = new StringBuffer();
+                is = con.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String line = null;
+                while ( (line = br.readLine()) != null )
+                    buffer.append(line + "rn");
+
+                is.close();
+                con.disconnect();
+                return buffer.toString();
+            }
+            catch(Throwable t) {
+                t.printStackTrace();
+            }
+            finally {
+                try { is.close(); } catch(Throwable t) {}
+                try { con.disconnect(); } catch(Throwable t) {}
+            }
+
+            return null;
+
+        }
+
+//        public byte[] getImage(String code) {
+//            HttpURLConnection con = null ;
+//            InputStream is = null;
+//            try {
+//                con = (HttpURLConnection) ( new URL(IMG_URL + code+".png")).openConnection();
+//                con.setRequestMethod("GET");
+//                con.setDoInput(true);
+//                con.setDoOutput(true);
+//                con.connect();
+//
+//                // Let's read the response
+//                is = con.getInputStream();
+//                byte[] buffer = new byte[1024];
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//
+//                while ( is.read(buffer) != -1)
+//                    baos.write(buffer);
+//
+//                return baos.toByteArray();
+//            }
+//            catch(Throwable t) {
+//                t.printStackTrace();
+//            }
+//            finally {
+//                try { is.close(); } catch(Throwable t) {}
+//                try { con.disconnect(); } catch(Throwable t) {}
+//            }
+//
+//            return null;
+//
+//        }
+    }
+
+    private class getWeather extends AsyncTask<String,Void,HashMap<String,String>> {
+
+        protected HashMap<String,String> doInBackground(String... params) {
+            String data = ( (new WeatherHttpClient()).getWeatherData(params[0],params[1]));
+            HashMap<String, String> weatherHashMap = new HashMap<>();
+
+            Log.d(TAG, "doInBackground: data "+data);
+
+            try {
+                JSONObject jsonObject = new JSONObject(data);
+                JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
+                //weatherHashMap.put("icon",weather.getString("icon"));
+                weatherHashMap.put("main",weather.getString("main"));
+                weatherHashMap.put("description",weather.getString("description"));
+                JSONObject main = jsonObject.getJSONObject("main");
+                weatherHashMap.put("temp",main.getString("temp"));
+                weatherHashMap.put("humidity",main.getString("humidity"));
+
+                // put resId of icon in the hashMap
+                weatherHashMap.put("icon",String.valueOf(setWeatherIcon(weather.getString("icon"))));
+
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            return weatherHashMap;
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String, String> weatherHashMap) {
+            // check the data
+            Log.d(TAG, "onPostExecute: hashMap "+weatherHashMap.toString());
+
+            // set Weather into TextViews
+            TextView tv_temp = (TextView) getActivity().findViewById(R.id.tv_temp);
+            tv_temp.setText(KelvinIntoCelsius(weatherHashMap.get("temp")));
+            TextView tv_desc = (TextView) getActivity().findViewById(R.id.tv_description);
+            String desc = weatherHashMap.get("description");
+            tv_desc.setText(getDesc(desc));
+            int resId = Integer.parseInt(weatherHashMap.get("icon"));
+            ImageView iv = (ImageView) getActivity().findViewById(R.id.iv_weather);
+            iv.setImageResource(resId);
+            progressBar.setVisibility(View.GONE);
+        }
+
+        // 온도가 캘빈온도 이므로 -273.15 해야 섭씨 !
+        private String KelvinIntoCelsius(String kelvin){
+            double kelvinDouble = Double.parseDouble(kelvin);
+            double celsiusDouble = kelvinDouble - 273.15;
+            String celsius = String.format("%.1f", celsiusDouble);
+            return celsius;
+        }
+    }
+
+    private int setWeatherIcon(String code){
+        int resId=R.drawable.d1;
+        switch (code){
+            case "01d" : resId = R.drawable.d1;
+                break;
+            case "01n" : resId = R.drawable.n1;
+                break;
+            case "02d" : resId = R.drawable.d2;
+                break;
+            case "02n" : resId = R.drawable.n2;
+                break;
+            case "03d" : resId = R.drawable.d3;
+                break;
+            case "03n" : resId = R.drawable.d3;
+                break;
+            case "04d" : resId = R.drawable.d3;
+                break;
+            case "04n" : resId = R.drawable.d3;
+                break;
+            case "09d" : resId = R.drawable.rain;
+                break;
+            case "09n" : resId = R.drawable.rain;
+                break;
+            case "10d" : resId = R.drawable.summer_rain;
+                break;
+            case "10n" : resId = R.drawable.moon_rain;
+                break;
+            case "11d" : resId = R.drawable.heavy_rain;
+                break;
+            case "11n" : resId = R.drawable.heavy_rain;
+                break;
+            case "13d" : resId = R.drawable.sun_snowing;
+                break;
+            case "13n" : resId = R.drawable.moon_snow;
+                break;
+            case "50d" : resId = R.drawable.mist;
+                break;
+            case "50n" : resId = R.drawable.mist;
+                break;
+        }
+        return resId;
+    }
+
+    private String getDesc(String desc){
+        switch (desc){
+            //800
+            case "clear sky" : return "맑음";
+            //80x
+            case "few clouds" : return "구름 조금";
+            case "scattered clouds" : return  "구름 조금";
+            case "broken clouds" : return "흐림";
+            case "overcast clouds" : return "구름 많음";
+            //5xx
+            case "light rain" : return "가랑비";
+            case "moderate rain" : return "가랑비";
+            case "heavy intensity rain" : return "폭우";
+            case "very heavy rain" : return "폭우";
+            case "extreme rain" : return "폭우";
+            case "shower rain" : return "소나기";
+            case "freezing rain" : return "비";
+            case "light intensity shower rain" : return "가벼운 소나기";
+            case "ragged shower rain" : return "소나기";
+            case "heavy intensity shower rain" : return "강한 소나기";
+            //3xx
+            case "light intensity drizzle" : return "가벼운 이슬비";
+            case "drizzle" : return "이슬비";
+            case "heavy intensity drizzle" : return "가랑비";
+            case "light intensity drizzle rain" : return "가랑비";
+            case "drizzle rain" : return "가랑비";
+            case "heavy intensity drizzle rain" : return "비";
+            case "shower rain and drizzle" : return "소나기";
+            case "heavy shower rain and drizzle" : return "소나기";
+            case "shower drizzle" : return "소나기";
+
+            default: return desc;
+        }
+    }
+
 }
