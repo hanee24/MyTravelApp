@@ -1,20 +1,13 @@
 package com.example.parkhanee.mytravelapp;
 
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.SyncStateContract;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +17,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,11 +33,12 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 
+import static android.support.v4.widget.SwipeRefreshLayout.*;
 
-public class FolderActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
+
+public class FolderActivity extends AppCompatActivity implements OnRefreshListener {
 
     int folder_id;
     Folder folder;
@@ -54,8 +47,10 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
     String TAG = "FolderActivity";
     RecyclerView recyclerView;
     FolderContentsAdapter mAdapter;
+    LinearLayoutManager lm;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private int pageNum = 1 ;
+    private int pageNum = 1 ; // 현재 페이지 번호
+    private int pages=0; // 총 불러와야하는 페이지 갯수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +72,39 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
 
         mAdapter = new FolderContentsAdapter();
         recyclerView = (RecyclerView) findViewById(R.id.listView4);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // TODO: 2016. 10. 12. may need to use different kind of LayoutManager
+        lm = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(lm); // may need to use different kind of LayoutManager
         recyclerView.setAdapter(mAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator()); // TODO: 2016. 10. 12. may need to use different kind
+        recyclerView.setItemAnimator(new DefaultItemAnimator()); // may need to use different kind
+        
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+            // TODO: 2016. 10. 19. set footer
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visibleItemCount = recyclerView.getChildCount();
+                int totalItemCount = lm.getItemCount();
+                int firstVisibleItem = lm.findFirstVisibleItemPosition();
+                int count = totalItemCount - visibleItemCount;
+
+                if(firstVisibleItem >= count && totalItemCount != 0
+                        &&recyclerView.getChildAt(visibleItemCount - 1).getBottom() <= recyclerView.getHeight()) //  && mLockListView == false)
+                {
+                    Log.d(TAG, "onScrolled: it's the end!");
+                    if (pages > pageNum){ // 현재 페이지가 총 페이지수 보다 적을때만 새로운 페이지를 로딩
+                        pageNum ++;
+                        // TODO: 2016. 10. 19. show footer
+                        myClickHandler(true); // TODO: 2016. 10. 19. hide footer onPostExecute
+                    }
+                }
+
+            }
+        });
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -190,7 +215,6 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
 
         String TAG_SUB, stringUrl;
         Boolean isList; // true == fetch latest postings, false == delete folder
-        ProgressDialog dialog;
         int pageNum; // 현재 불러오는 페이지 번호
         int totalCount; // 총 포스팅 갯수
         int numOfRows = 5; // 한페이지의 최대 포스팅 갯수
@@ -229,9 +253,12 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
                     if (body instanceof String) {// It's a string
                         Log.d(TAG, "onPostExecute: bodyString "+ body);
                         totalCount = 0;
+                        pages = 0;
                     } else if (body instanceof JSONObject) {// It's an object
                         bodyObject = (JSONObject) body;
                         totalCount = bodyObject.getInt("totalCount");
+                        pages = bodyObject.getInt("pages");
+                        Log.d(TAG, "doInBackground: pages "+pages);
                     }
 
                     if(totalCount > 0){
@@ -263,13 +290,6 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
 
 
             return map;
-        }
-
-        @Override
-        protected void onPreExecute() {
-                dialog = new ProgressDialog(FolderActivity.this);
-                dialog.setMessage("잠시만 기다려 주세요");
-                dialog.show();
         }
 
         @Override
@@ -323,11 +343,6 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
 
             }catch (JSONException e){
                 e.printStackTrace();
-            }
-
-            // dismiss the progressDialog
-            if (dialog.isShowing()) {
-                dialog.dismiss();
             }
 
         }
