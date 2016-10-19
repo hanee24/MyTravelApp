@@ -42,6 +42,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class FolderActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
@@ -54,6 +55,7 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
     RecyclerView recyclerView;
     FolderContentsAdapter mAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private int pageNum = 1 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,8 +163,12 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
+            if (isList){
+                new mURLConnection().execute(pageNum);
+            }else{
+                new mURLConnection().execute(0);
+            }
 
-            new mURLConnection().execute(isList);
 
         } else {
             // stopping swipe refresh
@@ -176,21 +182,28 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
     public void onRefresh() {
         // showing refresh animation before making http call
         swipeRefreshLayout.setRefreshing(true);
+        pageNum=1;
         myClickHandler(true);
     }
 
-    private class mURLConnection extends AsyncTask<Boolean, Void, String> {
+    private class mURLConnection extends AsyncTask<Integer, Void, HashMap<String,String> > {
 
         String TAG_SUB, stringUrl;
         Boolean isList; // true == fetch latest postings, false == delete folder
         ProgressDialog dialog;
+        int pageNum; // 현재 불러오는 페이지 번호
+        int totalCount; // 총 포스팅 갯수
+        int numOfRows = 5; // 한페이지의 최대 포스팅 갯수
+        int currentCount; // 현재 페이지에 불러오는 포스팅 갯수
 
         @Override
-        protected String doInBackground(Boolean... booleen) {
-            isList = booleen[0];
+        protected HashMap<String,String> doInBackground(Integer... integers) {
+            HashMap<String, String> map = new HashMap<>();
+            pageNum = integers[0];
+            isList = integers[0]!=0; // pageNum==0 이면 deleteFolderProcess.
             if (isList){
                 TAG_SUB = "[GetPostings]";
-                stringUrl = "http://hanea8199.vps.phps.kr/get_postings.php";
+                stringUrl = "http://hanea8199.vps.phps.kr/get_postings.php?pageNum="+pageNum+"&numOfRows="+numOfRows;
             }else{
                 TAG_SUB = "[DeleteFolderProcess]";
                 stringUrl = "http://hanea8199.vps.phps.kr/deletefolder_process.php";
@@ -199,41 +212,14 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
             String postData = "folder_id="+String.valueOf(folder.getId());  // send folder id to server with POST method
 
             try {
+                String data = downloadUrl(stringUrl,postData);
 
-                return downloadUrl(stringUrl,postData);
-            } catch (IOException e) {
-                return TAG_SUB + " Unable to retrieve web page. URL may be invalid.";
-            }
-        }
+                if (isList){ // dealing with json data
 
-        @Override
-        protected void onPreExecute() {
-//            if (isList){
-                dialog = new ProgressDialog(FolderActivity.this);
-                dialog.setMessage("잠시만 기다려 주세요");
-                dialog.show();
-//            }else{
-//                // print the number of folders at local DB before deleting
-//                Log.d(TAG, TAG_SUB + " onPreExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
-//            }
+                    String resultMsg="";
+                    JSONObject bodyObject=null;
 
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-
-            int resultCode=98;
-            String str_result="";
-            String resultMsg="";
-            int totalCount=0;
-            JSONObject bodyObject=null;
-
-            try{
-                //check the whole result
-                JSONObject result = new JSONObject(s);
-                Log.d(TAG,  TAG_SUB +"onPostExecute: result "+result.toString());
-
-                if (isList){ // if it's [GetPostings] process
+                    JSONObject result = new JSONObject(data);
                     JSONObject header = result.getJSONObject("header");
                     resultMsg = header.getString("resultMsg");
                     Log.d(TAG,  TAG_SUB + " onPostExecute: resultMsg "+resultMsg);
@@ -249,54 +235,87 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
                     }
 
                     if(totalCount > 0){
-                        JSONArray postingsArray=null;
-                        JSONObject postingsObject=null;
-                        // "postings" 로 받은 객체가 Array이면 totalCount >1 , Object 이면 totalCount ==1
-                        Object postings = bodyObject.get("postings");
-                        if (postings instanceof JSONArray) {// It's an Array
-                            postingsArray = (JSONArray) postings;
-                        } else if (postings instanceof JSONObject) {// It's an object
-                            postingsObject = (JSONObject) postings;
-                        }
-
-                        // clear items which mAdapter has before adding new postings list.
-                        mAdapter.clearItem();
+                        JSONArray postingsArray = bodyObject.getJSONArray("postings");
+                        currentCount = postingsArray.length();
 
                         // get each posting object from postings, and set it into recyclerView.
-                        for (int i=0; i<totalCount; i++){
-                            JSONObject posting=null;
-                            if (postingsArray!=null){
-                                posting = postingsArray.getJSONObject(i);
-                            }else if (postingsObject !=null){
-                                posting = postingsObject;
-                            }else {
-                                Log.d(TAG, "onPostExecute: something is wrong! both postingsArray and Object are null");
-                            }
+                        for (int i=0; i<currentCount; i++){
+                            JSONObject posting = postingsArray.getJSONObject(i);
 
-                            // add posting to recycler view adapter
-                            Posting posting1 = new Posting();
-                            posting1.setPosting_id(posting.getString("posting_id"));
-                            posting1.setFolder_id(String.valueOf(folder_id));
-                            posting1.setUser_id(posting.getString("user_id"));
-                            posting1.setModified(posting.getString("modified"));
-                            posting1.setCreated(posting.getString("modified"));
-                            posting1.setType(posting.getString("type"));
-                            posting1.setPosting_title(posting.getString("title"));
-                            posting1.setNote(posting.getString("note"));
-                            if ( ! posting.getString("image_path").equals("")){ // image_path 요소가 비어있지 않으면 posting1에 설정해줌.
-                                posting1.setImage_path(posting.getString("image_path"));
-                            }
-                            mAdapter.addItem(posting1);
+                            map.put("postring_id"+i,posting.getString("posting_id"));
+                            map.put("user_id"+i,posting.getString("user_id"));
+                            map.put("modified"+i,posting.getString("modified"));
+                            map.put("type"+i,posting.getString("type"));
+                            map.put("title"+i,posting.getString("title"));
+                            map.put("note"+i,posting.getString("note"));
+                            map.put("image_path"+i,posting.getString("image_path"));
+
                         }
-                        mAdapter.notifyDataSetChanged();
-
-                        Log.d(TAG, TAG_SUB +" onPostExecute: postings "+postings.toString());
                     }
+
+                }else {
+                    map.put("result",data);
+                }
+
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            return map;
+        }
+
+        @Override
+        protected void onPreExecute() {
+                dialog = new ProgressDialog(FolderActivity.this);
+                dialog.setMessage("잠시만 기다려 주세요");
+                dialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String,String> s) {
+
+            int resultCode=98;
+            String str_result="";
+            String resultMsg="";
+
+            try{
+                if (isList){ // if it's [GetPostings] process
+
+                    // clear items which mAdapter has before adding new postings list.
+                    if (pageNum==1){
+                        mAdapter.clearItem();
+                    }
+
+                    // get each posting object from HashMap, and set it into recyclerView.
+                    for (int i=0; i<currentCount; i++){
+                        // add posting to recycler view adapter
+                        Posting posting1 = new Posting();
+                        posting1.setPosting_id(s.get("posting_id"+i));
+                        posting1.setFolder_id(String.valueOf(folder_id));
+                        posting1.setUser_id(s.get("user_id"+i));
+                        posting1.setModified(s.get("modified"+i));
+                        posting1.setCreated(s.get("modified"+i));
+                        posting1.setType(s.get("type"+i));
+                        posting1.setPosting_title(s.get("title"+i));
+                        posting1.setNote(s.get("note"+i));
+                        if ( ! s.get("image_path"+i).equals("")){ // image_path 요소가 비어있지 않으면 posting1에 설정해줌.
+                            posting1.setImage_path(s.get("image_path"+i));
+                        }
+                        mAdapter.addItem(posting1);
+                    }
+                    mAdapter.notifyDataSetChanged();
+                    Log.d(TAG, TAG_SUB +" onPostExecute: postings "+s.toString());
 
                     // stopping swipe refresh
                     swipeRefreshLayout.setRefreshing(false);
 
                 }else { // if it's [DeleteFolderProcess]
+
+                    //check the whole result
+                    JSONObject result = new JSONObject(s.get("result"));
+                    Log.d(TAG,  TAG_SUB +"onPostExecute: result "+result.toString());
+
                     // print the number of folders at local DB after deleting
                     Log.d(TAG, TAG_SUB + " onPostExecute: folders "+String.valueOf(db.getMyFolders(folder.getOwner_id()).size()));
                 }
@@ -312,8 +331,6 @@ public class FolderActivity extends AppCompatActivity implements SwipeRefreshLay
             }
 
         }
-
-
 
         private String downloadUrl(String myurl,String postData) throws IOException {
             InputStream is = null;
