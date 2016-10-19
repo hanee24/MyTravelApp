@@ -51,6 +51,8 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
     private SwipeRefreshLayout swipeRefreshLayout;
     private int pageNum = 1 ; // 현재 페이지 번호
     private int pages=0; // 총 불러와야하는 페이지 갯수
+    private OnLoadMoreListener mOnLoadMoreListener;
+    private boolean isLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +80,6 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
         recyclerView.setItemAnimator(new DefaultItemAnimator()); // may need to use different kind
         
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-            // TODO: 2016. 10. 19. set footer
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -92,19 +89,33 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
                 int firstVisibleItem = lm.findFirstVisibleItemPosition();
                 int count = totalItemCount - visibleItemCount;
 
-                if(firstVisibleItem >= count && totalItemCount != 0
+                if(!isLoading && firstVisibleItem >= count && totalItemCount != 0
                         &&recyclerView.getChildAt(visibleItemCount - 1).getBottom() <= recyclerView.getHeight()) //  && mLockListView == false)
                 {
                     Log.d(TAG, "onScrolled: it's the end!");
                     if (pages > pageNum){ // 현재 페이지가 총 페이지수 보다 적을때만 새로운 페이지를 로딩
-                        pageNum ++;
-                        // TODO: 2016. 10. 19. show footer
-                        myClickHandler(true); // TODO: 2016. 10. 19. hide footer onPostExecute
+                        // footer
+                        if (mOnLoadMoreListener != null) {
+                            mOnLoadMoreListener.onLoadMore();
+                        }
+                        isLoading = true;
                     }
                 }
 
             }
         });
+
+        mOnLoadMoreListener = new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                Log.d(TAG, "onLoadMore: ");
+                mAdapter.addItem(null);
+                mAdapter.notifyDataSetChanged();
+                pageNum ++;
+                myClickHandler(true);
+
+            }
+        };
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -306,6 +317,11 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
                     if (pageNum==1){
                         mAdapter.clearItem();
                     }
+                    //footer
+                    if (isLoading){
+                        // remove progressBar
+                        mAdapter.removeFooter();
+                    }
 
                     // get each posting object from HashMap, and set it into recyclerView.
                     for (int i=0; i<currentCount; i++){
@@ -329,6 +345,10 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
 
                     // stopping swipe refresh
                     swipeRefreshLayout.setRefreshing(false);
+
+
+                    //footer
+                    isLoading=false;
 
                 }else { // if it's [DeleteFolderProcess]
 
