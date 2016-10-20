@@ -72,7 +72,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
         tv_desc = (TextView) findViewById(R.id.description);
         tv_date = (TextView) findViewById(R.id.textView25);
 
-        mAdapter = new FolderContentsAdapter();
+        mAdapter = new FolderContentsAdapter(FolderActivity.this);
         recyclerView = (RecyclerView) findViewById(R.id.listView4);
         lm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(lm); // may need to use different kind of LayoutManager
@@ -280,13 +280,14 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
                         for (int i=0; i<currentCount; i++){
                             JSONObject posting = postingsArray.getJSONObject(i);
 
-                            map.put("postring_id"+i,posting.getString("posting_id"));
+                            map.put("posting_id"+i,posting.getString("posting_id"));
                             map.put("user_id"+i,posting.getString("user_id"));
                             map.put("modified"+i,posting.getString("modified"));
                             map.put("type"+i,posting.getString("type"));
                             map.put("title"+i,posting.getString("title"));
                             map.put("note"+i,posting.getString("note"));
                             map.put("image_path"+i,posting.getString("image_path"));
+                            map.put("original_path"+i,posting.getString("original_path"));
 
                         }
                     }
@@ -337,6 +338,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
                         posting1.setNote(s.get("note"+i));
                         if ( ! s.get("image_path"+i).equals("")){ // image_path 요소가 비어있지 않으면 posting1에 설정해줌.
                             posting1.setImage_path(s.get("image_path"+i));
+                            posting1.setOriginal_path(s.get("original_path"+i));
                         }
                         mAdapter.addItem(posting1);
                     }

@@ -6,7 +6,7 @@ package com.example.parkhanee.mytravelapp;
 public class Posting {
 
     private String posting_id, folder_id, user_id,  type, posting_title, note,created, modified;
-    private String image_path;
+    private String image_path, original_path;
 
     public Posting(){}
 
@@ -20,9 +20,10 @@ public class Posting {
         this.modified = modified;
         this.type = type;
         this.image_path="";
+        this.original_path ="";
     }
 
-    public Posting(String posting_id, String folder_id, String user_id, String type, String title, String note, String created, String modified,String image_path){
+    public Posting(String posting_id, String folder_id, String user_id, String type, String title, String note, String created, String modified,String image_path, String original_path){
         this.posting_id = posting_id;
         this.folder_id= folder_id;
         this.user_id = user_id;
@@ -32,6 +33,7 @@ public class Posting {
         this.modified = modified;
         this.type = type;
         this.image_path = image_path;
+        this.original_path = original_path;
     }
 
     //getters and setters
@@ -72,6 +74,10 @@ public class Posting {
         return image_path;
     }
 
+    public String getOriginal_path() {
+        return original_path;
+    }
+
     public void setPosting_id(String posting_id) {
         this.posting_id = posting_id;
     }
@@ -106,5 +112,14 @@ public class Posting {
 
     public void setImage_path(String image_path) {
         this.image_path = image_path;
+    }
+
+    public void setOriginal_path(String original_path) {
+        this.original_path = original_path;
+    }
+
+    @Override
+    public String toString() {
+        return " [ "+posting_id+" "+folder_id+" "+user_id+"] ";
     }
 }

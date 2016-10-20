@@ -15,11 +15,14 @@
     <permission
         android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true"/>
+
     <uses-permission android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE"/>
-    <!--permission to save image files captured by intent camera into directory which is accessible by media provider.-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- permission to save image files captured by intent camera into directory which is accessible by media provider. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -139,6 +142,8 @@
                 android:resource="@xml/file_paths"/>
         </provider>
 
+        <activity android:name=".ImageActivity">
+        </activity>
     </application>
 
 </manifest>
