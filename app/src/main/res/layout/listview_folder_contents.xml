@@ -62,8 +62,9 @@
             android:text="Small Text"
             android:id="@+id/userId"
             android:layout_alignParentBottom="false"
-            android:layout_toRightOf="@+id/created"
-            android:layout_alignBottom="@+id/created"/>
+            android:layout_below="@+id/created"
+            android:layout_alignLeft="@+id/created"
+            android:layout_marginBottom="5dp"/>
 
         <TextView
             android:layout_width="wrap_content"

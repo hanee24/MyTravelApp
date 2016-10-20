@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -228,7 +229,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
         Boolean isList; // true == fetch latest postings, false == delete folder
         int pageNum; // 현재 불러오는 페이지 번호
         int totalCount; // 총 포스팅 갯수
-        int numOfRows = 5; // 한페이지의 최대 포스팅 갯수
+        int numOfRows = 6; // 한페이지의 최대 포스팅 갯수
         int currentCount; // 현재 페이지에 불러오는 포스팅 갯수
 
         @Override

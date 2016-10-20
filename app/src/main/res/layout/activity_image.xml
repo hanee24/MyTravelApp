@@ -21,24 +21,26 @@
     <ImageButton
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:id="@+id/imageButton6"
+        android:id="@+id/imageExit"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:src="@drawable/multiply"
         android:scaleType="fitXY"
         android:background="#00ffffff"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginRight="16dp"
+        android:onClick="mOnClick"/>
 
     <ImageButton
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:id="@+id/imageButton7"
+        android:id="@+id/imageDownload"
         android:src="@drawable/download"
         android:scaleType="fitXY"
         android:background="#00ffffff"
         android:layout_above="@+id/textView46"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:onClick="mOnClick"/>
 
     <TextView
         android:layout_width="wrap_content"
