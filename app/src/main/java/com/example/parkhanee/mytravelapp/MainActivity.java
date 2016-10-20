@@ -87,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private boolean isReceiverRegistered;
 
+    // these three values are always null when the activity is recreated !
+    public static Double lat;
+    public static Double lng;
+    public static HashMap<String, String> weatherHashMap;
+    public static String geoCode;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -303,18 +310,14 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
         Class fragmentClass;
 
-        Double lat=0.0;
-        Double lng=0.0; // location data appending to nearbyFragment
+        // location data appending to nearbyFragment
         switch(menuItem.getItemId()) {
             case R.id.main:
                 fragmentClass = MainContentFragment.class;
                 break;
             case R.id.nearby:
                 fragmentClass = NearbyFragment.class;
-                //get location data from MainContentFragment
-                // in order to pass the data to nearbyFragment
-                lat = MainContentFragment.lat;
-                lng = MainContentFragment.lng;
+                Log.d(TAG, "selectDrawerItem: lat lng hashmap "+lat+" "+lng+" "+weatherHashMap );
                 break;
             case R.id.area:
                 fragmentClass = AreaFragment.class;
@@ -340,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
             if (lat!=0.0){
                 //pass location data to nearbyFragment
                 Bundle bundle = new Bundle();
-                bundle.putDouble("lat", lat);
+                bundle.putDouble("lat",lat);
                 bundle.putDouble("lng",lng);
                 fragment.setArguments(bundle);
             }

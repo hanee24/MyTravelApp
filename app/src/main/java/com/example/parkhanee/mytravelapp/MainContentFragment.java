@@ -55,9 +55,8 @@ public class MainContentFragment extends Fragment implements
 
     GoogleApiClient mGoogleApiClient;
     Location myLocation;
-    public static Double lat;
-    public static Double lng;
-
+    Double lat;
+    Double lng;
 
     View a;
 
@@ -117,21 +116,31 @@ public class MainContentFragment extends Fragment implements
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED 
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
-        // TODO: 2016. 10. 1. comment it in order to run an emulator
-        lat = myLocation.getLatitude();
-        lng = myLocation.getLongitude();
+
+        if (MainActivity.lat==null) {
+            // 메인 액티비티에 위치정보 저장되어있는것이 없으면 새로 불러온다
+            Log.d(TAG, "onConnected:  1313 new location");
+            lat = myLocation.getLatitude(); // TODO: 2016. 10. 1. comment it in order to run an emulator
+            lng = myLocation.getLongitude(); // TODO: 2016. 10. 1. comment it in order to run an emulator
+            MainActivity.lat = lat;
+            MainActivity.lng = lng;
+        }else{
+            Log.d(TAG, "onConnected: 1313 location from main");
+            lat = MainActivity.lat;
+            lng = MainActivity.lng;
+        }
 
         String Lat = String.valueOf(lat);
         String Lng = String.valueOf(lng);
 
-        // TODO: 2016. 10. 1. comment it in order to run an emulator
-        myClickHandler(Lat,Lng);
+        myClickHandler(Lat,Lng); // TODO: 2016. 10. 1. comment it in order to run an emulator
 
 
         btn_nearby.setOnClickListener(new View.OnClickListener() {
@@ -203,8 +212,17 @@ public class MainContentFragment extends Fragment implements
         if (networkInfo != null && networkInfo.isConnected()) {
 
             String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+Lat+","+Lng+"&key=AIzaSyBZ9S7Eo3eaZ0ocOQTuJScvOw_xbXiM194&language=ko";
-            new getGeoCode().execute(url);
-            new getWeather().execute(Lat,Lng);
+            if (MainActivity.geoCode!=null && MainActivity.weatherHashMap!=null){
+                Log.d(TAG, "myClickHandler: 1313 geoCode, weather from Main");
+                location.setText(MainActivity.geoCode);
+                setWeatherIntoViews(MainActivity.weatherHashMap);
+            } else {
+                Log.d(TAG, "myClickHandler: 1313 new geoCode and weather");
+                new getGeoCode().execute(url);
+                new getWeather().execute(Lat,Lng);
+            }
+
+
 
         } else {
             location.setText("위치 정보를 찾을 수 없습니다. 네트워크 연결을 확인 해 주세요.");
@@ -272,6 +290,7 @@ public class MainContentFragment extends Fragment implements
             String[] str = s.split(" ");
             String ss = str[1]+" "+str[2]+" "+str[3];
             location.setText(ss);
+            MainActivity.geoCode = ss;
         }
     }
 
@@ -336,53 +355,46 @@ public class MainContentFragment extends Fragment implements
     private class getWeather extends AsyncTask<String,Void,HashMap<String,String>> {
 
         protected HashMap<String,String> doInBackground(String... params) {
-            String data = ( (new WeatherHttpClient()).getWeatherData(params[0],params[1]));
-            HashMap<String, String> weatherHashMap = new HashMap<>();
+            if (MainActivity.weatherHashMap==null){
+                // 메인 액티비티에 미리 저장된 날씨정보가 없을때만 새로 불러오기
+                String data = ( (new WeatherHttpClient()).getWeatherData(params[0],params[1]));
+                HashMap<String, String> weatherHashMap = new HashMap<>();
 
-            Log.d(TAG, "doInBackground: data "+data);
+                Log.d(TAG, "doInBackground: data "+data);
 
-            try {
-                JSONObject jsonObject = new JSONObject(data);
-                JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
-                //weatherHashMap.put("icon",weather.getString("icon"));
-                weatherHashMap.put("main",weather.getString("main"));
-                weatherHashMap.put("description",weather.getString("description"));
-                JSONObject main = jsonObject.getJSONObject("main");
-                weatherHashMap.put("temp",main.getString("temp"));
-                weatherHashMap.put("humidity",main.getString("humidity"));
+                try {
+                    JSONObject jsonObject = new JSONObject(data);
+                    JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
+                    //weatherHashMap.put("icon",weather.getString("icon"));
+                    weatherHashMap.put("main",weather.getString("main"));
+                    weatherHashMap.put("description",weather.getString("description"));
+                    JSONObject main = jsonObject.getJSONObject("main");
+                    weatherHashMap.put("temp",main.getString("temp"));
+                    weatherHashMap.put("humidity",main.getString("humidity"));
 
-                // put resId of icon in the hashMap
-                weatherHashMap.put("icon",String.valueOf(setWeatherIcon(weather.getString("icon"))));
+                    // put resId of icon in the hashMap
+                    weatherHashMap.put("icon",String.valueOf(setWeatherIcon(weather.getString("icon"))));
 
-            } catch (Exception e){
-                e.printStackTrace();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                MainActivity.weatherHashMap = weatherHashMap;
+                Log.d(TAG, "doInBackground: 1313 new weather");
+                return weatherHashMap;
+            }else { // TODO: 2016. 10. 20. 필요없음
+                // 메인 액티비티에 미리 저장된 날씨정보 불러오기.
+                Log.d(TAG, "doInBackground: 1313 weather from main");
+                return MainActivity.weatherHashMap;
             }
-            return weatherHashMap;
+
         }
 
         @Override
         protected void onPostExecute(HashMap<String, String> weatherHashMap) {
             // check the data
-            Log.d(TAG, "onPostExecute: hashMap "+weatherHashMap.toString());
+            //Log.d(TAG, "onPostExecute: hashMap "+weatherHashMap.toString());
 
-            // set Weather into TextViews
-            TextView tv_temp = (TextView) getActivity().findViewById(R.id.tv_temp);
-            tv_temp.setText(KelvinIntoCelsius(weatherHashMap.get("temp")));
-            TextView tv_desc = (TextView) getActivity().findViewById(R.id.tv_description);
-            String desc = weatherHashMap.get("description");
-            tv_desc.setText(getDesc(desc));
-            int resId = Integer.parseInt(weatherHashMap.get("icon"));
-            ImageView iv = (ImageView) getActivity().findViewById(R.id.iv_weather);
-            iv.setImageResource(resId);
-            progressBar.setVisibility(View.GONE);
-        }
-
-        // 온도가 캘빈온도 이므로 -273.15 해야 섭씨 !
-        private String KelvinIntoCelsius(String kelvin){
-            double kelvinDouble = Double.parseDouble(kelvin);
-            double celsiusDouble = kelvinDouble - 273.15;
-            String celsius = String.format("%.1f", celsiusDouble);
-            return celsius;
+            setWeatherIntoViews(weatherHashMap);
         }
     }
 
@@ -462,6 +474,26 @@ public class MainContentFragment extends Fragment implements
 
             default: return desc;
         }
+    }
+
+    // 온도가 캘빈온도 이므로 -273.15 해야 섭씨 !
+    private String KelvinIntoCelsius(String kelvin){
+        double kelvinDouble = Double.parseDouble(kelvin);
+        double celsiusDouble = kelvinDouble - 273.15;
+        String celsius = String.format("%.1f", celsiusDouble);
+        return celsius;
+    }
+
+    private void setWeatherIntoViews(HashMap<String, String> weatherHashMap){
+        TextView tv_temp = (TextView) getActivity().findViewById(R.id.tv_temp);
+        tv_temp.setText(KelvinIntoCelsius(weatherHashMap.get("temp")));
+        TextView tv_desc = (TextView) getActivity().findViewById(R.id.tv_description);
+        String desc = weatherHashMap.get("description");
+        tv_desc.setText(getDesc(desc));
+        int resId = Integer.parseInt(weatherHashMap.get("icon"));
+        ImageView iv = (ImageView) getActivity().findViewById(R.id.iv_weather);
+        iv.setImageResource(resId);
+        progressBar.setVisibility(View.GONE);
     }
 
 }
