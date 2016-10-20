@@ -75,7 +75,6 @@ public class WriteActivity extends AppCompatActivity {
     static final int REQUEST_GALLERY = 1;
     static final int REQUEST_IMAGE_CAPTURE = 12;
     private Bitmap bitmap;
-    String mCurrentPhotoPath;
     String imageFileName;
     String user_id;
 
@@ -117,7 +116,7 @@ public class WriteActivity extends AppCompatActivity {
                 postDataParams.put("posting_id",unixTime);
                 postDataParams.put("folder_id",folder_id);
                 postDataParams.put("user_id",getUserId());
-                // TODO: 2016. 10. 7. manage posting type when it can add images
+                // manege posting type when it can add images
                 if (bitmap !=null){
                     Log.d(TAG, "mOnClick save : bitmap is not null");
                     postDataParams.put("type","picture");
@@ -148,27 +147,8 @@ public class WriteActivity extends AppCompatActivity {
                                 switch (i){
                                     case 0 : // 사진 촬영
                                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                                        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//                                            // save the full-size photo : 빈 이미지파일을 만들고 카메라 인텐트를 호출하면 찍은 사진이 그 이미지파일로 간다
-//                                            // Create the File where the photo should go
-//                                            File photoFile = null;
-//                                            try {
-//                                                photoFile = createImageFile();
-//                                            } catch (IOException ex) {
-//                                                // Error occurred while creating the File
-//
-//                                            }
-//                                            // Continue only if the File was successfully created
-//                                            if (photoFile != null) {
-//                                                Uri photoURI = FileProvider.getUriForFile(WriteActivity.this,
-//                                                        "com.example.android.fileprovider",
-//                                                        photoFile);
-//                                                Log.d(TAG, "onClick: photoURI "+photoURI);
-//                                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                                                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//                                            }
-//
-//                                        }
+
                                         break;
                                     case 1 : // 사진 앨범에서 선택
                                         Intent intent = new Intent();
@@ -195,40 +175,9 @@ public class WriteActivity extends AppCompatActivity {
             imageFileName = user_id+"_" + timeStamp + ".jpg";
 
             if (requestCode == REQUEST_GALLERY ) {
-                //                // We need to recycle unused bitmaps
-//                if (bitmap != null) {
-//                    bitmap.recycle();
-//                }
-
-
-                //InputStream stream = getContentResolver().openInputStream(data.getData());
-//                      bitmap = decodeSampledBitmapFromStream(stream,new Rect(0,0,100,100),100,100);// TODO: 2016. 10. 14. outOfMemory Error
-//
-//                    assert stream != null;
-//                    stream.close();
-
-
-//                Uri selectedImage = data.getData();
-//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//                Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
-//                cursor.moveToFirst();
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String picturePath = cursor.getString(columnIndex);
-//                cursor.close();
-//                bitmap = BitmapFactory.decodeFile(picturePath);
-
 
                 Uri selectedImage = data.getData();
                 String path = getPath(WriteActivity.this, selectedImage);
-//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//
-//                Cursor cursor = getContentResolver().query(selectedImage,
-//                        filePathColumn, null, null, null);
-//                cursor.moveToFirst();
-//
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String picturePath = cursor.getString(columnIndex);
-//                cursor.close();
 
                 Log.d(TAG, "onActivityResult: decodeFile start");
                 //bitmap = BitmapFactory.decodeFile(path);
@@ -247,9 +196,6 @@ public class WriteActivity extends AppCompatActivity {
 
                 String path = saveToInternalStorage(bitmap,imageFileName);
                 Log.d(TAG, "onActivityResult: path "+path);
-//            loadImageFromStorage(path,imageFileName);
-                // add the photo to a gallery
-//            galleryAddPic();
             }
             imageView.setImageBitmap(bitmap);
 
@@ -288,32 +234,6 @@ public class WriteActivity extends AppCompatActivity {
         return inSampleSize;
     }
 
-    // Load a Scaled Down Version of Bitmap into Memory
-    public static Bitmap decodeSampledBitmapFromStream(InputStream stream, Rect rect,
-
-                                                         int reqWidth, int reqHeight) {
-
-        stream.mark(1000); // TODO: 2016. 10. 14. set a suitable limitation
-        
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(stream, rect, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        Log.d("bitmap", "decodeSampledBitmapFromStream: stream "+stream);
-        try {
-            stream.reset();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.d("bitmap", "decodeSampledBitmapFromStream: stream "+stream);
-        return BitmapFactory.decodeStream(stream, rect, options);
-    }
 
     // Load a Scaled Down Version of Bitmap into Memory
     public static Bitmap decodeSampledBitmapFromFile(String path, int reqWidth, int reqHeight) {
@@ -358,57 +278,6 @@ public class WriteActivity extends AppCompatActivity {
         return directory.getAbsolutePath();
     }
 
-    // for loading image from Internal memory
-    private void loadImageFromStorage(String path, String fileName)
-    {
-
-        try {
-            File f=new File(path, fileName );  //File f=new File(path, "profile.jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            imageView.setImageBitmap(b);
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-
-    // for saving image into SD card
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "HANEE_" + timeStamp + "_";
-        /*
-         getExternalFilesDir method returns a directory within which the photos remain private to my app only.
-         and the photos will be deleted when the user uninstalls the app
-         ( https://developer.android.com/training/camera/photobasics.html#TaskScalePhoto )
-         */
-        File storageDir =  Environment.getExternalStorageDirectory();
-        //Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        // getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-
-        return image;
-    }
-
-    // for saving image into SD card
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
-
-
     public void myNetworkHandler() {
 
         // check if the network has connected
@@ -422,6 +291,8 @@ public class WriteActivity extends AppCompatActivity {
             if (bitmap!=null){
                 // execute ImageUploadTask only when there is a bitmap image selected from gallery of taken from camera
                 new ImageUploadTask().execute();
+            }else{
+                Log.d(TAG, "myNetworkHandler: no image selected to upload");
             }
 
         } else {
