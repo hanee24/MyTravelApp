@@ -118,7 +118,6 @@ public class WriteActivity extends AppCompatActivity {
                 postDataParams.put("user_id",getUserId());
                 // manege posting type when it can add images
                 if (bitmap !=null){
-                    Log.d(TAG, "mOnClick save : bitmap is not null");
                     postDataParams.put("type","picture");
                 }else {
                     postDataParams.put("type","note");
@@ -184,37 +183,30 @@ public class WriteActivity extends AppCompatActivity {
                 bitmap = decodeSampledBitmapFromFile(path,1000,1000); // TODO: 2016. 10. 14. adjust required width and height
                 Log.d(TAG, "onActivityResult: decodeFile end");
 
-
             } else if (requestCode == REQUEST_IMAGE_CAPTURE ){
             /*
                 The Android Camera application encodes the photo in the return Intent delivered to onActivityResult()
                 as a small Bitmap in the extras, under the key "data".
              */
                 Bundle extras = data.getExtras();
-                bitmap = (Bitmap) extras.get("data"); // TODO: 2016. 10. 14. what if this bitmap is too large ?  ..
+                bitmap = (Bitmap) extras.get("data");
                 // Create an image file name
 
-                String path = saveToInternalStorage(bitmap,imageFileName);
-                Log.d(TAG, "onActivityResult: path "+path);
+//                String path = saveToInternalStorage(bitmap,imageFileName);
+//                Log.d(TAG, "onActivityResult: path "+path);
             }
             imageView.setImageBitmap(bitmap);
 
         }
-
-
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     // Load a Scaled Down Version of Bitmap into Memory
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
-
-        Log.d("bitmap", "calculateInSampleSize: height width");
 
         if (height > reqHeight || width > reqWidth) {
 
@@ -249,34 +241,9 @@ public class WriteActivity extends AppCompatActivity {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
 
-        return BitmapFactory.decodeFile(path, options); // outOfMemoryError
+        return BitmapFactory.decodeFile(path, options);
     }
 
-    // for saving image into Internal memory
-    private String saveToInternalStorage(Bitmap bitmapImage,String imageFileName){
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-
-        // Create imageDir
-        File mypath=new File(directory,imageFileName);
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(mypath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return directory.getAbsolutePath();
-    }
 
     public void myNetworkHandler() {
 
