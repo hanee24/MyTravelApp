@@ -167,10 +167,6 @@ public class MainContentFragment extends Fragment implements
                     Fragment fragment=null;
                     try {
                         fragment = (Fragment) fragmentClass.newInstance();
-//                        Bundle bundle = new Bundle();
-//                        bundle.putDouble("lat", lat);
-//                        bundle.putDouble("lng",lng);
-//                        fragment.setArguments(bundle);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -335,37 +331,6 @@ public class MainContentFragment extends Fragment implements
 
         }
 
-//        public byte[] getImage(String code) {
-//            HttpURLConnection con = null ;
-//            InputStream is = null;
-//            try {
-//                con = (HttpURLConnection) ( new URL(IMG_URL + code+".png")).openConnection();
-//                con.setRequestMethod("GET");
-//                con.setDoInput(true);
-//                con.setDoOutput(true);
-//                con.connect();
-//
-//                // Let's read the response
-//                is = con.getInputStream();
-//                byte[] buffer = new byte[1024];
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//
-//                while ( is.read(buffer) != -1)
-//                    baos.write(buffer);
-//
-//                return baos.toByteArray();
-//            }
-//            catch(Throwable t) {
-//                t.printStackTrace();
-//            }
-//            finally {
-//                try { is.close(); } catch(Throwable t) {}
-//                try { con.disconnect(); } catch(Throwable t) {}
-//            }
-//
-//            return null;
-//
-//        }
     }
 
     private class getWeather extends AsyncTask<String,Void,HashMap<String,String>> {

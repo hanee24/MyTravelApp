@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +37,6 @@ import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,9 +81,6 @@ public class MainActivity extends AppCompatActivity {
     HashMap<String, String> postDataParams;
     private static final String DEBUG_TAG = "MainActivity";
 
-    GoogleCloudMessaging gcm;
-    String regid;
-
     //gcm quick start guide
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -98,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(MainActivity.this);
         setContentView(R.layout.activity_temp);
-
-//        getRegId();
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -155,20 +148,10 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        // gcm quick start guide
-        // Registering BroadcastReceiver
-//        registerReceiver();
-
         // blog.saltfactory
         registBroadcastReceiver();
         getInstanceIdToken(); // it is originally within button onClick method in the post
 
-        // gcm quick start guide
-//        if (checkPlayServices()) {
-//            // Start IntentService to register this application with GCM.
-//            Intent intent = new Intent(this, RegistrationIntentService.class);
-//            startService(intent);
-//        }
 
     }
 
@@ -228,14 +211,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    // gcm quick start guide
-    private void registerReceiver(){
-        if(!isReceiverRegistered) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
-            isReceiverRegistered = true;
-        }
-    }
     /**
      * gcm quick start guide
      * Check the device to make sure it has the Google Play Services APK. If
@@ -664,17 +639,6 @@ public class MainActivity extends AppCompatActivity {
 
             if (resultCode==00){ //result is Okay
                 msg = "fb info has passed to server db successfully";
-               /*AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage(msg)
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent aa = new Intent(getContext(),LogInActivity.class);
-                                startActivity(aa);
-                            }
-                        });
-                AlertDialog alert = builder.create();
-                alert.show();*/
                 Toast.makeText(MainActivity.this,msg, Toast.LENGTH_SHORT).show();
             }
 //            else{ // error occurred
@@ -772,111 +736,5 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
-    public void getRegId(){
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-
-                // 1
-                // get register id from GCM server
-                // 'RegistrationIntentService' class is used instead in the official guide <-- getInstanceIdToken()
-                String msg = "";
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-                    }
-                    regid = gcm.register("944123553315"); // set sender ID here which can be obtained from FireBaseConsole - Setting - CloudMessaging
-                    msg = "Device registered, registration ID=" + regid;
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                }
-                Log.i("GCM",  msg);
-
-
-
-
-                // 2
-                // Send reg id and request to my server
-                setGcm(regid);
-                return msg;
-            }
-
-            @Override
-            protected void onPostExecute(String msg) {
-                //etRegId.setText(msg + "\n");
-            }
-        }.execute(null, null, null);
-    }
-
-    public void setGcm(final String regid){
-
-        new AsyncTask<Void,Void,String>(){
-
-            @Override
-            protected String doInBackground(Void... voids) {
-
-                try {
-                    return downloadUrl("http://hanea8199.vps.phps.kr/test/gcm_test2.php");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return "Unable to retrieve web page. URL may be invalid.";
-                }
-            }
-
-            private String downloadUrl(String myurl) throws IOException {
-                InputStream is = null;
-                // Only display the first 500 characters of the retrieved
-                // web page content.
-                int len = 5000000;
-
-                try {
-                    URL url = new URL(myurl);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setReadTimeout(10000 /* milliseconds */);
-                    conn.setConnectTimeout(15000 /* milliseconds */);
-                    conn.setRequestMethod("POST");
-                    conn.setDoInput(true);
-
-                    // add post parameters
-                    OutputStream os = conn.getOutputStream();
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                    writer.write("regid="+regid);
-                    writer.close();
-                    os.close();
-
-                    conn.connect();
-                    int response = conn.getResponseCode();
-                    Log.d("gcm "+TAG, "The server response is: " + response);
-                    is = conn.getInputStream();
-                    //is = conn.getErrorStream(); // check error msg from server
-
-                    // Convert the InputStream into a string
-                    String contentAsString = readIt(is, len);
-                    return contentAsString;
-
-                    // Makes sure that the InputStream is closed after the app is
-                    // finished using it.
-                } finally {
-                    if (is != null) {
-                        is.close();
-                    }
-                }
-            }
-
-            public String readIt(InputStream stream, int len) throws IOException {
-                Reader reader = null;
-                reader = new InputStreamReader(stream, "UTF-8");
-                char[] buffer = new char[len];
-                reader.read(buffer);
-                return new String(buffer);
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                    Log.d("gcm "+TAG, "onPostExecute: "+ s);
-            }
-
-        }.execute(null, null, null);
-    }
 
 }

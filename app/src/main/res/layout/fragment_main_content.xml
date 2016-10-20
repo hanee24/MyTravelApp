@@ -26,8 +26,9 @@
         android:layout_alignParentEnd="true"
         android:paddingLeft="80dp"
         android:paddingRight="80dp"
-        android:paddingBottom="50dp"
-        android:paddingTop="10dp"/>
+        android:paddingBottom="60dp"
+        android:paddingTop="20dp"
+        />
 
     <Button
         android:layout_width="wrap_content"
