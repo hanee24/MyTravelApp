@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -374,7 +375,6 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 50000000;
 
             try {
                 URL url = new URL(myurl);
@@ -398,7 +398,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
-                String contentAsString = readIt(is, len);
+                String contentAsString = readIt(is);
                 return contentAsString;
 
                 // Makes sure that the InputStream is closed after the app is
@@ -410,13 +410,8 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
             }
         }
 
-        public String readIt(InputStream stream, int len) throws IOException {
-            Reader reader = null;
-            reader = new InputStreamReader(stream, "UTF-8");
-            char[] buffer = new char[len];
-            reader.read(buffer);
-            IOUtils.toString(stream, "UTF-8");
-            return new String(buffer);
+        public String readIt(InputStream stream) throws IOException {
+            return IOUtils.toString(stream, "UTF-8");
         }
 
 

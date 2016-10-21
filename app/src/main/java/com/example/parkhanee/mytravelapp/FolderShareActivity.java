@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -219,11 +220,7 @@ public class FolderShareActivity extends Activity {
         }
 
         public String readIt(InputStream stream, int len) throws IOException {
-            Reader reader = null;
-            reader = new InputStreamReader(stream, "UTF-8");
-            char[] buffer = new char[len];
-            reader.read(buffer);
-            return new String(buffer);
+            return IOUtils.toString(stream, "UTF-8");
         }
 
         private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
