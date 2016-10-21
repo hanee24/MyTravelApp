@@ -110,7 +110,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
             public void onLoadMore() {
                 Log.d(TAG, "onLoadMore: ");
                 mAdapter.addItem(null);
-                mAdapter.notifyDataSetChanged();
+               // mAdapter.notifyDataSetChanged();
                 pageNum ++;
                 myClickHandler(true);
 

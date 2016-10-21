@@ -21,7 +21,7 @@
         android:required="true"/>
 
     <uses-permission android:name="com.example.parkhanee.mytravelapp.permission.C2D_MESSAGE"/>
-    <!-- permission to save image files captured by intent camera into directory which is accessible by media provider. -->
+    <!-- permission to save image files into directories which are accessible by media provider. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
