@@ -39,7 +39,7 @@ public class MediaScanner {
 
                 @Override
                 public void onScanCompleted(String path, Uri uri) {
-
+                    mMediaScanner.disconnect();
                 }
             };
             mMediaScanner = new MediaScannerConnection(mContext, mMediaScannerClient);
@@ -47,6 +47,5 @@ public class MediaScanner {
 
         mPath = path;
         mMediaScanner.connect();
-        mMediaScanner.disconnect();
     }
 }
