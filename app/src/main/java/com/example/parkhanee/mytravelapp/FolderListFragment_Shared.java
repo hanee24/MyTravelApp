@@ -239,7 +239,7 @@ public class FolderListFragment_Shared  extends Fragment {
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
             reader.read(buffer);
-            return new String(buffer); // TODO: 2016. 10. 18. out of memory error
+            return new String(buffer);
         }
 
         @Override

@@ -16,7 +16,8 @@
         android:layout_alignParentTop="false"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:scaleType="fitCenter"/>
 
     <ImageButton
         android:layout_width="25dp"

@@ -168,7 +168,7 @@ public class MainContentFragment extends Fragment implements
         String Lat = String.valueOf(lat);
         String Lng = String.valueOf(lng);
 
-        myClickHandler(Lat,Lng); 
+        myClickHandler(Lat,Lng);
 
 
         btn_nearby.setOnClickListener(new View.OnClickListener() {

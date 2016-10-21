@@ -155,6 +155,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         public Fragment getItem(int position) {
             return ImageSlideFragment.newInstance(position,imgArrayList);
         }
+
     }
 
     public void btnOnClick(View v){
@@ -288,11 +289,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             }
 
             if (totalCount.equals("")){ //조건에 맞는 아이템 없음
-                totalCount = "0"; //TODO : 이미지 정보가 없는건 괜찮은데 다른 상세정보가 없으면 안돼는데? 이거 예외처리?
+                totalCount = "0"; 
             }
             int tc = Integer.parseInt(totalCount);
 
-            if (isImage){ //when there are more images than numOfRows, discard redundant images
+            if (isImage){ //when there are more images than numOfRows, discard redundant images which belong to page above 2
                 if (numOfRows.equals("")){
                     numOfRows="0";
                 }
@@ -304,14 +305,14 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
                 try {
                 JSONObject poi;
-                    for(int i=0; i<tc ; i++) {
+                    for(int i=0; i<tc&&i<10 ; i++) {
                         if (tc == 1) {
                             poi = itemObject;
                             System.out.println("tc==1; "+poi);
-                        } else if (itemArray.length() == tc) {
+                        } else if (itemArray.length() == tc && i<itemArray.length()) {
                             poi = itemArray.getJSONObject(i);
                             System.out.println("poi "+isImage.toString()+poi);
-                        }else{
+                        }else {
                             poi = itemArray.getJSONObject(i);
                             System.out.println("else "+isImage.toString()+poi);
                         }

@@ -1,6 +1,7 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -44,7 +45,7 @@ public class ImageSlideFragment extends Fragment { //480 320image
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_image_slide, container, false);
+        final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_image_slide, container, false);
         imageView = (ImageView) rootView.findViewById(R.id.imageView2);
 
 
@@ -52,6 +53,15 @@ public class ImageSlideFragment extends Fragment { //480 320image
             imageView.setImageResource(R.drawable.noimageavailable);
         }else{
             setImageView(rootView.getContext());
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(rootView.getContext(),ImageActivity.class);
+                    i.putExtra("original_path",imgArrayList.get(mImageNum));
+                    startActivity(i);
+                }
+            });
+
         }
         return rootView;
     }
