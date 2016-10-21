@@ -1,8 +1,13 @@
 package com.example.parkhanee.mytravelapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
@@ -12,6 +17,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -28,10 +35,25 @@ import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
@@ -58,6 +80,9 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     private Boolean isShowFull;
 
     Boolean isImage=false;
+    Posting posting;
+    DBHelper dbHelper;
+    private String TAG = "NearbyD3Activity";
 
 
     @Override
@@ -101,6 +126,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         tvCreated = (TextView) findViewById(R.id.createdtime);
         tvM = (TextView) findViewById(R.id.tv_modified);
         tvC = (TextView) findViewById(R.id.tv_created);
+        dbHelper = new DBHelper(NearbyD3Activity.this);
+        dbHelper.getReadableDatabase();
 
         tvDist.setText(String.valueOf(dist));
         String strCat="기타";
@@ -178,7 +205,64 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 SetOverviewDisplay(tvOverview);
                 isShowFull = true; //더보기 눌렀으니까 이제 full overview 보여야
                 break;
+            case R.id.add : // add poi to travel folder
+                if (posting==null){
+                    Toast.makeText(NearbyD3Activity.this, "잠시 후 다시 시도해 주세요", Toast.LENGTH_SHORT).show();
+                }else {
+                    // 첫번째 이미지를 포스팅 객체에 담음
+                    posting.setOriginal_path(imgArrayList.get(0));
+                    Log.d("set image path", "onProgressUpdate: posting "+posting.toString());
+
+                    //  select folder -- dialog with list
+                    final CharSequence[] items={"내 폴더","공유 폴더"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(NearbyD3Activity.this);
+                    builder.setTitle("관광지 정보 저장하기");
+                    builder.setItems(items, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // fetch folders
+                                    List<Folder> folders;
+                                    String user_id = getUserId();
+                                    if (i==0){ //my folders
+                                        folders=dbHelper.getMyFolders(user_id);
+                                    }else { // shared folders
+                                        folders = dbHelper.getSharedFolders(user_id);
+                                    }
+
+                                    if (folders.size()==0){
+                                        Toast.makeText(NearbyD3Activity.this, "여행 폴더가 없습니다", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        folderDialog(folders);
+                                    }
+                                }
+                            });
+                    builder.show();
+
+
+                }
+                break;
         }
+    }
+
+    public void folderDialog(final List<Folder> folders){
+        // 폴더 아이템 수 만큼 선택지 리스트 만들기
+        CharSequence[] items = new CharSequence[folders.size()];
+        for (int i=0;i<folders.size();i++){
+            items[i] = folders.get(i).getName();
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(NearbyD3Activity.this);
+        builder.setTitle("저장할 폴더를 선택 해 주세요");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // save folderId into posting object
+                        posting.setFolder_id(String.valueOf(folders.get(i).getId()));
+                        Toast.makeText(NearbyD3Activity.this,folders.get(i).getName(), Toast.LENGTH_SHORT).show();
+                        new WriteProcess().execute(posting);
+                    }
+                });
+        builder.show();
+
     }
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
@@ -289,7 +373,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             }
 
             if (totalCount.equals("")){ //조건에 맞는 아이템 없음
-                totalCount = "0"; 
+                totalCount = "0";
             }
             int tc = Integer.parseInt(totalCount);
 
@@ -322,6 +406,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
                         if (poi.has("title")) {// if poi has "title" it's from apiREQ, else it's from imgREQ
 
+                            isImage = false;
                             String title = poi.getString("title");
                             String overview = poi.getString("overview");
                             overview = overview.replace("<br>", " ");
@@ -426,19 +511,27 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                                 tvModified.setVisibility(View.GONE);
                             }
 
-                            //first image
+                            //first image from poiReq
                             if (poi.has("firstimage")){
                                 imgArrayList.clear();//In order to prevent creating extra loading image at the end
                                 String url = poi.getString("firstimage");
                                 imgArrayList.add(0,url);
                             }
+                            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            Date date = new Date();
+                            String now = dateFormat.format(date);
+                            String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set "unixTime_contentId" as posting Id
+                            posting = new Posting(unixTime+"_"+String.valueOf(contentId),null,getUserId(),"poi",title,shortOverview.substring(0,50)+" ... ",now,now);
+                            Log.d("set contents", "onProgressUpdate: posting "+posting.toString());
                         } else {
+                            // imgReq
                             if (imgArrayList.get(0).equals("null")){
                                 imgArrayList.clear(); //In order to prevent creating extra loading image at the end
                             }
                             String url = poi.getString("originimgurl");
                             imgArrayList.add(url);
                             isImage=true;
+
                         }
                     }
 
@@ -454,24 +547,40 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                     e.printStackTrace();
                 }
         }
-    }
 
 
-    private void initViewPager(){
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(mOnPageChangeListener);
-        int size = imgArrayList.size();
-        if (size>1){
-            indicator.createDot(size);
+
+        private void initViewPager(){
+            mViewPager = (ViewPager) findViewById(R.id.pager);
+            mPagerAdapter = new myPagerAdapter(getSupportFragmentManager());
+            mViewPager.setAdapter(mPagerAdapter);
+            mViewPager.setOnPageChangeListener(mOnPageChangeListener);
+            int size = imgArrayList.size();
+            if (size>1){
+                indicator.createDot(size);
+            }
         }
-    }
 
 
-    private void call(){
-        // if calling intent has been initialized,
-        startActivity(callingIntent);
+        private void call(){
+            // if calling intent has been initialized,
+            startActivity(callingIntent);
+        }
+
+        private void SetArrowsVisibility(Boolean show){
+            ImageButton previous = (ImageButton) findViewById(R.id.previous);
+            ImageButton next = (ImageButton) findViewById(R.id.next);
+            if (show){
+                previous.setVisibility(View.VISIBLE);
+                next.setVisibility(View.VISIBLE);
+            }else{
+                previous.setVisibility(View.GONE);
+                next.setVisibility(View.GONE);
+            }
+
+        }
+
+
     }
 
 
@@ -485,17 +594,146 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         }
     }
 
-    private void SetArrowsVisibility(Boolean show){
-        ImageButton previous = (ImageButton) findViewById(R.id.previous);
-        ImageButton next = (ImageButton) findViewById(R.id.next);
-        if (show){
-            previous.setVisibility(View.VISIBLE);
-            next.setVisibility(View.VISIBLE);
-        }else{
-            previous.setVisibility(View.GONE);
-            next.setVisibility(View.GONE);
+    private String getUserId(){
+        SharedPreferences sharedPreferences =  getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        return str;
+    }
+
+    private class WriteProcess extends AsyncTask<Posting,Void,String>{
+        HashMap<String, String> postParams;
+//        ProgressDialog dialog;
+//
+//        @Override
+//        protected void onPreExecute() {
+//            dialog = new ProgressDialog(NearbyD3Activity.this);
+//            dialog.setMessage("잠시만 기다려 주세요");
+//            dialog.setCanceledOnTouchOutside(false);
+//            dialog.show();
+//        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            String resultMsg="";
+
+            try{
+                JSONObject result = new JSONObject(s);
+
+                //check the whole result
+                resultMsg = result.toString();
+                Log.d(TAG, "onPostExecute: "+resultMsg);
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+//            if (dialog.isShowing()) {
+//                dialog.dismiss();
+//            }
+            Toast.makeText(NearbyD3Activity.this, "저장되었습니다", Toast.LENGTH_SHORT).show();
         }
 
+        @Override
+        protected String doInBackground(Posting... postings) {
+            // network check
+            ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected()) {
+                // 인터넷 있을 때
+                Posting posting = postings[0];
+                dbHelper.addPosting(posting);
+                postingToPostParams(posting);
+                try {
+                    return downloadUrl("http://hanea8199.vps.phps.kr/write_process.php");
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            } else {
+                // 인터넷 없을 때
+                 return "Cannot proceed, No network connection available.";
+            }
+        }
+
+        public void postingToPostParams(Posting posting){
+            postParams = new HashMap<>();
+            postParams.put("posting_id",posting.getPosting_id());
+            postParams.put("folder_id",posting.getFolder_id());
+            postParams.put("user_id",getUserId());
+            postParams.put("type","poi");
+            postParams.put("posting_title",posting.getPosting_title());
+            postParams.put("note",posting.getNote());
+            postParams.put("created",posting.getCreated());
+            postParams.put("original_path",posting.getOriginal_path());
+        }
+
+        private String downloadUrl(String myurl) throws IOException {
+            InputStream is = null;
+            // Only display the first 500 characters of the retrieved
+            // web page content.
+            int len = 50000;
+
+            try {
+                URL url = new URL(myurl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+
+                // add post parameters
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                writer.write(getPostDataString(postParams));
+                writer.flush();
+                writer.close();
+                os.close();
+
+                conn.connect();
+                int response = conn.getResponseCode();
+                Log.d(TAG, "The server response is: " + response);
+                is = conn.getInputStream();
+
+                // Convert the InputStream into a string
+                String contentAsString = readIt(is, len);
+                return contentAsString;
+
+                // Makes sure that the InputStream is closed after the app is
+                // finished using it.
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        }
+
+        public String readIt(InputStream stream, int len) throws IOException {
+            Reader reader = null;
+            reader = new InputStreamReader(stream, "UTF-8");
+            char[] buffer = new char[len];
+            reader.read(buffer);
+            return new String(buffer);
+        }
+
+        private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+            //convert data  being sent to server as POST method into correct form
+            StringBuilder result = new StringBuilder();
+            boolean first = true;
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (first)
+                    first = false;
+                else
+                    result.append("&");
+
+                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
+
+            Log.d(TAG, "getPostDataString: "+result.toString());
+
+            return result.toString();
+        }
     }
 
 }

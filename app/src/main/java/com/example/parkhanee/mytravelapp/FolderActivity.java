@@ -36,6 +36,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
+
 import static android.support.v4.widget.SwipeRefreshLayout.*;
 
 
@@ -373,7 +374,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
             InputStream is = null;
             // Only display the first 500 characters of the retrieved
             // web page content.
-            int len = 5000000;
+            int len = 50000000;
 
             try {
                 URL url = new URL(myurl);
@@ -414,6 +415,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
             reader.read(buffer);
+            IOUtils.toString(stream, "UTF-8");
             return new String(buffer);
         }
 

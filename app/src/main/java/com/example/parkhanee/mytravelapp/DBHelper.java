@@ -358,7 +358,6 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Get All Folders
-    // TODO: 2016. 10. 4. is it ever going to be  used?
     public List<Folder> getAllFolders(String user_id) {
         List<Folder> folders = new LinkedList<Folder>();
 
