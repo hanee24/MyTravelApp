@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -120,6 +122,32 @@ public class MainContentFragment extends Fragment implements
                 && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+       /*  에뮬레이터 위치 바꿨을 때 새 위치 등록해주기 위해서 필요한 코드
+        LocationManager mLM = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        mLM.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                1000, 1, new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                    }
+
+                    @Override
+                    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String s) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String s) {
+
+                    }
+                });
+*/
+
         myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
@@ -127,8 +155,8 @@ public class MainContentFragment extends Fragment implements
         if (MainActivity.lat==null) {
             // 메인 액티비티에 위치정보 저장되어있는것이 없으면 새로 불러온다
             Log.d(TAG, "onConnected:  1313 new location");
-            lat = myLocation.getLatitude(); // TODO: 2016. 10. 1. comment it in order to run an emulator
-            lng = myLocation.getLongitude(); // TODO: 2016. 10. 1. comment it in order to run an emulator
+            lat = myLocation.getLatitude();
+            lng = myLocation.getLongitude();
             MainActivity.lat = lat;
             MainActivity.lng = lng;
         }else{
@@ -140,7 +168,7 @@ public class MainContentFragment extends Fragment implements
         String Lat = String.valueOf(lat);
         String Lng = String.valueOf(lng);
 
-        myClickHandler(Lat,Lng); // TODO: 2016. 10. 1. comment it in order to run an emulator
+        myClickHandler(Lat,Lng); 
 
 
         btn_nearby.setOnClickListener(new View.OnClickListener() {
