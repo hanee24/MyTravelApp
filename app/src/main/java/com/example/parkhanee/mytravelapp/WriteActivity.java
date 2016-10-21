@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -52,6 +53,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -170,13 +175,15 @@ public class WriteActivity extends AppCompatActivity {
 
         if (resultCode == Activity.RESULT_OK){
 
+            String path="";
+
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             imageFileName = user_id+"_" + timeStamp + ".jpg";
 
             if (requestCode == REQUEST_GALLERY ) {
 
                 Uri selectedImage = data.getData();
-                String path = getPath(WriteActivity.this, selectedImage);
+                path = getPath(WriteActivity.this, selectedImage);
 
                 Log.d(TAG, "onActivityResult: decodeFile start");
                 //bitmap = BitmapFactory.decodeFile(path);
@@ -192,14 +199,48 @@ public class WriteActivity extends AppCompatActivity {
                 bitmap = (Bitmap) extras.get("data");
                 // Create an image file name
 
-//                String path = saveToInternalStorage(bitmap,imageFileName);
-//                Log.d(TAG, "onActivityResult: path "+path);
+                path = saveToInternalStorage(bitmap,imageFileName);
+            }
+
+
+            try {
+                // 인텐트로 불러온 이미지를 비트맵으로 저장할 때 자동으로 -90도 돌아가는거 조정해주는 클래스
+                bitmap = ExifUtils.rotateBitmap(path,bitmap);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
             }
             imageView.setImageBitmap(bitmap);
 
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    // for saving image into Internal memory
+    private String saveToInternalStorage(Bitmap bitmapImage,String imageFileName){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+
+        // Create imageDir
+        File mypath=new File(directory,imageFileName);
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
+    }
+
 
     // Load a Scaled Down Version of Bitmap into Memory
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
