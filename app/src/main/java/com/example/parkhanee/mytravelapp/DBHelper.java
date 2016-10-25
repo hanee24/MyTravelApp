@@ -827,6 +827,45 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public Posting getPosting(int id){
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_POSTING, // a. table
+                        p_COLUMNS, // b. column names
+                        p_KEY_ID+"  = ?", // c. selections
+                        new String[] { String.valueOf(id) }, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        // 4. build an object
+        Posting posting = new Posting();
+        // CursorIndexOutOfBoundsException: Index 0 requested, with a size of 0
+        // when the folder index is wrong so that no folder has called
+        posting.setPosting_id(cursor.getString(0));
+        posting.setFolder_id(cursor.getString(1));
+        posting.setUser_id(cursor.getString(2));
+        posting.setType(cursor.getString(3));
+        posting.setPosting_title(cursor.getString(4));
+        posting.setNote(cursor.getString(5));
+        posting.setCreated(cursor.getString(6));
+        posting.setModified(cursor.getString(7));
+
+        Log.d("getPosting( id:"+id+")", posting.toString());
+
+        // 5. return
+        return posting;
+    }
+
     // Get All Users
     public ArrayList<Posting> getAllPosting() {
         ArrayList<Posting> postings = new ArrayList<>();
@@ -892,6 +931,53 @@ public class DBHelper extends SQLiteOpenHelper {
         return postings;
     }
 
+    // Updating single folder
+    public int updatePosting(Posting posting) {
 
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(p_KEY_ID,posting.getPosting_id());
+        values.put(p_KEY_FOLDER_ID,posting.getFolder_id());
+        values.put(p_KEY_USER_ID,posting.getUser_id());
+        values.put(p_KEY_TYPE,posting.getType());
+        values.put(p_KEY_TITLE,posting.getPosting_title());
+        values.put(p_KEY_NOTE,posting.getNote());
+        values.put(p_KEY_CREATED,posting.getCreated());
+        values.put(p_KEY_MODIFIED,posting.getModified());
+
+        // 3. updating row
+        int i = db.update(TABLE_POSTING, //table
+                values, // column/value
+                p_KEY_ID+" = ?", // selections
+                new String[] { String.valueOf(posting.getPosting_id()) }); //selection args
+
+        // 4. close
+        db.close();
+
+        Log.d("updatePosting", posting.toString());
+
+        return i;
+
+    }
+
+    public void deletePosting(int id) {
+
+        getAllShares();
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_POSTING,
+                p_KEY_ID+" = ?",
+                new String[] { String.valueOf(id) });
+
+        // 3. close
+        db.close();
+
+        Log.d("deletePosting (id:", String.valueOf(id)+")");
+    }
 
 }

@@ -29,14 +29,5 @@
         <item
             android:id="@+id/share"
             android:title="@string/string_share"/>
-        <item
-            android:id="@+id/poi"
-            android:title="@string/string_poi"/>
-        <item
-            android:id="@+id/map"
-            android:title="@string/string_map"/>
     </group>
-
-
-
 </menu>

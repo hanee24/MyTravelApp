@@ -28,6 +28,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
@@ -71,29 +73,53 @@ public class WriteActivity extends AppCompatActivity {
     private Bitmap bitmap;
     String imageFileName;
     String user_id;
+    String image_path;
+    String type="";
+    Posting posting=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
+        imageView = (ImageView) findViewById(R.id.image);
+        user_id = getUserId();
+
         // get arguments from FolderActivity
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra("args");
         folder_id = String.valueOf(bundle.getInt("folder_id"));
+        int posting_id = 0;
+        posting_id = bundle.getInt("posting_id");
+        image_path = bundle.getString("image_path","");
+        if (posting_id!=0){
+            setViews(posting_id,image_path);
+        }
+
         // TODO: 2016. 10. 25. 이미쓴거 수정하기 하려면.. posting_id랑 타입 가져올 것.
         // 포스팅 아이디로 로컬디비에서 데이터 가져와서 내부 내용 보여주고
         // 타입이 이미지면,,,?
         // 내것만 수정 가능해야지 !!
 
-        imageView = (ImageView) findViewById(R.id.image);
-        user_id = getUserId();
+
     }
 
     private String getUserId(){
         SharedPreferences sharedPreferences =  getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
         String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
         return str;
+    }
+
+    public void setViews(int posting_id,String image_path){
+        dbHelper = new DBHelper(WriteActivity.this);
+        posting = dbHelper.getPosting(posting_id);
+        ((EditText) findViewById(R.id.posting_title)).setText(posting.getPosting_title());
+        ((EditText) findViewById(R.id.posting_body)).setText(posting.getNote());
+        type = posting.getType();
+        dbHelper.close();
+        if (!image_path.equals("")){
+            Picasso.with(WriteActivity.this).load(image_path).into(imageView);
+        }
     }
 
     public void mOnClick(View view){
@@ -110,18 +136,27 @@ public class WriteActivity extends AppCompatActivity {
                 String now = dateFormat.format(date);
                 // save data to local db
                 dbHelper = new DBHelper(WriteActivity.this);
-                String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set unix time as posting Id
+                String posting_id;
+                if (posting!=null){
+                    posting_id = posting.getPosting_id();
+                    // TODO: 2016. 10. 25. dbHelper.updatePosting
+                    dbHelper.updatePosting(new Posting(posting_id,folder_id,getUserId(),type,title, note, now,now));
+                }else{
+                    posting_id =  String.valueOf(System.currentTimeMillis() / 1000); //set unix time as posting Id
+                    dbHelper.addPosting(new Posting(posting_id,folder_id,getUserId(),type,title, note, now,now));
+                }
                 String type;
-                if (bitmap !=null){
+                if (posting!=null){
+                   type = this.type;
+                } else if (bitmap !=null){
                     type = "picture";
                 }else {
                     type = "note";
                 }
-                dbHelper.addPosting(new Posting(unixTime,folder_id,getUserId(),type,title, note, now,now));
 
                 // send data to server
                 postDataParams = new HashMap<>();
-                postDataParams.put("posting_id",unixTime);
+                postDataParams.put("posting_id",posting_id);
                 postDataParams.put("folder_id",folder_id);
                 postDataParams.put("user_id",getUserId());
                 // manege posting type when it can add images
@@ -294,6 +329,7 @@ public class WriteActivity extends AppCompatActivity {
             String stringUrl = "http://hanea8199.vps.phps.kr/write_process.php";
             new WriteProcess().execute(stringUrl); // connect to server
 
+            // TODO: 2016. 10. 25. type이 poi거나 picture이면 이미지 수정 안되게 ??
             if (bitmap!=null){
                 // execute ImageUploadTask only when there is a bitmap image selected from gallery of taken from camera
                 new ImageUploadTask().execute();

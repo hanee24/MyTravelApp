@@ -518,7 +518,7 @@ public class MainContentFragment extends Fragment implements
     }
 
     private void setWeatherIntoViews(HashMap<String, String> weatherHashMap){
-        TextView tv_temp = (TextView) getActivity().findViewById(R.id.tv_temp);
+        TextView tv_temp = (TextView) getActivity().findViewById(R.id.tv_temp); // FIXME: 2016. 10. 25. 날씨 세팅되기 전에 다른거 들어갔다 나오면 여기서 널포인터 에러
         tv_temp.setText(KelvinIntoCelsius(weatherHashMap.get("temp")));
         TextView tv_desc = (TextView) getActivity().findViewById(R.id.tv_description);
         String desc = weatherHashMap.get("description");

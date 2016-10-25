@@ -15,9 +15,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.common.base.MoreObjects;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
