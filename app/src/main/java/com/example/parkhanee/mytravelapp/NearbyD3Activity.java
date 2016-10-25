@@ -521,7 +521,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             Date date = new Date();
                             String now = dateFormat.format(date);
                             String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set "unixTime_contentId" as posting Id
-                            posting = new Posting(unixTime+"_"+String.valueOf(contentId),null,getUserId(),"poi",title,shortOverview.substring(0,50)+" ... ",now,now);
+                            posting = new Posting(unixTime+"_"+String.valueOf(contentId),null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
                             Log.d("set contents", "onProgressUpdate: posting "+posting.toString());
                         } else {
                             // imgReq

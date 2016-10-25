@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -155,10 +156,14 @@ public class MainContentFragment extends Fragment implements
         if (MainActivity.lat==null) {
             // 메인 액티비티에 위치정보 저장되어있는것이 없으면 새로 불러온다
             Log.d(TAG, "onConnected:  1313 new location");
-            lat = myLocation.getLatitude();
-            lng = myLocation.getLongitude();
-            MainActivity.lat = lat;
-            MainActivity.lng = lng;
+            if (myLocation==null){
+                Toast.makeText(getActivity(),"location is null",Toast.LENGTH_SHORT).show();
+            }else{
+                lat = myLocation.getLatitude();
+                lng = myLocation.getLongitude();
+                MainActivity.lat = lat;
+                MainActivity.lng = lng;
+            }
         }else{
             Log.d(TAG, "onConnected: 1313 location from main");
             lat = MainActivity.lat;
