@@ -93,11 +93,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         //intent
         Intent i = getIntent();
         contentId = i.getIntExtra("contentId",0);
-//        int dist = i.getIntExtra("dist",0);
-//        int cat = i.getIntExtra("cat",0);
-//        if (cat==39){
-//            imageYN = "N";
-//        }
+        int dist = i.getIntExtra("dist",0);
+        int cat = i.getIntExtra("cat",0);
+        if (cat==39){
+            imageYN = "N";
+        }
         //get api
         apiKey = getString(R.string.travelApiKey);
         try {
@@ -129,31 +129,46 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         dbHelper = new DBHelper(NearbyD3Activity.this);
         dbHelper.getReadableDatabase();
 
-//        tvDist.setText(String.valueOf(dist));
-//        String strCat="기타";
-//        switch (cat){
-//            case -1 : strCat="전체";
-//                break;
-//            case 12: strCat="관광지";
-//                break;
-//            case 39 : strCat="음식";
-//                break;
-//            case 32 : strCat="숙박";
-//                break;
-//            case 15 : strCat="행사|공연|축제";
-//                break;
-//            case 14: strCat = "문화시설";
-//                break;
-//            case 25: strCat = "여행코스";
-//                break;
-//            case 28 : strCat="레포츠";
-//                break;
-//            case 38 : strCat="쇼핑";
-//                break;
-//            default: strCat=String.valueOf(cat);
-//                break;
-//        }
-//        tvCat.setText(strCat);
+        // folderActivity 에서 넘어와서 category, distance 정보가 없는경우 텍스트뷰 gone 처리
+        TextView aa = (TextView) findViewById(R.id.aa);
+        TextView aaa = (TextView) findViewById(R.id.aaa);
+        if (dist==0){
+            tvDist.setVisibility(View.GONE);
+            tvCat.setVisibility(View.GONE);
+            aa.setVisibility(View.GONE);
+            aaa.setVisibility(View.GONE);
+        }else {
+            tvDist.setVisibility(View.VISIBLE);
+            tvCat.setVisibility(View.VISIBLE);
+            aa.setVisibility(View.VISIBLE);
+            aaa.setVisibility(View.VISIBLE);
+        }
+
+        tvDist.setText(String.valueOf(dist));
+        String strCat="기타";
+        switch (cat){
+            case -1 : strCat="전체";
+                break;
+            case 12: strCat="관광지";
+                break;
+            case 39 : strCat="음식";
+                break;
+            case 32 : strCat="숙박";
+                break;
+            case 15 : strCat="행사|공연|축제";
+                break;
+            case 14: strCat = "문화시설";
+                break;
+            case 25: strCat = "여행코스";
+                break;
+            case 28 : strCat="레포츠";
+                break;
+            case 38 : strCat="쇼핑";
+                break;
+            default: strCat=String.valueOf(cat);
+                break;
+        }
+        tvCat.setText(strCat);
 
         imgArrayList = new ArrayList<>();
         imgArrayList.add(0,"null");
@@ -211,7 +226,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 }else {
                     // 첫번째 이미지를 포스팅 객체에 담음
                     posting.setOriginal_path(imgArrayList.get(0));
-                    Log.d("set image path", "onProgressUpdate: posting "+posting.toString());
 
                     //  select folder -- dialog with list
                     final CharSequence[] items={"내 폴더","공유 폴더"};

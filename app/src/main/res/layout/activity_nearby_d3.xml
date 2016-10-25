@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text=" m"
-                android:id="@+id/textView6"
+                android:id="@+id/aa"
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@+id/title"
                 />
@@ -70,20 +70,20 @@
                 android:text="dist"
                 android:id="@+id/dist"
                 android:layout_alignParentTop="false"
-                android:layout_toLeftOf="@+id/textView6"
-                android:layout_toStartOf="@+id/textView6"
-                android:layout_alignTop="@+id/textView6"/>
+                android:layout_toLeftOf="@+id/aa"
+                android:layout_toStartOf="@+id/aa"
+                android:layout_alignTop="@+id/aa"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text=" • "
-                android:id="@+id/textView11"
+                android:id="@+id/aaa"
                 android:layout_alignParentTop="false"
                 android:layout_toLeftOf="@+id/dist"
                 android:layout_toStartOf="@+id/dist"
-                android:layout_alignTop="@+id/textView6"/>
+                android:layout_alignTop="@+id/aa"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -92,10 +92,10 @@
                 android:text="cat"
                 android:id="@+id/cat"
                 android:layout_alignParentTop="false"
-                android:layout_toLeftOf="@+id/textView11"
-                android:layout_toStartOf="@+id/textView11"
+                android:layout_toLeftOf="@+id/aaa"
+                android:layout_toStartOf="@+id/aaa"
                 android:layout_alignParentStart="false"
-                android:layout_alignTop="@+id/textView6"/>
+                android:layout_alignTop="@+id/aa"/>
 
             <TextView
                 android:layout_width="wrap_content"

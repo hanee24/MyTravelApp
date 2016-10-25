@@ -81,6 +81,10 @@ public class WriteActivity extends AppCompatActivity {
         Intent i = getIntent();
         Bundle bundle = i.getBundleExtra("args");
         folder_id = String.valueOf(bundle.getInt("folder_id"));
+        // TODO: 2016. 10. 25. 이미쓴거 수정하기 하려면.. posting_id랑 타입 가져올 것.
+        // 포스팅 아이디로 로컬디비에서 데이터 가져와서 내부 내용 보여주고
+        // 타입이 이미지면,,,?
+        // 내것만 수정 가능해야지 !!
 
         imageView = (ImageView) findViewById(R.id.image);
         user_id = getUserId();
@@ -96,6 +100,10 @@ public class WriteActivity extends AppCompatActivity {
         switch (view.getId()){
             case R.id.save :
                 String title = ((EditText) findViewById(R.id.posting_title)).getText().toString();
+                if (title.equals("")){
+                    Toast.makeText(WriteActivity.this, "제목을 입력 해 주세요", Toast.LENGTH_SHORT).show();
+                    break;
+                }
                 String note = ((EditText) findViewById(R.id.posting_body)).getText().toString();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date date = new Date();
@@ -103,7 +111,13 @@ public class WriteActivity extends AppCompatActivity {
                 // save data to local db
                 dbHelper = new DBHelper(WriteActivity.this);
                 String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set unix time as posting Id
-                dbHelper.addPosting(new Posting(unixTime,folder_id,getUserId(),"note",title, note, now,now));
+                String type;
+                if (bitmap !=null){
+                    type = "picture";
+                }else {
+                    type = "note";
+                }
+                dbHelper.addPosting(new Posting(unixTime,folder_id,getUserId(),type,title, note, now,now));
 
                 // send data to server
                 postDataParams = new HashMap<>();
@@ -111,16 +125,11 @@ public class WriteActivity extends AppCompatActivity {
                 postDataParams.put("folder_id",folder_id);
                 postDataParams.put("user_id",getUserId());
                 // manege posting type when it can add images
-                if (bitmap !=null){
-                    postDataParams.put("type","picture");
-                }else {
-                    postDataParams.put("type","note");
-                }
+                postDataParams.put("type",type);
                 // get text from editTexts
                 postDataParams.put("posting_title", title);
                 postDataParams.put("note",note);
                 postDataParams.put("created",now);
-
                 myNetworkHandler();
                 break;
             case R.id.cancel :
@@ -412,7 +421,6 @@ public class WriteActivity extends AppCompatActivity {
 
     /**
      * The class connects with server and uploads the photo
-     *
      *
      */
     class ImageUploadTask extends AsyncTask<Void, Void, String> {

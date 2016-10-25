@@ -80,7 +80,14 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     mHolder.imageView.setVisibility(View.VISIBLE);
                     mHolder.tvTitle.setBackgroundColor(mHolder.view.getResources().getColor(R.color.transparentBlack));
                     mHolder.tvTitle.setTextColor(mHolder.view.getResources().getColor(R.color.myWhite));
-                    Picasso.with(mHolder.view.getContext()).load(p.getImage_path()).into(mHolder.imageView); //set picture
+                    if (p.getImage_path().equals("null")){
+                        // poi인데 이미지가 없는 경우 , no Image Availble이미지 설정 해주기
+                        mHolder.imageView.setImageResource(R.drawable.noimageavailable);
+                    }else {
+                        // get image from url and set it onto the imageView
+                        Picasso.with(mHolder.view.getContext()).load(p.getImage_path()).into(mHolder.imageView); //set picture
+                    }
+
 
                     mHolder.imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
