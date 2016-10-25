@@ -67,6 +67,9 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 mHolder.tvUserId.setText(p.getUser_id());
 
                 final String path = p.getOriginal_path();
+                final String type = p.getType();
+                final String posting_id = p.getPosting_id();
+
 
                 if (p.getImage_path()==null){ // when there is no image
                     mHolder.imageView.setVisibility(View.GONE);
@@ -82,9 +85,18 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     mHolder.imageView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent i = new Intent(view.getContext(),ImageActivity.class);
-                            i.putExtra("original_path",path);
-                            context.startActivity(i);
+                            if (type.equals("poi")){
+                                Intent i = new Intent(view.getContext(),NearbyD3Activity.class);
+                                // posting id 의 끝자리 여섯개가 contentId
+                                String contentId = posting_id.substring(Math.max(0, posting_id.length() - 6));
+                                i.putExtra("contentId",Integer.parseInt(contentId));
+                                context.startActivity(i);
+                            }else {
+                                Intent i = new Intent(view.getContext(),ImageActivity.class);
+                                i.putExtra("original_path",path);
+                                context.startActivity(i);
+                            }
+
                         }
                     });
                 }

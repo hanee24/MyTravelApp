@@ -93,11 +93,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         //intent
         Intent i = getIntent();
         contentId = i.getIntExtra("contentId",0);
-        int dist = i.getIntExtra("dist",0);
-        int cat = i.getIntExtra("cat",0);
-        if (cat==39){
-            imageYN = "N";
-        }
+//        int dist = i.getIntExtra("dist",0);
+//        int cat = i.getIntExtra("cat",0);
+//        if (cat==39){
+//            imageYN = "N";
+//        }
         //get api
         apiKey = getString(R.string.travelApiKey);
         try {
@@ -129,31 +129,31 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
         dbHelper = new DBHelper(NearbyD3Activity.this);
         dbHelper.getReadableDatabase();
 
-        tvDist.setText(String.valueOf(dist));
-        String strCat="기타";
-        switch (cat){
-            case -1 : strCat="전체";
-                break;
-            case 12: strCat="관광지";
-                break;
-            case 39 : strCat="음식";
-                break;
-            case 32 : strCat="숙박";
-                break;
-            case 15 : strCat="행사|공연|축제";
-                break;
-            case 14: strCat = "문화시설";
-                break;
-            case 25: strCat = "여행코스";
-                break;
-            case 28 : strCat="레포츠";
-                break;
-            case 38 : strCat="쇼핑";
-                break;
-            default: strCat=String.valueOf(cat);
-                break;
-        }
-        tvCat.setText(strCat);
+//        tvDist.setText(String.valueOf(dist));
+//        String strCat="기타";
+//        switch (cat){
+//            case -1 : strCat="전체";
+//                break;
+//            case 12: strCat="관광지";
+//                break;
+//            case 39 : strCat="음식";
+//                break;
+//            case 32 : strCat="숙박";
+//                break;
+//            case 15 : strCat="행사|공연|축제";
+//                break;
+//            case 14: strCat = "문화시설";
+//                break;
+//            case 25: strCat = "여행코스";
+//                break;
+//            case 28 : strCat="레포츠";
+//                break;
+//            case 38 : strCat="쇼핑";
+//                break;
+//            default: strCat=String.valueOf(cat);
+//                break;
+//        }
+//        tvCat.setText(strCat);
 
         imgArrayList = new ArrayList<>();
         imgArrayList.add(0,"null");
@@ -520,9 +520,12 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             Date date = new Date();
                             String now = dateFormat.format(date);
-                            String unixTime = String.valueOf(System.currentTimeMillis() / 1000); //set "unixTime_contentId" as posting Id
-                            posting = new Posting(unixTime+"_"+String.valueOf(contentId),null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
+                            String unixTime = String.valueOf(System.currentTimeMillis() / 1000);
+                            posting = new Posting(unixTime.substring(7,10)+String.valueOf(contentId),null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
                             Log.d("set contents", "onProgressUpdate: posting "+posting.toString());
+                            // set unixTime + contentId as posting Id
+                            // unixTime 1477370040 contentId 126909 postingId  0040126909
+                            // Log.d(TAG, "onProgressUpdate: unixTime "+unixTime+" contentId " + String.valueOf(contentId)+" postingId  "+unixTime.substring(6,10)+String.valueOf(contentId));
                         } else {
                             // imgReq
                             if (imgArrayList.get(0).equals("null")){
@@ -531,7 +534,6 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             String url = poi.getString("originimgurl");
                             imgArrayList.add(url);
                             isImage=true;
-
                         }
                     }
 
