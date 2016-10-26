@@ -144,8 +144,6 @@
 
         <activity android:name=".ImageActivity">
         </activity>
-        <activity android:name=".AreaBasedD1Activity">
-        </activity>
     </application>
 
 </manifest>
