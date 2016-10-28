@@ -485,10 +485,13 @@ public class NearbyD2Activity extends AppCompatActivity  {
                 e.printStackTrace();
             }
 
+            TextView tv = (TextView) findViewById(R.id.textView8);
             if (totalCount.equals("")){ //조건에 맞는 아이템 없음 --> 에러처리 하기
                 totalCount = "0";
                 btnLoadMore.setVisibility(View.GONE);
+                tv.setVisibility(View.VISIBLE);
             }else{
+                tv.setVisibility(View.GONE);
                 int tc = Integer.parseInt(totalCount);
                 if (tc >12){ // totalCount 12 이상
                     btnLoadMore.setVisibility(View.VISIBLE);
