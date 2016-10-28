@@ -3,6 +3,7 @@ package com.example.parkhanee.mytravelapp.sectionedexpandablegridlayout.adapters
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,7 @@ public class SectionedExpandableGridAdapter extends RecyclerView.Adapter<Section
     }
 
     @Override
-    public void onBindViewHolder(SectionedExpandableGridAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(SectionedExpandableGridAdapter.ViewHolder holder, final int position) {
         switch (holder.viewType) {
             case VIEW_TYPE_AREA :
                 final Area area = (Area) mDataArrayList.get(position);
@@ -78,19 +79,36 @@ public class SectionedExpandableGridAdapter extends RecyclerView.Adapter<Section
                 holder.sectionTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mItemClickListener.itemClicked(section);
+                        // mItemClickListener.itemClicked(section);
+                    }
+                });
+                holder.sectionToggleButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (section.isExpanded){ // 닫혀있는 상태에서 열려고 눌렀을 때 AreaFragment 에서 onItemClick(Section) 처리.
+                            mSectionStateChangeListener.onSectionStateChanged(section, false);
+                        }else {
+                            mItemClickListener.itemClicked(section);
+                            section.isExpanded=true;
+                            mSectionStateChangeListener.onSectionStateChanged(section, true);
+                            for (int i=0;i<mDataArrayList.size();i++){ // 선택된 섹션 이외에는 다 닫히도록
+                                if (isSection(i) && i!=position){
+                                    Section ss = (Section)mDataArrayList.get(i);
+                                    ss.isExpanded = false;
+                                    mSectionStateChangeListener.onSectionStateChanged(ss, false);
+                                }
+                            }
+                        }
                     }
                 });
                 holder.sectionToggleButton.setChecked(section.isExpanded);
-                holder.sectionToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        mSectionStateChangeListener.onSectionStateChanged(section, isChecked);
-                    }
-                });
+//                holder.sectionToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                    @Override
+//                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    }
+//                });
                 break;
         }
-
     }
 
     @Override
@@ -100,6 +118,7 @@ public class SectionedExpandableGridAdapter extends RecyclerView.Adapter<Section
 
     @Override
     public int getItemViewType(int position) {
+        // mDataArrayList에는 section, area 둘 다 그냥 주욱 들어있어서 차례대로 onBindViewHolder 에서 읽으면서 두개를 두 타입으로 나눠서 처리
         if (isSection(position))
             return VIEW_TYPE_SECTION;
         else return VIEW_TYPE_AREA;

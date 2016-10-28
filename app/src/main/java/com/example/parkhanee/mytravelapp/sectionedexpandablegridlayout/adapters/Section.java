@@ -11,7 +11,7 @@ public class Section {
     public Section(String name,int id) {
         this.name = name;
         this.id = id;
-        isExpanded = true;
+        isExpanded = id == 1;
     }
 
     public String getName() {
