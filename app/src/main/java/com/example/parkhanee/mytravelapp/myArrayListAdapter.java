@@ -98,7 +98,7 @@ public class myArrayListAdapter extends BaseAdapter {
         if (!picture.equals("null")){
             Picasso.with(context).load(picture).into(holder.imageView); //set picture
         }else{
-            holder.imageView.setImageDrawable(v.getResources().getDrawable(R.drawable.compass));
+            holder.imageView.setImageDrawable(v.getResources().getDrawable(R.drawable.noimageavailable_small));
         }
 
         return v;

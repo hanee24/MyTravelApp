@@ -57,9 +57,10 @@
         android:id="@+id/imageView"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/compass"
+        android:src="@drawable/noimageavailable_small"
         android:layout_marginRight="10dp"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+        android:scaleType="fitCenter"/>
 
     <TextView
         android:layout_width="wrap_content"

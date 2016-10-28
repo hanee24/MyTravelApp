@@ -19,7 +19,6 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Folder Name"
         android:id="@+id/folderName"
-        android:textColor="@color/theme_color"
         android:textStyle="bold"
         android:layout_below="@+id/writeButton"
         android:layout_centerHorizontal="true"/>

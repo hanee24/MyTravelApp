@@ -41,7 +41,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
     String strRadius;
     String strCat;
     TextView tvDesc;
-    Button mapBtn;
+    ImageButton mapBtn;
     ImageButton settingBtn;
     TextView tvTotalCount;
     TextView tvTitle;
@@ -84,7 +84,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
         isNearby = intent.getBooleanExtra("isNearby",true);
         Toast.makeText(NearbyD2Activity.this, "isNearby "+isNearby, Toast.LENGTH_SHORT).show();
 
-        mapBtn = (Button) findViewById(R.id.button5);
+        mapBtn = (ImageButton) findViewById(R.id.button5);
         settingBtn = (ImageButton) findViewById(R.id.button4);
         apiKey = getString(R.string.travelApiKey);
         myAdapter = new myArrayListAdapter(NearbyD2Activity.this,isNearby);

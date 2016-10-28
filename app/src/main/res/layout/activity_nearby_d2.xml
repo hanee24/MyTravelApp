@@ -32,8 +32,8 @@
 
     <ImageButton
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:id="@+id/button4"
         android:layout_alignTop="@+id/textView3"
         android:layout_alignParentRight="true"
@@ -44,15 +44,18 @@
         android:scaleType="fitXY"
         android:background="#00ffffff"
         android:padding="2dp"/>
-    <Button
+    <ImageButton
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="지도"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/map"
+        android:scaleType="fitXY"
         android:id="@+id/button5"
         android:layout_alignBottom="@+id/button4"
         android:layout_toLeftOf="@+id/button4"
-        android:layout_toStartOf="@+id/button4"/>
+        android:layout_toStartOf="@+id/button4"
+        android:background="#00ffffff"
+        android:layout_marginRight="10dp"/>
 
     <ListView
         android:layout_width="wrap_content"
