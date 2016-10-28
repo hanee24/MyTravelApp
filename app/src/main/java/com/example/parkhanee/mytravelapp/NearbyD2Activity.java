@@ -1,16 +1,17 @@
 package com.example.parkhanee.mytravelapp;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,13 +28,13 @@ public class NearbyD2Activity extends AppCompatActivity  {
     int cat;
     String strRadius;
     String strCat;
-    TextView tv;
+    TextView tvDesc;
     Button mapBtn;
     Button settingBtn;
     TextView tvTotalCount;
+    TextView tvTitle;
 
     String apiKey;
-    URL apiREQ;
 
     private ListView listView;
     private myArrayListAdapter myAdapter;
@@ -44,23 +45,27 @@ public class NearbyD2Activity extends AppCompatActivity  {
     Double lat;
     Double lng;
 
+    Boolean isNearby;
+    int areaCode;
+    String area;
+    int sigunguCode;
+    String sigungu;
+    private String TAG = "NearbyD2Activity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_d2);
-        Intent intent = getIntent();
-        radius = intent.getIntExtra("radius", 500);
-        cat = intent.getIntExtra("cat", -1);
-        strRadius = intent.getStringExtra("strRadius");
-        strCat = intent.getStringExtra("strCat");
-        lng = intent.getDoubleExtra("lng",0.0);
-        lat = intent.getDoubleExtra("lat",0.0);
 
+        tvDesc = (TextView) findViewById(R.id.textView4);
+        tvTitle = (TextView) findViewById(R.id.textView3);
 
-        tv = (TextView) findViewById(R.id.textView4);
-        tv.setText(strCat + " • " + strRadius);
         tvTotalCount = (TextView) findViewById(R.id.totalCount);
         dialog = new ProgressDialog(NearbyD2Activity.this);
+
+        Intent intent = getIntent();
+        isNearby = intent.getBooleanExtra("isNearby",true);
+        Toast.makeText(NearbyD2Activity.this, "isNearby "+isNearby, Toast.LENGTH_SHORT).show();
 
         mapBtn = (Button) findViewById(R.id.button5);
         settingBtn = (Button) findViewById(R.id.button4);
@@ -73,14 +78,77 @@ public class NearbyD2Activity extends AppCompatActivity  {
         listView.addFooterView(btnLoadMore);
         listView.setAdapter(myAdapter);
 
-        new URLReader().execute(radius,cat);
+        if (isNearby){
+            radius = intent.getIntExtra("radius", 500);
+            cat = intent.getIntExtra("cat", -1);
+            strRadius = intent.getStringExtra("strRadius");
+            strCat = intent.getStringExtra("strCat");
+            lng = intent.getDoubleExtra("lng",0.0);
+            lat = intent.getDoubleExtra("lat",0.0);
+            tvDesc.setText(strCat + " • " + strRadius);
+            tvTitle.setText("주변 탐색");
+            new URLReader().execute(radius,cat);
 
-        btnLoadMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                new URLReader().execute(radius,cat);
+            btnLoadMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    new URLReader().execute(radius,cat);
+                }
+            });
+        } else {
+            area = intent.getStringExtra("area");
+            switch (area){
+                case "서울" : areaCode = 1;
+                    break;
+                case "인천" : areaCode = 2;
+                    break;
+                case "대전" : areaCode = 3;
+                    break;
+                case "대구" : areaCode = 4;
+                    break;
+                case "광주" : areaCode = 5;
+                    break;
+                case "부산" : areaCode = 6;
+                    break;
+                case "울산" : areaCode = 7;
+                    break;
+                case "세종특별자치시" : areaCode = 8;
+                    break;
+                case "경기도" : areaCode = 31;
+                    break;
+                case "강원도" : areaCode = 32;
+                    break;
+                case "충청북도" : areaCode = 33;
+                    break;
+                case "충청남도" : areaCode = 34;
+                    break;
+                case "경상북도" : areaCode = 35;
+                    break;
+                case "경상남도" : areaCode = 36;
+                    break;
+                case "전라북도" : areaCode = 37;
+                    break;
+                case "전라남도" : areaCode = 38;
+                    break;
+                case "제주도" : areaCode = 39;
+                    break;
+                default: areaCode = 0;
+                    break;
             }
-        });
+            sigunguCode = intent.getIntExtra("sigunguCode",0);
+            sigungu = intent.getStringExtra("sigungu");
+
+            tvTitle.setText("지역 검색");
+            tvDesc.setText(area+" "+sigungu);
+            new URLReader().execute(areaCode,sigunguCode);
+
+            btnLoadMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    new URLReader().execute(areaCode,sigunguCode);
+                }
+            });
+        }
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +166,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Item a = (Item)myAdapter.getItem(i);
+                Item a = (Item) myAdapter.getItem(i);
                 int contentId = a.getContentId();
                 int cat = a.getCat();
                 int dist = a.getDist();
@@ -113,6 +181,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
 
 
     private class URLReader extends AsyncTask<Integer, JSONObject, String> {
+        URL apiREQ;
 
         @Override
         protected void onPreExecute() {
@@ -133,9 +202,6 @@ public class NearbyD2Activity extends AppCompatActivity  {
         protected String doInBackground(Integer... params) {
 
             pageNo = pageNo + 1;
-            // int i=0;
-            int radius = params[0];
-            int cat = params[1];
 
             String  inputLine;
             String result="";
@@ -143,12 +209,21 @@ public class NearbyD2Activity extends AppCompatActivity  {
             JSONObject body=null;
 
                 try {
-                    if (cat==-1){
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
-                    }else{
-                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                    if (isNearby){
+                        int radius = params[0];
+                        int cat = params[1];
+                        if (cat==-1){
+                            apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        }else{
+                            apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
+                        }
+                    }else {
+                        int areaCode = params[0];
+                        int sigunguCode = params[1];
+                        apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?ServiceKey=" + apiKey +"&areaCode="+areaCode+"&sigunguCode="+sigunguCode+"&numOfRows=12&pageNo="+pageNo+"&MobileOS=ETC&MobileApp=AppTesting&_type=json");
                     }
 
+                    Log.d(TAG, "doInBackground: apiREQ "+apiREQ);
                     in = new BufferedReader(
                             new InputStreamReader(apiREQ.openStream()));
                     while ((inputLine = in.readLine()) != null)
@@ -215,27 +290,41 @@ public class NearbyD2Activity extends AppCompatActivity  {
                 if (itemObject == null&&itemArray==null) {
                     // exit asyncTask
                 }else if (itemArray!=null){
+
                     for(int i=0; i < itemArray.length(); i++){
                         JSONObject poi = itemArray.getJSONObject(i);
                         String title = poi.getString("title");
-                        String mapy = poi.getString("mapy");
+                        String mapy , mapx;
+                        if (poi.has("mapy")){
+                            mapy = poi.getString("mapy");
+                            mapx = poi.getString("mapx");
+                        }else{
+                            mapy = "0";
+                            mapx = "0";
+                        }
+
                         Double y = Double.parseDouble(mapy);
-                        String mapx = poi.getString("mapx");
                         Double x = Double.parseDouble(mapx);
                         if (poi.has("firstimage2")){
                             img = poi.getString("firstimage2");
                         }else{
                             img = "null";
                         }
-                        int dist = poi.getInt("dist");
+
+                        int dist;
+                        if (poi.has("dist")){
+                            dist  = poi.getInt("dist");
+                        }else {
+                            dist = 0;
+                        }
                         int contentTypeId = poi.getInt("contenttypeid");
                         int contentId = poi.getInt("contentid");
 
                         //Set ListView Items
                         String desc = "description";
                         myAdapter.addItem(new Item(contentTypeId,title,img,desc,dist,mapy,mapx,contentId));
-
                     }
+
                 } else {
                     JSONObject poi = itemObject;
                     String title = poi.getString("title");
@@ -248,7 +337,13 @@ public class NearbyD2Activity extends AppCompatActivity  {
                     }else{
                         img = "null";
                     }
-                    int dist = poi.getInt("dist");
+                    int dist;
+                    if (poi.has("dist")){
+                        dist  = poi.getInt("dist");
+                    }else {
+                        dist = 0;
+                    }
+
                     int contentTypeId = poi.getInt("contenttypeid");
                     int contentId = poi.getInt("contentid");
                     //Set ListView Items

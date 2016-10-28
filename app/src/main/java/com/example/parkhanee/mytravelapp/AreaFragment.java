@@ -1,10 +1,12 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,10 @@ public class AreaFragment extends Fragment implements ItemClickListener{
     RecyclerView mRecyclerView;
     SectionedExpandableLayoutHelper helper;
 
+    int areaCode=1;
+    String area="서울";
+    String TAG = "AreaFragment";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,12 +52,21 @@ public class AreaFragment extends Fragment implements ItemClickListener{
 
     @Override
     public void itemClicked(Area area) {
-        Toast.makeText(getActivity(), "Area: "+ area.getId()+area.getName() + " clicked", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(getActivity(), NearbyD2Activity.class);
+        i.putExtra("isNearby",false);
+        i.putExtra("sigungu",area.getName());
+        i.putExtra("sigunguCode",area.getId());
+        i.putExtra("area",this.area);
+        i.putExtra("areaCode",areaCode);
+        startActivity(i);
+        Log.d(TAG,  "Area: "+ area.getId()+area.getName() + " clicked");
     }
 
     @Override
     public void itemClicked(Section section) {
-        Toast.makeText(getActivity(), "Section: "+ section.getId() + section.getName() + " clicked", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Section: "+ section.getId() + section.getName() + " clicked");
+        areaCode = section.getId();
+        area = section.getName();
     }
 
 

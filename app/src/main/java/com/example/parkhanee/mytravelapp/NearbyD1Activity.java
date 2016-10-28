@@ -94,6 +94,7 @@ public class NearbyD1Activity extends AppCompatActivity {
                 i.putExtra("strCat",strCat);
                 i.putExtra("lgt",lgt);
                 i.putExtra("lat",lat);
+                i.putExtra("isNearby",true);
                 startActivity(i);
             }
         });
