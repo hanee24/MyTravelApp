@@ -7,39 +7,68 @@
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.parkhanee.mytravelapp.NearbyD3Activity"
     android:orientation="vertical">
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_weight="1"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp"
-        >
-    </android.support.v4.view.ViewPager>
-    <com.example.parkhanee.mytravelapp.ViewPagerIndicator
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_alignBottom="@+id/pager"
-        android:id="@+id/indicator"
-        android:layout_centerHorizontal="true"
-        android:alpha="0.9"
-        android:layout_margin="10dp"
-        />
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="match_parent"
         android:id="@+id/scrollView"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="false"
-        android:layout_below="@+id/pager"
+        android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:paddingBottom="16dp">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_weight="1"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="0dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                >
+            </android.support.v4.view.ViewPager>
+
+            <com.example.parkhanee.mytravelapp.ViewPagerIndicator
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignBottom="@+id/pager"
+                android:id="@+id/indicator"
+                android:layout_centerHorizontal="true"
+                android:alpha="0.9"
+                android:layout_margin="10dp"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/previous"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/white_leftarrow"
+                android:layout_marginTop="85dp"
+                android:background="#00ffffff"
+                android:onClick="btnOnClick"
+                android:alpha="0.9"
+                android:adjustViewBounds="false"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/next"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/white_rightarrow"
+                android:layout_alignTop="@+id/previous"
+                android:background="#00ffffff"
+                android:onClick="btnOnClick"
+                android:alpha="0.9"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -47,11 +76,14 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Title"
                 android:id="@+id/title"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="false"
+                android:layout_alignParentLeft="false"
                 android:layout_alignParentStart="true"
                 android:layout_toLeftOf="@+id/cat"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/pager"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="16dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -61,7 +93,7 @@
                 android:id="@+id/aa"
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@+id/title"
-                />
+                android:layout_marginRight="16dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,7 +139,7 @@
                 android:layout_alignLeft="@+id/title"
                 android:layout_alignStart="@+id/title"
                 android:layout_below="@+id/title"
-                android:layout_marginBottom="20dp"/>
+                android:layout_marginBottom="5dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -190,10 +222,13 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/overview"
                 android:layout_alignParentEnd="true"
-                android:background="@color/accent_material_dark"
+                android:background="@color/theme_color"
                 android:visibility="gone"
                 android:onClick="btnOnClick"
-                android:layout_marginBottom="30dp"/>
+                android:layout_marginBottom="30dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:textColor="@color/default_text_color"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -250,40 +285,16 @@
     </ScrollView>
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/previous"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/white_leftarrow"
-        android:layout_marginTop="85dp"
-        android:background="#00ffffff"
-        android:onClick="btnOnClick"
-        android:alpha="0.9"
-        android:adjustViewBounds="false"/>
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/next"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/white_rightarrow"
-        android:layout_alignTop="@+id/previous"
-        android:background="#00ffffff"
-        android:onClick="btnOnClick"
-        android:alpha="0.9"/>
-
-    <ImageButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:id="@+id/add"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="8dp"
-        android:onClick="btnOnClick"/>
+        android:onClick="btnOnClick"
+        android:src="@drawable/addtofolder"
+        android:scaleType="fitXY"
+        android:background="#00ffffff"/>
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ package com.example.parkhanee.mytravelapp;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -17,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +57,9 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
     private int pages=0; // 총 불러와야하는 페이지 갯수
     private OnLoadMoreListener mOnLoadMoreListener;
     private boolean isLoading;
+
+    private boolean isMine; // 내폴더인지 공유폴더인지
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +130,7 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
 
     public void mOnClick(View view){
         switch (view.getId()){
-            case R.id.imageButton : // write imageButton
+            case R.id.imageButton : // setting imageButton
                 Intent i = new Intent(FolderActivity.this,FolderUpdateActivity.class);
                 Bundle bundle1 = new Bundle();
                 bundle1.putInt("folder_id",folder_id);
@@ -178,6 +183,20 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
 
         // set folder info
         folder = db.getFolder(folder_id);
+
+        // 폴더의 오너 아이디와 현재 로그인한 아이디가 같으면 내폴더, 아니면 공유받은 폴더.
+        isMine = folder.getOwner_id().equals(getUserId());
+        ImageButton settingBtn = (ImageButton) findViewById(R.id.imageButton);
+        ImageButton deleteBtn = (ImageButton) findViewById(R.id.imageButton4);
+        int visibility;
+        if (isMine){
+            visibility = View.VISIBLE;
+        }else {
+            visibility = View.GONE;
+        }
+        settingBtn.setVisibility(visibility);
+        deleteBtn.setVisibility(visibility);
+
         tv_name.setText(folder.getName());
         tv_desc.setText(folder.getDesc());
         String date = folder.getDate_start().substring(0,10)+" ~ "+folder.getDate_end().substring(0,10);
@@ -190,6 +209,12 @@ public class FolderActivity extends AppCompatActivity implements OnRefreshListen
 //        ArrayList<Posting> postings = db.getMyPostings(folder_id);
 //        mAdapter.addItem(postings);
 //        mAdapter.notifyDataSetChanged();
+    }
+
+    private String getUserId(){
+        SharedPreferences sharedPreferences =  getSharedPreferences(getString(R.string.MyPREFERENCES), Context.MODE_PRIVATE);
+        String str = sharedPreferences.getString(getString(R.string.userIdKey),null);
+        return str;
     }
 
     // check if the network has connected before executing AsyncTask network connection to server

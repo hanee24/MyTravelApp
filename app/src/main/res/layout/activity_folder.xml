@@ -19,9 +19,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Folder Name"
         android:id="@+id/folderName"
-        android:textColor="@color/accent_material_light"
+        android:textColor="@color/theme_color"
         android:textStyle="bold"
-        android:layout_below="@+id/imageButton4"
+        android:layout_below="@+id/writeButton"
         android:layout_centerHorizontal="true"/>
 
     <TextView
@@ -52,7 +52,6 @@
         android:layout_alignBottom="@+id/imageButton4"
         android:layout_toLeftOf="@+id/imageButton4"
         android:layout_toStartOf="@+id/imageButton4"
-        android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         />
 
@@ -65,23 +64,28 @@
         android:background="#00ffffff"
         android:onClick="mOnClick"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginLeft="5dp"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentEnd="false"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toLeftOf="@+id/writeButton"
+        android:layout_marginRight="5dp"/>
 
     <ImageButton
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:id="@+id/writeButton"
-        android:layout_alignTop="@+id/imageButton"
-        android:layout_toLeftOf="@+id/imageButton"
         android:src="@drawable/write"
         android:scaleType="fitXY"
         android:background="#00ffffff"
-        android:onClick="mOnClick"/>
+        android:onClick="mOnClick"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

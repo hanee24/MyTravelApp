@@ -70,7 +70,7 @@
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
         android:layout_below="@+id/textView3"
-        android:textColor="@color/accent_material_light"
+        android:textColor="@color/theme_color"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="5dp"
         android:layout_alignLeft="@+id/textView3"/>
@@ -84,7 +84,7 @@
         android:layout_below="@+id/textView3"
         android:layout_toRightOf="@+id/textView5"
         android:layout_toEndOf="@+id/textView5"
-        android:textColor="@color/accent_material_light"
+        android:textColor="@color/theme_color"
         android:layout_marginTop="5dp"/>
 
     <TextView
@@ -95,6 +95,6 @@
         android:id="@+id/textView7"
         android:layout_toRightOf="@+id/totalCount"
         android:layout_alignTop="@+id/totalCount"
-        android:textColor="@color/accent_material_light"/>
+        android:textColor="@color/theme_color"/>
 
 </RelativeLayout>

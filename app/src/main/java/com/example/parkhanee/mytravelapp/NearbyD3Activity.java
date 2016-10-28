@@ -1,5 +1,6 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -617,6 +618,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     }
 
     private class WriteProcess extends AsyncTask<Posting,Void,String>{
+        String folder_id;
         HashMap<String, String> postParams;
 //        ProgressDialog dialog;
 //
@@ -646,7 +648,22 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 //            if (dialog.isShowing()) {
 //                dialog.dismiss();
 //            }
-            Toast.makeText(NearbyD3Activity.this, "저장되었습니다", Toast.LENGTH_SHORT).show();
+
+            new AlertDialog.Builder(NearbyD3Activity.this)
+                    .setTitle("저장되었습니다.")
+                    .setMessage("여행 폴더에서 확인 가능합니다.")
+                    .setIcon(R.drawable.addtofolder)
+                    .setPositiveButton("여행 폴더에서 보기", new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            Intent i = new Intent(NearbyD3Activity.this,FolderActivity.class);
+                            Bundle args = new Bundle();
+                            args.putInt("folder_id",Integer.parseInt(folder_id));
+                            i.putExtra("args",args);
+                            startActivity(i);
+                        }})
+                    .setNegativeButton(android.R.string.no, null) // null말고 .dismiss라도 넣어줘야하는거 아닌가 ?
+                    .show();
         }
 
         @Override
@@ -659,6 +676,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                 // 인터넷 있을 때
                 Posting posting = postings[0];
                 dbHelper.addPosting(posting);
+                folder_id = posting.getFolder_id();
                 postingToPostParams(posting);
                 try {
                     return downloadUrl("http://hanea8199.vps.phps.kr/write_process.php");
