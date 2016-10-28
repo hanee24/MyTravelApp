@@ -536,11 +536,13 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             Date date = new Date();
                             String now = dateFormat.format(date);
                             String unixTime = String.valueOf(System.currentTimeMillis() / 1000);
-                            posting = new Posting(unixTime.substring(7,10)+String.valueOf(contentId),null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
+                            String contentIdString = String.valueOf(contentId);
+                            int contentIdLength = contentIdString.length();
+                            posting = new Posting(unixTime.substring(7,10)+contentIdString + contentIdLength ,null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
                             Log.d("set contents", "onProgressUpdate: posting "+posting.toString());
-                            // set unixTime + contentId as posting Id
+                            // set << unixTime(4) + contentId + length of contentId(1) >> as posting Id
                             // unixTime 1477370040 contentId 126909 postingId  0040126909
-                            // Log.d(TAG, "onProgressUpdate: unixTime "+unixTime+" contentId " + String.valueOf(contentId)+" postingId  "+unixTime.substring(6,10)+String.valueOf(contentId));
+                             Log.d(TAG, "onProgressUpdate: unixTime "+unixTime+" contentId " + String.valueOf(contentId)+" length "+contentIdLength+"  postingId  "+unixTime.substring(6,10)+String.valueOf(contentId)+ contentIdLength);
                         } else {
                             // imgReq
                             if (imgArrayList.get(0).equals("null")){

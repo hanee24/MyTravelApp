@@ -114,7 +114,9 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                             if (type.equals("poi")){
                                 Intent i = new Intent(view.getContext(),NearbyD3Activity.class);
                                 // posting id 의 끝자리 여섯개가 contentId
-                                String contentId = posting_id.substring(Math.max(0, posting_id.length() - 6));
+                                String contentIdLength = posting_id.substring(Math.max(0, posting_id.length() - 1));
+                                String contentId = posting_id.substring(Math.max(0, posting_id.length() - Integer.parseInt(contentIdLength)));
+                                Log.d(TAG, "onClick: length id "+contentIdLength+" "+contentId);
                                 i.putExtra("contentId",Integer.parseInt(contentId));
                                 context.startActivity(i);
                             }else {
