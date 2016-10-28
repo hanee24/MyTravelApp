@@ -110,4 +110,9 @@ public class myArrayListAdapter extends BaseAdapter {
         itemArrayList.add(item);
     }
 
+    public void clearItem(){
+        itemArrayList.clear();
+        notifyDataSetChanged();
+    }
+
 }

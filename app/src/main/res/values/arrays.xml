@@ -19,6 +19,21 @@
         <item>여행코스</item>
     </string-array>
 
+    <string-array name="order_nearby">
+        <item>거리순</item>
+        <item>제목순</item>
+        <item>조회순</item>
+        <item>수정일순</item>
+        <item>생성일순</item>
+    </string-array>
+
+    <string-array name="order_area">
+        <item>제목순</item>
+        <item>조회순</item>
+        <item>수정일순</item>
+        <item>생성일순</item>
+    </string-array>
+
     <string-array name="Cat_ContentTypeId">
         <item>null0</item>
         <item>null1</item>
