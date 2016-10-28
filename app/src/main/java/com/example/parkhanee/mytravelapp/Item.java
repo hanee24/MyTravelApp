@@ -25,6 +25,10 @@ public class Item {
         this.contentId = contentId;
     }
 
+    public Item(){
+        super();
+    }
+
     //getters and setters
 
     public int getCat(){

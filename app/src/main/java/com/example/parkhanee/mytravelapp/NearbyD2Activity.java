@@ -175,18 +175,25 @@ public class NearbyD2Activity extends AppCompatActivity  {
             });
         }
 
-        mapBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if (isNearby){
+            mapBtn.setVisibility(View.VISIBLE);
+            mapBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                Intent i = new Intent(NearbyD2Activity.this, NearbyMapActivity.class);
-                i.putExtra("radius", radius);
-                i.putExtra("cat", cat);
-                i.putExtra("lat",lat);  // my location
-                i.putExtra("lng",lng);
-                startActivity(i);
-            }
-        });
+                    Intent i = new Intent(NearbyD2Activity.this, NearbyMapActivity.class);
+                    i.putExtra("radius", radius);
+                    i.putExtra("cat", cat);
+                    i.putExtra("lat",lat);  // my location
+                    i.putExtra("lng",lng);
+                    startActivity(i);
+                }
+            });
+        }else {
+            mapBtn.setVisibility(View.GONE);
+        }
+
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

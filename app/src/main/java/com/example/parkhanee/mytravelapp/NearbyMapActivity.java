@@ -10,12 +10,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
@@ -47,17 +49,13 @@ public class NearbyMapActivity extends AppCompatActivity {
     private Double lng;
     private int radius;
     private int cat;
-    ArrayList<String> titleArrayList = new ArrayList<>();
-    ArrayList<Integer> catArrayList = new ArrayList<>();
-    ArrayList<String> yArrayList = new ArrayList<>();
-    ArrayList<String> xArrayList = new ArrayList<>();
-    ArrayList<Integer> distArrayList = new ArrayList<>();
+    ArrayList<Item> items = new ArrayList<>();
     String apiKey;
     URL apiREQ;
     ProgressDialog dialog;
     private int pageNo=0;
     Boolean loadMore=true;
-
+    private String TAG = "NearbyMapActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,16 +87,22 @@ public class NearbyMapActivity extends AppCompatActivity {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 map = mapboxMap;
-                new MyAsyncTask().execute(); // run the first asyncTask
+                new MyAsyncTask().execute(); // run the first asyncTask (pageNo==1)
 
-                map.setCameraPosition(new CameraPosition.Builder()
+                mapboxMap.setCameraPosition(new CameraPosition.Builder()
                         .target(new LatLng(lat,lng))
-                        .zoom(13)   //.bearing(300)//.tilt(30)
+                        .zoom(13)
                         .build());
-                map.addMarker(new MarkerOptions()
+
+                // Create an Icon object for the marker to use
+                        IconFactory iconFactory = IconFactory.getInstance(NearbyMapActivity.this);
+                Drawable iconDrawable = ContextCompat.getDrawable(NearbyMapActivity.this, R.drawable.purple_marker_20);
+                Icon icon = iconFactory.fromDrawable(iconDrawable);
+
+                mapboxMap.addMarker(new MarkerOptions()
                         .position(new LatLng(lat,lng))
                         .title("내 위치")
-                        //.icon(icon)
+                        .icon(icon)
                 );
 
                 //TODO: category에 따라 색깔이 다른 marker icon사용
@@ -107,7 +111,13 @@ public class NearbyMapActivity extends AppCompatActivity {
                     @Override
                     public boolean onInfoWindowClick(@NonNull Marker marker) {
                         int id = (int)marker.getId();
-                        //TODO : make onclick method to go to NearbyD3Activity
+                        if (id!=0){ // id==0이면 내위치 infowindow를 누른 것
+                            // go to NearbyD3Activity
+                            Intent i = new Intent(NearbyMapActivity.this,NearbyD3Activity.class);
+                            i.putExtra("contentId",items.get(id-1).getContentId());
+                            startActivity(i);
+                            return true;
+                        }
                         return false;
                     }
                 });
@@ -160,11 +170,11 @@ public class NearbyMapActivity extends AppCompatActivity {
             if (loadMore){
                 new MyAsyncTask().execute();
             }else{
-                for (int i=0;i<titleArrayList.size();i++){
-                    Double y = Double.parseDouble(yArrayList.get(i));
-                    Double x = Double.parseDouble(xArrayList.get(i));
+                for (int i=0;i<items.size();i++){
+                    Double y = Double.parseDouble(items.get(i).getMapy());
+                    Double x = Double.parseDouble(items.get(i).getMapx());
                     String category;
-                    switch (catArrayList.get(i)){
+                    switch (items.get(i).getCat()){
                         case 12 : category="관광지";
                             break;
                         case 39 : category="음식점";
@@ -185,9 +195,11 @@ public class NearbyMapActivity extends AppCompatActivity {
                             break;
                     }
 
+                    Log.d("map", "onPostExecute: "+y+" "+x+items.get(i).getTitle());
+
                     map.addMarker(new MarkerViewOptions()
                             .position(new LatLng(y,x))
-                            .title(titleArrayList.get(i))
+                            .title(items.get(i).getTitle())
                             .snippet(category)
                     );
 
@@ -213,6 +225,8 @@ public class NearbyMapActivity extends AppCompatActivity {
                 }else{
                     apiREQ = new URL("http://api.visitkorea.or.kr/openapi/service/rest/KorService/locationBasedList?ServiceKey=" + apiKey + "&arrange=E&contentTypeId=" + cat + "&mapX=" + lng + "&mapY=" + lat + "&radius=" + radius + "&listYN=Y&MobileOS=ETC&MobileApp=TourAPI3.0_Guide&arrange=A&numOfRows=12&pageNo="+pageNo+"&MobileOS=Android&MobileApp=TestApp&_type=json");
                 }
+
+                Log.d("map", "doInBackground: "+apiREQ);
 
                 in = new BufferedReader(
                         new InputStreamReader(apiREQ.openStream()));
@@ -256,7 +270,13 @@ public class NearbyMapActivity extends AppCompatActivity {
             }
 
             //paging 처리
-            int tc = Integer.parseInt(totalCount);
+            int tc;
+            if (totalCount.equals("")){
+                tc=0;
+            }else {
+                tc = Integer.parseInt(totalCount);
+            }
+
 
             if (tc%12==0){ //totalCount = 12개,24개, ...
                 loadMore = tc/12 >pageNo;
@@ -272,13 +292,10 @@ public class NearbyMapActivity extends AppCompatActivity {
                         String mapx = poi.getString("mapx");
                         int contentTypeId = poi.getInt("contenttypeid");
                         int dist = poi.getInt("dist");
+                        int contentId = poi.getInt("contentid");
 
-                        //set array-lists of poi
-                        titleArrayList.add(title);
-                        yArrayList.add(mapy);
-                        xArrayList.add(mapx);
-                        catArrayList.add(contentTypeId);
-                        distArrayList.add(dist);
+                        //set array-list of poi
+                        items.add(new Item(contentTypeId,title,"","",dist,mapy,mapx,contentId));
                     }
                 }else if (itemObject!=null){ //when there is only one item
                     JSONObject poi = itemObject;
@@ -287,13 +304,10 @@ public class NearbyMapActivity extends AppCompatActivity {
                     String mapx = poi.getString("mapx");
                     int contentTypeId = poi.getInt("contenttypeid");
                     int dist = poi.getInt("dist");
+                    int contentId = poi.getInt("contentid");
 
-                    //set array-lists of poi
-                    titleArrayList.add(title);
-                    yArrayList.add(mapy);
-                    xArrayList.add(mapx);
-                    catArrayList.add(contentTypeId);
-                    distArrayList.add(dist);
+                    //set array-list of poi
+                    items.add(new Item(contentTypeId,title,"","",dist,mapy,mapx,contentId));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

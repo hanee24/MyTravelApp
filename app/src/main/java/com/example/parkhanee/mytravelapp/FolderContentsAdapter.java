@@ -113,7 +113,7 @@ public class FolderContentsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         public void onClick(View view) {
                             if (type.equals("poi")){
                                 Intent i = new Intent(view.getContext(),NearbyD3Activity.class);
-                                // set << contentId(6~7) + unixTime(2) >> as posting Id
+                                // posting id = contentId(6~7) + unixTime(2)
                                 //  e.g. unixTime 1477659150 contentId 133353  postingId  13335350
                                 String contentId = posting_id.substring(0,posting_id.length()-2);
                                 i.putExtra("contentId",Integer.parseInt(contentId));

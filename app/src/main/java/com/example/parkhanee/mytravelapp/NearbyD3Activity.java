@@ -538,11 +538,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             String unixTime = String.valueOf(System.currentTimeMillis() / 1000);
                             String contentIdString = String.valueOf(contentId);
 
+                            // posting id = contentId(6~7) + unixTime(2)
+                            //  e.g. unixTime 1477659150 contentId 133353  postingId  13335350
                             posting = new Posting(contentIdString + unixTime.substring(8,10) ,null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
 
                             Log.d("set contents", "onProgressUpdate: posting "+posting.toString());
-                            // set << contentId(6~7) + unixTime(2) >> as posting Id
-                            //  e.g. unixTime 1477659150 contentId 133353  postingId  13335350
                             Log.d(TAG, "onProgressUpdate: unixTime "+unixTime+" contentId " + String.valueOf(contentId)+"  postingId  "+contentIdString + unixTime.substring(8,10));
 
                         } else {
