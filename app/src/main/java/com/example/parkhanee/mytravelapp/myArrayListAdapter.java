@@ -19,9 +19,11 @@ public class myArrayListAdapter extends BaseAdapter {
 
     private ArrayList<Item> itemArrayList = new ArrayList<>();
     private Context context = null;
+    private Boolean isNearby;
 
-    public myArrayListAdapter(Context context){
+    public myArrayListAdapter(Context context, Boolean isNearby){
         this.context= context;
+        this.isNearby = isNearby;
     }
 
     @Override
@@ -59,7 +61,12 @@ public class myArrayListAdapter extends BaseAdapter {
 
         holder.tvTitle.setText(itemArrayList.get(position).getTitle());
         holder.tvDesc.setText(itemArrayList.get(position).getDesc());
-        holder.tvDist.setText(String.valueOf(itemArrayList.get(position).getDist()));
+        if (isNearby){
+            holder.tvDist.setText(String.valueOf(" • "+itemArrayList.get(position).getDist()+"m"));
+        }else {
+            holder.tvDist.setText("");
+        }
+
         holder.tvNumber.setText(String.valueOf(position+1));
         //set category textView
         int cat = itemArrayList.get(position).getCat();

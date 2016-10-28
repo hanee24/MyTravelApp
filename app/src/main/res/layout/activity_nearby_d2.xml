@@ -30,18 +30,20 @@
         android:layout_toEndOf="@+id/textView3"
         android:layout_marginLeft="10dp"/>
 
-    <Button
+    <ImageButton
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="설정"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:id="@+id/button4"
         android:layout_alignTop="@+id/textView3"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="10dp"
-        android:layout_marginRight="10dp"/>
-
+        android:layout_marginRight="10dp"
+        android:src="@drawable/controls"
+        android:scaleType="fitXY"
+        android:background="#00ffffff"
+        android:padding="2dp"/>
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"

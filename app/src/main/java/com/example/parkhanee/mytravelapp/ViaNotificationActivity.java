@@ -47,10 +47,11 @@ public class ViaNotificationActivity extends AppCompatActivity {
         share_id = i.getStringExtra("share_id");
         dbHelper = new DBHelper(this);
         share = dbHelper.getShare(Integer.valueOf(share_id));
-
+        Folder folder = dbHelper.getFolder(Integer.parseInt(share.getFolder_id()));
         //폴더이름, 보낸 사용자 이름 보여주고 수락/거부 버튼
         TextView tv = (TextView) findViewById(R.id.textView39);
-        tv.setText(share.toString());
+        String str = folder.getOwner_id()+"님이 <"+folder.getName()+"> 폴더의 공유를 요청하였습니다. 수락하시겠습니까? ";
+        tv.setText(str);
 
     }
 

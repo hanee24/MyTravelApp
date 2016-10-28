@@ -46,31 +46,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" • "
-        android:id="@+id/textView8"
+        android:id="@+id/dist"
         android:layout_alignTop="@+id/cat"
         android:layout_toRightOf="@+id/cat"
         android:layout_toEndOf="@+id/cat"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="distance"
-        android:id="@+id/dist"
-        android:layout_toRightOf="@+id/textView8"
-        android:layout_toEndOf="@+id/textView8"
-        android:layout_alignTop="@+id/cat"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" m"
-        android:id="@+id/textView10"
-        android:layout_alignTop="@+id/dist"
-        android:layout_toRightOf="@+id/dist"
-        android:layout_toEndOf="@+id/dist"/>
 
     <ImageView
         android:layout_width="80dp"

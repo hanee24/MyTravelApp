@@ -15,6 +15,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -41,7 +42,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
     String strCat;
     TextView tvDesc;
     Button mapBtn;
-    Button settingBtn;
+    ImageButton settingBtn;
     TextView tvTotalCount;
     TextView tvTitle;
 
@@ -84,9 +85,9 @@ public class NearbyD2Activity extends AppCompatActivity  {
         Toast.makeText(NearbyD2Activity.this, "isNearby "+isNearby, Toast.LENGTH_SHORT).show();
 
         mapBtn = (Button) findViewById(R.id.button5);
-        settingBtn = (Button) findViewById(R.id.button4);
+        settingBtn = (ImageButton) findViewById(R.id.button4);
         apiKey = getString(R.string.travelApiKey);
-        myAdapter = new myArrayListAdapter(NearbyD2Activity.this);
+        myAdapter = new myArrayListAdapter(NearbyD2Activity.this,isNearby);
         listView = (ListView) findViewById(R.id.listView);
 
         btnLoadMore = new Button(this);
@@ -103,7 +104,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
             order = "E"; //거리순
             lng = intent.getDoubleExtra("lng",0.0);
             lat = intent.getDoubleExtra("lat",0.0);
-            tvDesc.setText(strCat + " • " + strRadius + " • " +strOrder);
+            tvDesc.setText(strCat + " • " + strRadius);
             tvTitle.setText("주변 탐색");
 
 
@@ -338,12 +339,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
                     public void onClick(View v) {
                         pageNo = 0;
                         myAdapter.clearItem();
-                        // TODO: 2016. 10. 28.  apply the changed setting
-                         // set textview with strCat and strDist;
-                         // set parameters for AsyncTask
-
-                        // TODO: 2016. 10. 28. make AsyncTask work with new settings
-
+                        // 2016. 10. 28.  apply the changed setting
                         if (isNearby){
                             radius = radiusTemp;
                             strRadius = strRadiusTemp;
@@ -352,7 +348,7 @@ public class NearbyD2Activity extends AppCompatActivity  {
                             order = orderTemp;
                             strOrder = strOrderTemp;
 
-                            tvDesc.setText(strCat + " • " + strRadius + " • " +strOrder);
+                            tvDesc.setText(strCat + " • " + strRadius);
                             new URLReader().execute(radius,cat);
 
                             btnLoadMore.setOnClickListener(new View.OnClickListener() {
