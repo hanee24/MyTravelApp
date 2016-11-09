@@ -10,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import com.example.parkhanee.mytravelapp.sectionedexpandablegridlayout.adapters.Area;
 import com.example.parkhanee.mytravelapp.sectionedexpandablegridlayout.adapters.ItemClickListener;
@@ -19,7 +17,6 @@ import com.example.parkhanee.mytravelapp.sectionedexpandablegridlayout.adapters.
 import com.example.parkhanee.mytravelapp.sectionedexpandablegridlayout.adapters.SectionedExpandableLayoutHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by parkhanee on 2016. 9. 6..

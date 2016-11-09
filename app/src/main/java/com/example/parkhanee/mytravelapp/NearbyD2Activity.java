@@ -2,26 +2,20 @@ package com.example.parkhanee.mytravelapp;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,7 +76,6 @@ public class NearbyD2Activity extends AppCompatActivity  {
 
         Intent intent = getIntent();
         isNearby = intent.getBooleanExtra("isNearby",true);
-        Toast.makeText(NearbyD2Activity.this, "isNearby "+isNearby, Toast.LENGTH_SHORT).show();
 
         mapBtn = (ImageButton) findViewById(R.id.button5);
         settingBtn = (ImageButton) findViewById(R.id.button4);

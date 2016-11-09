@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="검색 설정"
+        android:text="검색 필터"
         android:id="@+id/textView6"
         android:layout_alignParentStart="false"
         android:layout_alignParentTop="false"

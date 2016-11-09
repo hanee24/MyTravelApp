@@ -32,8 +32,6 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
-import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -272,7 +270,7 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // save folderId into posting object
                         posting.setFolder_id(String.valueOf(folders.get(i).getId()));
-                        Toast.makeText(NearbyD3Activity.this,folders.get(i).getName(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(NearbyD3Activity.this,folders.get(i).getName(), Toast.LENGTH_SHORT).show();
                         new WriteProcess().execute(posting);
                     }
                 });

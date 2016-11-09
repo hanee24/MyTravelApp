@@ -544,7 +544,7 @@ public class WriteActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
             Log.d(TAG, "[ImageUploadTask] onPostExecute: result "+result);
-            Toast.makeText(getApplicationContext(), "[ImageUploadTask] file uploaded",
+            Toast.makeText(getApplicationContext(), " 업로드가 완료 되었습니다.",
                     Toast.LENGTH_LONG).show();
         }
 

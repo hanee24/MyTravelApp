@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 /**
  * Created by parkhanee on 2016. 9. 5..
@@ -105,7 +104,6 @@ public class NearbyFragment extends Fragment {
         okay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "ok", Toast.LENGTH_SHORT).show();
                 Intent i  = new Intent(getActivity(), NearbyD2Activity.class);
                 i.putExtra("radius",radius);
                 i.putExtra("cat",cat);

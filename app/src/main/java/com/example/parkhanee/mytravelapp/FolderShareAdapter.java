@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,19 +21,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -120,7 +115,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
             public void onClick(View view) {
                 final String receiver = users.get(position).getUser_name();
                 final String receiver_id = users.get(position).getUser_id();
-                Toast.makeText(context, receiver+"  "+users.get(position).getUser_id(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, receiver+"  "+users.get(position).getUser_id(), Toast.LENGTH_SHORT).show();
                 final int folder_id = FolderShareActivity.folder_id;
 
                 // 2016. 9. 23. make a dialog and send GCM
