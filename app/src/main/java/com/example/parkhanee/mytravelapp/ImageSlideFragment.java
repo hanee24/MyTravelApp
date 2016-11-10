@@ -51,6 +51,7 @@ public class ImageSlideFragment extends Fragment { //480 320image
 
         if (imgArrayList.get(0).equals("null")){ //when there is no image
             imageView.setImageResource(R.drawable.noimageavailable);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
         }else{
             setImageView(rootView.getContext());
             imageView.setOnClickListener(new View.OnClickListener() {

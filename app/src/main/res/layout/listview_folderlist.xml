@@ -46,12 +46,11 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="state"
         android:id="@+id/tvShareState"
-        android:layout_above="@+id/folder_desc"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="46dp"
         android:layout_marginEnd="46dp"
-        />
+        android:layout_alignBottom="@+id/textView19"/>
 
     <TextView
         android:layout_width="wrap_content"

@@ -538,7 +538,13 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
 
                             // posting id = contentId(6~7) + unixTime(2)
                             //  e.g. unixTime 1477659150 contentId 133353  postingId  13335350
-                            posting = new Posting(contentIdString + unixTime.substring(8,10) ,null,getUserId(),"poi",title,fullOverview.substring(0,50)+" ... ",now,now);
+                            String strOverview ;
+                            if (fullOverview.length()>50){
+                                strOverview = fullOverview.substring(0,50)+" ... ";
+                            }else {
+                                strOverview=fullOverview;
+                            }
+                            posting = new Posting(contentIdString + unixTime.substring(8,10) ,null,getUserId(),"poi",title,strOverview,now,now);
 
                             Log.d("set contents", "onProgressUpdate: posting "+posting.toString());
                             Log.d(TAG, "onProgressUpdate: unixTime "+unixTime+" contentId " + String.valueOf(contentId)+"  postingId  "+contentIdString + unixTime.substring(8,10));

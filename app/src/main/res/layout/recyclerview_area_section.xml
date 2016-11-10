@@ -20,7 +20,7 @@
             android:paddingStart="10dp"
             android:background="@color/colorPrimary"
             android:textColor="@color/default_text_color"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:id="@+id/text_section"
             android:layout_weight="0.12"
             android:paddingTop="10dp"
