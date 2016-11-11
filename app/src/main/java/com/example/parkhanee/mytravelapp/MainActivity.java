@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -357,8 +358,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Highlight the selected item has been done by NavigationView
         //menuItem.setChecked(true);
+        // TODO: 2016. 11. 11.
+
         // Set action bar title
-        setTitle(menuItem.getTitle());
+//        setTitle(menuItem.getTitle());
+
+
+
         // Close the navigation drawer
         drawerLayout.closeDrawers();
     }

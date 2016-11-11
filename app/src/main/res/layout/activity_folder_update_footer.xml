@@ -15,10 +15,10 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="15dp"
 
-        android:background="@color/accent_material_dark"
+        android:background="@color/colorPrimary"
         style="?android:attr/buttonStyleSmall"
         android:onClick="mOnClick"
-        />
+        android:textColor="@color/colorFontPrimary"/>
 
 
 </RelativeLayout>

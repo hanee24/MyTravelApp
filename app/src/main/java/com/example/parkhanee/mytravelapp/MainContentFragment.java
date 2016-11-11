@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -49,8 +50,8 @@ import java.util.HashMap;
 public class MainContentFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    Button btn_nearby ;
-    Button btn_folder;
+    ImageButton btn_nearby ;
+    ImageButton btn_folder;
     TextView location;
     ProgressBar progressBar;
 
@@ -77,8 +78,8 @@ public class MainContentFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         a = view.findViewById(R.id.fragment_fb);
-        btn_nearby = (Button)view.findViewById(R.id.button);
-        btn_folder = (Button) view.findViewById(R.id.button2);
+        btn_nearby = (ImageButton)view.findViewById(R.id.button);
+        btn_folder = (ImageButton) view.findViewById(R.id.button2);
         location = (TextView) view.findViewById(R.id.textView2);
         progressBar = (ProgressBar) view.findViewById(R.id.weatherProgressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -436,37 +437,37 @@ public class MainContentFragment extends Fragment implements
                 break;
             case "01n" : resId = R.drawable.n1;
                 break;
-            case "02d" : resId = R.drawable.d2;
+            case "02d" : resId = R.drawable.cloud;
                 break;
-            case "02n" : resId = R.drawable.n2;
+            case "02n" : resId = R.drawable.cloud;
                 break;
-            case "03d" : resId = R.drawable.d3;
+            case "03d" : resId = R.drawable.cloud;
                 break;
-            case "03n" : resId = R.drawable.d3;
+            case "03n" : resId = R.drawable.cloud;
                 break;
-            case "04d" : resId = R.drawable.d3;
+            case "04d" : resId = R.drawable.cloud;
                 break;
-            case "04n" : resId = R.drawable.d3;
+            case "04n" : resId = R.drawable.cloud;
                 break;
             case "09d" : resId = R.drawable.rain;
                 break;
             case "09n" : resId = R.drawable.rain;
                 break;
-            case "10d" : resId = R.drawable.summer_rain;
+            case "10d" : resId = R.drawable.rain;
                 break;
-            case "10n" : resId = R.drawable.moon_rain;
+            case "10n" : resId = R.drawable.rain;
                 break;
-            case "11d" : resId = R.drawable.heavy_rain;
+            case "11d" : resId = R.drawable.thunder;
                 break;
-            case "11n" : resId = R.drawable.heavy_rain;
+            case "11n" : resId = R.drawable.thunder;
                 break;
-            case "13d" : resId = R.drawable.sun_snowing;
+            case "13d" : resId = R.drawable.snow;
                 break;
-            case "13n" : resId = R.drawable.moon_snow;
+            case "13n" : resId = R.drawable.snow;
                 break;
-            case "50d" : resId = R.drawable.mist;
+            case "50d" : resId = R.drawable.cloud;
                 break;
-            case "50n" : resId = R.drawable.mist;
+            case "50n" : resId = R.drawable.cloud;
                 break;
         }
         return resId;
@@ -503,11 +504,12 @@ public class MainContentFragment extends Fragment implements
             case "heavy shower rain and drizzle" : return "소나기";
             case "shower drizzle" : return "소나기";
 
+            case "haze" : return "옅은 안개";
             default: return desc;
         }
     }
 
-    // 온도가 캘빈온도 이므로 -273.15 해야 섭씨 !
+    // 온도가 캘빈온도 이므로 -273.15 해야 섭씨 온도
     private String KelvinIntoCelsius(String kelvin){
         double kelvinDouble = Double.parseDouble(kelvin);
         double celsiusDouble = kelvinDouble - 273.15;

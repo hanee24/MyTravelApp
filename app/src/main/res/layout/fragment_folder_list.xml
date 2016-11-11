@@ -18,19 +18,23 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/frame1">
+        android:layout_below="@+id/frame1"
+        android:paddingTop="5dp">
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="새로운 폴더 만들기"
             android:id="@+id/button8"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:onClick="mOnClick"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:textColor="#ffffff"
+            android:background="@drawable/button_newfolder"
+            android:textSize="16sp"/>
 
         <ListView
             android:layout_width="wrap_content"
@@ -43,7 +47,10 @@
             android:background="#00ffffff"
             android:divider="#00e0e0e0"
             android:dividerHeight="5dp"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -51,10 +58,22 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="새로고침"
             android:id="@+id/refresh"
+            android:layout_marginRight="10dp"
+            android:visibility="visible"
+            android:layout_below="@+id/button8"
+            android:layout_marginEnd="10dp"
+            android:layout_toLeftOf="@+id/imageButton6"/>
+
+        <ImageButton
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/imageButton6"
+            android:src="@drawable/refresh"
+            android:background="#00ffffff"
+            android:scaleType="fitXY"
+            android:layout_below="@+id/button8"
             android:layout_alignRight="@+id/listView2"
             android:layout_alignEnd="@+id/listView2"
-            android:layout_marginRight="10dp"
-            android:layout_below="@+id/button8"
-            android:visibility="visible"/>
+            android:layout_marginRight="10dp"/>
     </RelativeLayout>
 </RelativeLayout>

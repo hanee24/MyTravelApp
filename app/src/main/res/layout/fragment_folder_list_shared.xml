@@ -28,6 +28,8 @@
         android:background="#00ffffff"
         android:divider="#00e0e0e0"
         android:dividerHeight="5dp"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"/>
 
 </LinearLayout>

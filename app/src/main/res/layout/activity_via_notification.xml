@@ -8,37 +8,51 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.parkhanee.mytravelapp.ViaNotificationActivity">
+    tools:context="com.example.parkhanee.mytravelapp.ViaNotificationActivity"
+    android:id="@+id/e">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:id="@+id/imageView12"
+        android:src="@drawable/textbox"
+        android:scaleType="fitXY"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:text="폴더이름, 보낸 사용자 이름"
         android:id="@+id/textView39"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="133dp"
+        android:layout_marginTop="54dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        />
+        android:layout_alignTop="@+id/imageView12"
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:text="수락"
         android:id="@+id/accept"
+        android:layout_marginTop="55dp"
+        android:onClick="mOnClick"
         android:layout_below="@+id/textView39"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="143dp"
-        android:onClick="mOnClick"/>
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorFontPrimary"/>
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:text="거절"
         android:id="@+id/reject"
         android:onClick="mOnClick"
-        android:layout_below="@+id/accept"
-        android:layout_alignLeft="@+id/accept"
-        android:layout_alignStart="@+id/accept"/>
+        android:layout_alignBottom="@+id/accept"
+        android:layout_toRightOf="@+id/accept"
+        android:layout_marginLeft="10dp"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorFontPrimary"/>
 
 </RelativeLayout>

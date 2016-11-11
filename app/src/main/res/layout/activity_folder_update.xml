@@ -34,7 +34,9 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="5dp"
-        android:onClick="mOnClick"/>
+        android:onClick="mOnClick"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorFontPrimary"/>
 
     <Button
         android:layout_width="150dp"
@@ -46,7 +48,9 @@
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/cancel"
         android:layout_margin="5dp"
-        android:onClick="mOnClick"/>
+        android:onClick="mOnClick"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorFontPrimary"/>
 
 
 </RelativeLayout>

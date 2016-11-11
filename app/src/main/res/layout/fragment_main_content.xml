@@ -14,47 +14,22 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="15dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/colorFontPrimary"
+        android:textSize="20sp"/>
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_gravity="center_horizontal"
         android:gravity="center_vertical|center_horizontal"
         android:layout_below="@+id/textView2"
         android:id="@+id/iv_weather"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:paddingLeft="80dp"
-        android:paddingRight="80dp"
-        android:paddingBottom="60dp"
-        android:paddingTop="20dp"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="주변 탐색"
-        android:id="@+id/button"
-        android:layout_gravity="center_horizontal"
-        android:textSize="30dp"
-        android:nestedScrollingEnabled="false"
-        android:layout_marginBottom="20dp"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentEnd="false"
-        android:layout_below="@+id/iv_weather"
-        android:layout_marginTop="40dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="여행 폴더"
-        android:id="@+id/button2"
-        android:layout_gravity="center_horizontal"
-        android:textSize="30dp"
-        android:layout_marginBottom="40dp"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentEnd="false"/>
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="110dp"
+        android:layout_marginTop="20dp"
+        android:scaleType="fitXY"/>
 
     <fragment
         android:layout_width="wrap_content"
@@ -73,7 +48,10 @@
         android:text="-"
         android:id="@+id/tv_temp"
         android:layout_above="@+id/tv_description"
-        android:layout_centerHorizontal="true"/>
+        android:textColor="@color/colorFontPrimary"
+        android:layout_toRightOf="@+id/iv_weather"
+        android:layout_marginLeft="20dp"
+        android:textSize="23sp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -82,7 +60,10 @@
         android:text="-"
         android:id="@+id/tv_description"
         android:layout_alignBottom="@+id/iv_weather"
-        android:layout_centerHorizontal="true"/>
+        android:textColor="@color/colorFontPrimary"
+        android:layout_marginTop="5dp"
+        android:layout_alignLeft="@+id/tv_temp"
+        android:textSize="23sp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -92,14 +73,67 @@
         android:id="@+id/textView44"
         android:layout_alignTop="@+id/tv_temp"
         android:layout_toRightOf="@+id/tv_temp"
-        android:layout_toEndOf="@+id/tv_temp"/>
+        android:layout_toEndOf="@+id/tv_temp"
+        android:textColor="@color/colorFontPrimary"
+        android:textSize="23sp"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/weatherProgressBar"
-        android:layout_above="@+id/tv_temp"
+        android:layout_alignTop="@+id/iv_weather"
+        android:layout_alignEnd="@+id/fragment_fb"
+        android:layout_alignLeft="@+id/iv_weather"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="160dp"
+        android:id="@+id/button"
+        android:src="@drawable/mainbutton_nearby"
+        android:scaleType="fitXY"
+        android:layout_above="@+id/button2"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:background="#00ffffff"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginBottom="7dp"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="160dp"
+        android:id="@+id/button2"
+        android:src="@drawable/mainbutton_folder"
+        android:scaleType="fitXY"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="48dp"/>
+        android:background="#00ffffff"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginBottom="7dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="주변 탐색"
+        android:id="@+id/textView10"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:layout_alignTop="@+id/button"
+        android:layout_marginTop="70dp"
+        android:textSize="23sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="여행 폴더"
+        android:id="@+id/textView48"
+        android:textColor="#ffffff"
+        android:layout_alignTop="@+id/button2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:textSize="23sp"/>
 
 </RelativeLayout>

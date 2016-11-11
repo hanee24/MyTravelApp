@@ -21,7 +21,8 @@
         android:id="@+id/folderName"
         android:textStyle="bold"
         android:layout_below="@+id/writeButton"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/colorFontPrimary"/>
 
     <TextView
         android:layout_width="wrap_content"

@@ -135,7 +135,8 @@
                 android:layout_alignLeft="@+id/title"
                 android:layout_alignStart="@+id/title"
                 android:layout_below="@+id/title"
-                android:layout_marginBottom="5dp"/>
+                android:layout_marginBottom="5dp"
+                android:text="overview"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -155,7 +156,8 @@
                 android:id="@+id/tel"
                 android:layout_toRightOf="@+id/tv_tel"
                 android:layout_toEndOf="@+id/tv_tel"
-                android:layout_alignTop="@+id/tv_tel"/>
+                android:layout_alignTop="@+id/tv_tel"
+                android:text="tel"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -175,7 +177,8 @@
                 android:layout_toRightOf="@+id/tv_addr"
                 android:layout_toEndOf="@+id/tv_addr"
                 android:layout_marginBottom="10dp"
-                android:layout_alignTop="@+id/tv_addr"/>
+                android:layout_alignTop="@+id/tv_addr"
+                android:text="zipcode"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -194,7 +197,8 @@
                 android:id="@+id/addr1"
                 android:layout_alignTop="@+id/tv_addr1"
                 android:layout_toRightOf="@+id/tv_addr1"
-                android:layout_toEndOf="@+id/tv_addr1"/>
+                android:layout_toEndOf="@+id/tv_addr1"
+                android:text="addr1"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -232,7 +236,8 @@
                 android:layout_alignParentLeft="false"
                 android:layout_alignParentStart="false"
                 android:layout_alignLeft="@+id/tv_addr"
-                android:layout_marginBottom="15dp"/>
+                android:layout_marginBottom="15dp"
+                android:text="homepage"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -260,7 +265,8 @@
                 android:id="@+id/modifiedtime"
                 android:layout_toRightOf="@+id/tv_modified"
                 android:layout_toEndOf="@+id/tv_modified"
-                android:layout_alignTop="@+id/tv_modified"/>
+                android:layout_alignTop="@+id/tv_modified"
+                android:text="modified"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -269,7 +275,8 @@
                 android:id="@+id/createdtime"
                 android:layout_alignTop="@+id/tv_created"
                 android:layout_toRightOf="@+id/tv_created"
-                android:layout_toEndOf="@+id/tv_created"/>
+                android:layout_toEndOf="@+id/tv_created"
+                android:text="created"/>
 
         </RelativeLayout>
     </ScrollView>
