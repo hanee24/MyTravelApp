@@ -6,7 +6,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         app:elevation="5dp"
 
-        android:layout_marginLeft="1dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginRight="1dp"
         android:layout_width="90dp"
         android:layout_height="40dp"

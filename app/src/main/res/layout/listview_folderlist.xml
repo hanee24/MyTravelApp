@@ -49,15 +49,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="state"
-        android:id="@+id/tvShareState"
-        android:layout_marginLeft="38dp"
-        android:layout_marginStart="38dp"  />
-        <!--android:layout_toLeftOf="@+id/imageButton7"-->
+    <!--android:layout_toLeftOf="@+id/imageButton7"-->
     <!--android:layout_alignBottom="@+id/imageButton7"-->
 
     <TextView
@@ -81,6 +73,16 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_marginTop="15dp"
         android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="state"
+        android:id="@+id/tvShareState"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textView49"
+        android:layout_toEndOf="@+id/textView49"/>
 
     <!--<ImageButton-->
         <!--android:layout_width="50dp"-->

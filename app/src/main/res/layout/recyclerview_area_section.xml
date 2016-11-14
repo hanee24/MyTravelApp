@@ -21,12 +21,11 @@
             android:paddingBottom="10dp"
             android:paddingStart="10dp"
             android:background="@color/colorPrimary"
-            android:textColor="@color/colorFontPrimary"
-            android:textSize="14sp"
             android:id="@+id/text_section"
             android:layout_weight="0.12"
-            android:paddingTop="10dp"
-            android:text="ghj"/>
+            android:paddingTop="4dp"
+            android:text="ghj"
+            android:textStyle="bold"/>
 
         <ToggleButton
             android:layout_width="match_parent"

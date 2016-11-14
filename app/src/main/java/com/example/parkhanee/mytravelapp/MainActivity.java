@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_login;
     TextView tv_username;
     ImageView iv_icon;
-    ImageButton iv_hidden;
 
     HashMap<String, String> postDataParams;
     private static final String DEBUG_TAG = "MainActivity";
@@ -273,7 +272,6 @@ public class MainActivity extends AppCompatActivity {
         iv_icon = (ImageView) headerLayout.findViewById(R.id.profile_image);
         tv_login = (TextView) headerLayout.findViewById(R.id.textView18);
         tv_username = (TextView) headerLayout.findViewById(R.id.username);
-        iv_hidden = (ImageButton) headerLayout.findViewById(R.id.imageHidden);
 
         // init button onclick in MainContentFragment.xml
 
@@ -424,23 +422,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tv_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ifLogged){ //log out onClick
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    logout(fragmentManager);
-                    Toast.makeText(MainActivity.this, "로그아웃 되었습니다", Toast.LENGTH_SHORT).show();
-                    tv_login.setText("로그인 해 주세요");
-                    tv_username.setVisibility(View.GONE);
-                    iv_icon.setVisibility(View.GONE);
-                }else { //log in onClick
-                    Intent i = new Intent(MainActivity.this,LogInActivity.class);
-                    startActivity(i);
-                }
-            }
-        });
-
-        iv_hidden.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (ifLogged){ //log out onClick

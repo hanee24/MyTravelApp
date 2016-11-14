@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ import java.util.Map;
 public class FolderListFragment_Shared  extends Fragment {
 
     TextView refresh;
+    ImageButton iv_refresh;
     private FolderListAdapter myAdapter;
 
     String TAG = "FolderListFragment_Shared";
@@ -71,9 +73,15 @@ public class FolderListFragment_Shared  extends Fragment {
 
             @Override
             public void onClick(View view) {
+                setRefresh();
+            }
+        });
 
-                myClickHandler();
-                Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
+        iv_refresh = (ImageButton) view.findViewById(R.id.refresh_iv);
+        iv_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setRefresh();
             }
         });
 
@@ -181,6 +189,10 @@ public class FolderListFragment_Shared  extends Fragment {
         }
     }
 
+    public void setRefresh() {
+        myClickHandler();
+        Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
+    }
 
     private class SyncServer extends AsyncTask<String, Void, String> {
 

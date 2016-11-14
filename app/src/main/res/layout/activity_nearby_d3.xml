@@ -219,13 +219,13 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/overview"
                 android:layout_alignParentEnd="true"
-                android:background="@color/theme_color"
+                android:background="@drawable/default_button_style"
                 android:visibility="gone"
                 android:onClick="btnOnClick"
                 android:layout_marginBottom="30dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:textColor="@color/default_text_color"/>
+                android:textColor="@color/colorFontPrimary"/>
 
             <TextView
                 android:layout_width="wrap_content"

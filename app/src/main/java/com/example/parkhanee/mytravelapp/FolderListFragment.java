@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ import java.util.Map;
  */
 public class FolderListFragment extends Fragment {
     TextView refresh;
+    ImageButton iv_refresh;
 //    String userId;
 
     private FolderListAdapter myAdapter;
@@ -80,11 +82,18 @@ public class FolderListFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-
-                myClickHandler();
-                Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
+                setRefresh();
             }
         });
+
+        iv_refresh = (ImageButton) view.findViewById(R.id.imageButton6);
+        iv_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setRefresh();
+            }
+        });
+
 
 
         btn_new = (Button) view.findViewById(R.id.button8);
@@ -165,6 +174,12 @@ public class FolderListFragment extends Fragment {
         });
 
         dbHelper.close();
+    }
+
+    public void setRefresh(){
+
+        myClickHandler();
+        Toast.makeText(getActivity(), "refresh", Toast.LENGTH_SHORT).show();
     }
 
 
