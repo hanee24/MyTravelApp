@@ -8,66 +8,43 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.parkhanee.mytravelapp.LogInActivity">
+    tools:context="com.example.parkhanee.mytravelapp.LogInActivity"
+    android:background="@color/colorFontPrimary">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Log In"
+    <ImageView
+        android:layout_width="140dp"
+        android:layout_height="60dp"
         android:id="@+id/textView9"
         android:layout_marginTop="75dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/login"/>
 
     <EditText
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/id"
-        android:layout_marginTop="49dp"
-        android:layout_below="@+id/textView9"
-        android:layout_alignLeft="@+id/pasword"
-        android:layout_alignStart="@+id/pasword"
-        android:singleLine="true"
-        android:imeOptions="actionNext"/>
-
-    <EditText
-        android:layout_width="180dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/pasword"
-        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:singleLine="true"
+        android:maxLines="1"
         android:imeOptions="actionDone"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword"
+        android:hint="PWD"
+        android:textColorHint="@color/colorPrimary"
+        android:textColor="@color/colorPrimary"
+        android:layout_above="@id/save"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ID"
-        android:id="@+id/textView12"
-        android:layout_toLeftOf="@+id/id"
-        android:layout_marginRight="10dp"
-        android:layout_alignBottom="@+id/id"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="PWD"
-        android:id="@+id/textView13"
-        android:layout_alignBottom="@+id/pasword"
-        android:layout_toLeftOf="@+id/pasword"
-        android:layout_toStartOf="@+id/pasword"
-        android:layout_marginRight="10dp"/>
+        />
 
     <Button
-        android:layout_width="180dp"
+        android:layout_width="300dp"
         android:layout_height="40dp"
         android:text="로그인"
         android:id="@+id/save"
-        android:layout_below="@+id/pasword"
+        android:layout_above="@+id/fragment"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="51dp"/>
+        android:layout_marginTop="51dp"
+        android:background="@drawable/default_button_style"
+        android:textColor="@color/colorFontPrimary"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -76,8 +53,9 @@
         android:id="@+id/signin"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
-        android:layout_below="@+id/fragment"
-        android:background="#00ffffff"/>
+        android:background="#00ffffff"
+        android:textColor="@color/colorPrimary"
+        android:layout_alignParentBottom="true"/>
 
     <fragment
         android:layout_width="200dp"
@@ -85,7 +63,21 @@
         android:name="com.example.parkhanee.mytravelapp.FbLoginFragment"
         android:id="@+id/fragment"
         tools:layout="@layout/fragment_fb_login"
-        android:layout_below="@+id/save"
+        android:layout_above="@id/signin"
         android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/id"
+        android:imeOptions="actionNext"
+        android:maxLines="1"
+        android:hint="ID"
+        android:layout_marginBottom="19dp"
+        android:textColorHint="@color/colorPrimary"
+        android:textColor="@color/colorPrimary"
+        android:layout_above="@+id/pasword"
+        android:layout_alignLeft="@+id/pasword"
+        android:layout_alignStart="@+id/pasword"/>
 
 </RelativeLayout>

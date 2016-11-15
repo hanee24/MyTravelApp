@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="54dp"
         android:entries="@array/distance_array_list"/>
 
     <Spinner
@@ -47,8 +47,9 @@
         android:text="확인"
         android:id="@+id/button3"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="26dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:background="@drawable/default_button_style"/>
+        android:background="@drawable/default_button_style"
+        android:textColor="@color/colorFontPrimary"/>
 </LinearLayout>

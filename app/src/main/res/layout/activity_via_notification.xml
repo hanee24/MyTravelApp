@@ -21,19 +21,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
 
-    <TextView
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="폴더이름, 보낸 사용자 이름"
-        android:id="@+id/textView39"
-        android:layout_marginTop="54dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_alignTop="@+id/imageView12"
-        android:layout_centerHorizontal="true"/>
-
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
         android:text="수락"
         android:id="@+id/accept"
         android:layout_marginTop="55dp"
@@ -41,11 +30,11 @@
         android:layout_below="@+id/textView39"
         android:layout_centerHorizontal="true"
         android:background="@color/colorPrimary"
-        android:textColor="@color/colorFontPrimary"/>
+        android:textColor="@color/colorFontPrimary"
+        android:layout_height="30dp"/>
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
         android:text="거절"
         android:id="@+id/reject"
         android:onClick="mOnClick"
@@ -53,6 +42,17 @@
         android:layout_toRightOf="@+id/accept"
         android:layout_marginLeft="10dp"
         android:background="@color/colorPrimary"
-        android:textColor="@color/colorFontPrimary"/>
+        android:textColor="@color/colorFontPrimary"
+        android:layout_height="30dp"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:text="폴더이름, 보낸 사용자 이름"
+        android:id="@+id/textView39"
+        android:layout_marginTop="54dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignTop="@+id/imageView12"
+        android:layout_centerHorizontal="true"
+        android:layout_width="280dp"/>
 
 </RelativeLayout>

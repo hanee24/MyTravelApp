@@ -41,7 +41,7 @@
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="사진 추가하기"
         android:id="@+id/addPicture"
@@ -49,28 +49,33 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="52dp"
-        android:onClick="mOnClick"/>
+        android:onClick="mOnClick"
+        android:background="@drawable/default_button_style"
+        android:textColor="@color/colorFontPrimary"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="5dp"
         android:id="@+id/linearLayout">
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:text="취소"
             android:id="@+id/cancel"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:onClick="mOnClick"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:background="@drawable/default_button_style"
+            android:textColor="@color/colorFontPrimary"
+            android:layout_margin="5dp"/>
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:text="저장"
             android:id="@+id/save"
@@ -79,7 +84,10 @@
             android:layout_alignParentBottom="true"
             android:onClick="mOnClick"
             android:layout_alignBottom="@+id/cancel"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:background="@drawable/default_button_style"
+            android:textColor="@color/colorFontPrimary"
+            android:layout_margin="5dp"/>
     </LinearLayout>
 
     <ImageView

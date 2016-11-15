@@ -193,7 +193,7 @@ public class MainContentFragment extends Fragment implements
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
                 //set action bar title
-                getActivity().setTitle(R.string.string_nearby);
+//                getActivity().setTitle(R.string.string_nearby);
                 //set navigation view item checked
                 MainActivity.navigationView.setCheckedItem(R.id.nearby);
             }
@@ -214,7 +214,7 @@ public class MainContentFragment extends Fragment implements
                     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
                     //set action bar title
-                    getActivity().setTitle(R.string.string_folder);
+//                    getActivity().setTitle(R.string.string_folder);
                     //set navigation view item checked
                     MainActivity.navigationView.setCheckedItem(R.id.folder);
                 }else {

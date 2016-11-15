@@ -56,9 +56,6 @@ public class SignInActivity extends AppCompatActivity {
 
                 myClickHandler(view);
                 break;
-            case R.id.button7:  //cancel button pressed
-                finish();
-                break;
             default:
                 break;
         }

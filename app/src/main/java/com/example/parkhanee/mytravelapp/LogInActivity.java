@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -63,10 +64,11 @@ public class LogInActivity extends AppCompatActivity {
         btn_okay = (Button) findViewById(R.id.save);
         postDataParams = new HashMap<>();
 
-        // hide password when typed
-//        EditText pwd = (EditText) findViewById(R.id.pasword);
-//        pwd.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//        pwd.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        // set underline color of EditTexts
+        EditText pwd = (EditText) findViewById(R.id.pasword);
+        et_id = (EditText) findViewById(R.id.id);
+        pwd.getBackground().mutate().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
+        et_id.getBackground().mutate().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
 
         btn_okay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,7 +193,6 @@ public class LogInActivity extends AppCompatActivity {
 
             if (resultCode == 00) { //result is Okay
                 msg = "로그인 되었습니다";
-                et_id = (EditText) findViewById(R.id.id);
                 String id = et_id.getText().toString();
                 MainActivity.login(id, id, false);
                 AlertDialog.Builder builder = new AlertDialog.Builder(LogInActivity.this);

@@ -85,6 +85,9 @@ public class NearbyD2Activity extends AppCompatActivity  {
 
         btnLoadMore = new Button(this);
         btnLoadMore.setText("더 불러오기");
+        btnLoadMore.setTextColor(getApplication().getResources().getColor(R.color.colorFontPrimary));
+        btnLoadMore.setBackground(getApplication().getResources().getDrawable(R.drawable.default_button_style));
+
         listView.addFooterView(btnLoadMore);
         listView.setAdapter(myAdapter);
 

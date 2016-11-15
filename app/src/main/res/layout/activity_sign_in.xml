@@ -8,88 +8,72 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.parkhanee.mytravelapp.SignInActivity">
+    tools:context="com.example.parkhanee.mytravelapp.SignInActivity"
+    android:background="@color/colorFontPrimary">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Sign In"
+    <ImageView
+        android:layout_width="140dp"
+        android:layout_height="60dp"
         android:id="@+id/textView15"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="75dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/signin"/>
 
     <EditText
-        android:layout_width="180dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/editText"
         android:layout_marginTop="44dp"
-        android:layout_below="@+id/textView15"
-        android:layout_toRightOf="@+id/textView17"
-        android:layout_toEndOf="@+id/textView17"
-        android:singleLine="true"
-        android:imeOptions="actionNext"/>
+        android:layout_above="@+id/editText2"
+        android:imeOptions="actionNext"
+        android:layout_centerHorizontal="true"
+        android:maxLines="1"
+        android:hint="ID"
+        android:textColorHint="@color/colorPrimary"
+        android:textColor="@color/colorPrimary"/>
 
     <EditText
-        android:layout_width="180dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/editText2"
-        android:layout_below="@+id/editText"
+        android:layout_above="@+id/editText3"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
-        android:singleLine="true"
         android:imeOptions="actionNext"
-        android:inputType="textPassword"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ID"
-        android:id="@+id/textView16"
-        android:layout_toLeftOf="@+id/editText"
-        android:layout_marginRight="10dp"
-        android:layout_alignBottom="@+id/editText"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="PWD"
-        android:id="@+id/textView17"
-        android:layout_alignBottom="@+id/editText2"
-        android:layout_toLeftOf="@+id/editText2"
-        android:layout_marginRight="10dp"/>
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:hint="PWD"
+        android:textColorHint="@color/colorPrimary"
+        android:textColor="@color/colorPrimary"/>
 
     <EditText
-        android:layout_width="180dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/editText3"
-        android:layout_below="@+id/editText2"
+        android:layout_marginBottom="60dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:singleLine="true"
         android:imeOptions="actionDone"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword"
+        android:layout_above="@+id/button6"
+        android:maxLines="1"
+        android:hint="PWD"
+        android:textColorHint="@color/colorPrimary"
+        android:textColor="@color/colorPrimary"/>
 
     <Button
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
         android:text="확인"
         android:id="@+id/button6"
-        android:layout_below="@+id/editText3"
-        android:layout_marginTop="38dp"
-        android:layout_marginLeft="20dp"
-        android:onClick="mOnClick"/>
+        android:onClick="mOnClick"
+        android:textColor="@color/colorFontPrimary"
+        android:background="@drawable/default_button_style"
+        android:layout_marginBottom="26dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/editText3"
+        android:layout_alignStart="@+id/editText3"/>
 
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:text="취소"
-        android:id="@+id/button7"
-        android:layout_alignBottom="@+id/button6"
-        android:layout_toRightOf="@+id/button6"
-        android:layout_marginRight="20dp"
-        android:onClick="mOnClick"/>
 
 </RelativeLayout>

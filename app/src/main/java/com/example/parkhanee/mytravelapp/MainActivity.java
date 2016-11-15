@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
             final FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
             navigationView.setCheckedItem(R.id.main);
-            setTitle(R.string.string_main);
+//            setTitle(R.string.string_main);
         }
     }
 
@@ -305,38 +305,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
-        Fragment fragment = null;
+
         Class fragmentClass;
 
         // location data appending to nearbyFragment
         switch(menuItem.getItemId()) {
             case R.id.main:
-                fragmentClass = MainContentFragment.class;
+                openFragment(MainContentFragment.class);
                 break;
             case R.id.nearby:
-                fragmentClass = NearbyFragment.class;
+                openFragment(NearbyFragment.class);
                 Log.d(TAG, "selectDrawerItem: lat lng hashmap "+lat+" "+lng+" "+weatherHashMap );
                 break;
             case R.id.area:
-                fragmentClass = AreaFragment.class;
+                openFragment(AreaFragment.class);
                 break;
             case R.id.folder:
-                fragmentClass = FolderListFragment.class;
+                if (ifLogged){
+                    openFragment(FolderListFragment.class);
+                }else{
+                    loginDialog();
+                    break;
+                }
                 break;
-            // TODO: 2016. 9. 8. create poi, map fragment
-//            case R.id.poi:
-//                break;
-//            case R.id.map:
-//                break;
             case R.id.share :
-                fragmentClass = FolderListFragment_Shared.class;
+                if(ifLogged){
+                    openFragment(FolderListFragment_Shared.class);
+                }else {
+                    loginDialog();
+                    break;
+                }
                 break;
             default:
-                fragmentClass = MainContentFragment.class;
+               openFragment(MainContentFragment.class);
                 System.out.println("selectDrawerItem default ?");
+              break;
         }
 
+        // Close the navigation drawer
+        drawerLayout.closeDrawers();
+    }
+
+    public void openFragment(Class fragmentClass){
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+        Fragment fragment = null;
         try {
             fragment = (Fragment) fragmentClass.newInstance();
             if (lat!=0.0){
@@ -360,11 +372,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Set action bar title
 //        setTitle(menuItem.getTitle());
+    }
 
+    public void loginDialog(){
+        AlertDialog.Builder adb = new AlertDialog.Builder(getApplicationContext());
+        adb.setTitle("로그인이 필요한 서비스 입니다");
+        adb.setIcon(android.R.drawable.ic_dialog_alert);
+        adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent i = new Intent(getApplicationContext(),LogInActivity.class);
+                startActivity(i);
+            } });
+        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
 
-
-        // Close the navigation drawer
-        drawerLayout.closeDrawers();
+            } });
+        adb.show();
     }
 
 
