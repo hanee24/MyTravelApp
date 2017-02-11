@@ -97,18 +97,21 @@ public class FolderListFragment extends Fragment {
 
 
         btn_new = (Button) view.findViewById(R.id.button8);
-        frame =  view.findViewById(R.id.frame1);
+//        frame = MainActivity.getFrame();
+//        frame =  view.findViewById(R.id.frame1);
+//
+//        //set fragment
+//        Class fragmentClass = NewFolderFragment.class;
+//        Fragment fragment=null;
+//        try {
+//            fragment = (Fragment) fragmentClass.newInstance();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//        fragmentManager.beginTransaction().replace(R.id.frame1, fragment).commit();
 
-        //set fragment
-        Class fragmentClass = NewFolderFragment.class;
-        Fragment fragment=null;
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.frame1, fragment).commit();
+        frame = MainActivity.frame;
 
         btn_new.setOnClickListener(new View.OnClickListener() { //새로운 폴더 만들기 button onclick
             @Override

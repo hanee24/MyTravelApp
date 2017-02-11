@@ -93,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
     public static HashMap<String, String> weatherHashMap;
     public static String geoCode;
 
+    public static View frame;
+
 
 
     @Override
@@ -159,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         registBroadcastReceiver();
         getInstanceIdToken(); // it is originally within button onClick method in the post
 
-
+        NewFolderFrame();
     }
 
     /**
@@ -749,5 +751,25 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
+    public View getFrame(){
+        View frame = findViewById(R.id.frame1);
+        return frame;
+    }
+
+    public void NewFolderFrame(){
+        // at the end of OnCreate
+        frame =findViewById(R.id.frame1);
+
+        //set fragment
+        Class fragmentClass = NewFolderFragment.class;
+        Fragment fragment=null;
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.frame1, fragment).commit();
+    }
 
 }

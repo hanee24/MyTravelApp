@@ -18,6 +18,17 @@
             />
 
         <FrameLayout
+            android:id="@+id/frame1"
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:visibility="gone"
+            android:contextClickable="false">
+            <!--<include
+                android:id="@+id/include"
+                layout="@layout/fragment_new_folder"/>-->
+        </FrameLayout>
+
+        <FrameLayout
             android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

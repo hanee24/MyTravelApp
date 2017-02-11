@@ -323,7 +323,7 @@ public class MainContentFragment extends Fragment implements
             } else {
                 Log.d(TAG, "myClickHandler: 1313 new geoCode and weather");
                 new getGeoCode().execute(url);
-                new getWeather().execute(Lat,Lng);
+                // TODO: 2017. 2. 11.   new getWeather().execute(Lat,Lng);
             }
 
 
