@@ -50,7 +50,7 @@ import java.util.HashMap;
 public class MainContentFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    ImageButton btn_nearby ;
+    ImageButton btn_nearby;
     ImageButton btn_folder;
     TextView location;
     ProgressBar progressBar;
@@ -61,6 +61,8 @@ public class MainContentFragment extends Fragment implements
     Double lng;
 
     View a;
+    final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 111;
+    final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 112;
 
     // to check if the mainContentFragment is now active. --> MainActivity.OnBackPressed
     public static Boolean isMain;
@@ -69,7 +71,7 @@ public class MainContentFragment extends Fragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_main_content,container,false);
+        ViewGroup v = (ViewGroup) inflater.inflate(R.layout.fragment_main_content, container, false);
         return v;
     }
 
@@ -78,7 +80,7 @@ public class MainContentFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         a = view.findViewById(R.id.fragment_fb);
-        btn_nearby = (ImageButton)view.findViewById(R.id.button);
+        btn_nearby = (ImageButton) view.findViewById(R.id.button);
         btn_folder = (ImageButton) view.findViewById(R.id.button2);
         location = (TextView) view.findViewById(R.id.textView2);
         progressBar = (ProgressBar) view.findViewById(R.id.weatherProgressBar);
@@ -118,10 +120,82 @@ public class MainContentFragment extends Fragment implements
 
     @Override
     public void onConnected(@Nullable Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED 
-                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        btn_folder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (MainActivity.ifLogged) {
+                    //go to folderFragment if user has been logged in
+                    Class fragmentClass = FolderListFragment.class;
+                    Fragment fragment = null;
+                    try {
+                        fragment = (Fragment) fragmentClass.newInstance();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
+                    //set action bar title
+//                    getActivity().setTitle(R.string.string_folder);
+                    //set navigation view item checked
+                    MainActivity.navigationView.setCheckedItem(R.id.folder);
+                } else {
+                    AlertDialog.Builder adb = new AlertDialog.Builder(getContext());
+                    adb.setTitle("로그인이 필요한 서비스 입니다");
+                    adb.setIcon(android.R.drawable.ic_dialog_alert);
+                    adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i = new Intent(getContext(), LogInActivity.class);
+                            startActivity(i);
+                        }
+                    });
+                    adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    adb.show();
+                }
+
+            }
+        });
+
+
+        // case 1 : 권한승인 필요없는 경우 (api 23 이하) 또는 이전에 권한 승인 한 경우 (api 23 이상)
+        //          onConnected메소드가 끝까지 실행 됨
+        // case 2 : 권한승인여부 물어봐서 승인 된 경우
+        //          onRequestPermissionResult 에서 onPermissionGranted가 실행됨
+        // case 3 : 권한승인여부 물어봐서 거절 된 경우
+        //          onRequestPermissionResult 에서 onPermissionDenied가 실행됨
+
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onConnected: ask coarse location permission");
+
+            // 위치 권한 승인여부 사용자에게 물어보기
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+
             return;
         }
+
+        // 이건 따로 필요 없는 것 같다
+//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+//            Log.d(TAG, "onConnected: ask fine location permission");
+//
+//            // 위치 권한 승인여부 사용자에게 물어보기
+//            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+//            return;
+//        }
+
+//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//                &&ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+//            return;
+//        }
+
+        //
+        Log.d(TAG, "onConnected: permission CASE 1 ");
+        onPermissionGranted();
 
        /*  에뮬레이터 위치 바꿨을 때 새 위치 등록해주기 위해서 필요한 코드
         LocationManager mLM = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -146,11 +220,13 @@ public class MainContentFragment extends Fragment implements
 
                     }
                 });
-*/
+        */
+    }
 
+
+    private void onPermissionGranted() throws SecurityException {
         myLocation = com.google.android.gms.location.LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-
+                mGoogleApiClient); // this line of code requires security exception process
 
         if (MainActivity.lat==null) {
             // 메인 액티비티에 위치정보 저장되어있는것이 없으면 새로 불러온다
@@ -198,43 +274,39 @@ public class MainContentFragment extends Fragment implements
                 MainActivity.navigationView.setCheckedItem(R.id.nearby);
             }
         });
+    }
 
-        btn_folder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (MainActivity.ifLogged){
-                    //go to folderFragment if user has been logged in
-                    Class fragmentClass = FolderListFragment.class;
-                    Fragment fragment=null;
-                    try {
-                        fragment = (Fragment) fragmentClass.newInstance();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.frame, fragment).commit();
-                    //set action bar title
-//                    getActivity().setTitle(R.string.string_folder);
-                    //set navigation view item checked
-                    MainActivity.navigationView.setCheckedItem(R.id.folder);
-                }else {
-                    AlertDialog.Builder adb = new AlertDialog.Builder(getContext());
-                    adb.setTitle("로그인이 필요한 서비스 입니다");
-                    adb.setIcon(android.R.drawable.ic_dialog_alert);
-                    adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent(getContext(),LogInActivity.class);
-                            startActivity(i);
-                        } });
-                    adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                        } });
-                    adb.show();
+                    Log.d(TAG, "onConnected: permission CASE 2 ");
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    onPermissionGranted();
+
+                } else {
+
+                    Log.d(TAG, "onConnected: permission CASE 3 ");
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+
+                    // 주변탐색 기능을 사용할 수 없습니다 ~~
+                    // 거절 한 경우 nearbyFragment 접근 불가 처리(메인액티비티버튼&네비게이션뷰)
                 }
-
+                return;
             }
-        });
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     public void myClickHandler(String Lat, String Lng) { // check if the network has connected
@@ -350,7 +422,7 @@ public class MainContentFragment extends Fragment implements
             try {
                 String url = BASE_URL+"lat="+Lat+"&lon="+Lgt+"&APPID="+getString(R.string.weatherApiKey);
                 con = (HttpURLConnection) ( new URL(url)).openConnection();
-                con.setRequestMethod("GET");
+                con.setRequestMethod("POST"); // fixme :  권한 허용 하고나서 바로 실행했을 때  throws HTTP 405 "Method not allowed"
                 con.setDoInput(true);
                 con.setDoOutput(true);
                 con.connect();
