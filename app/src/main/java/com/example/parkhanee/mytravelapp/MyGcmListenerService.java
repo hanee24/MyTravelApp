@@ -124,14 +124,14 @@ public class MyGcmListenerService extends GcmListenerService {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.road)
+                .setSmallIcon(R.drawable.mytravel)
                 .setContentTitle(title)
                 .setTicker(title)
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.road))
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.mytravel))
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =

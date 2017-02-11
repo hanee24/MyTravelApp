@@ -434,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
             if (ifFbLogged){
                 iv_icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
             }else {
-                iv_icon.setImageResource(R.drawable.road);
+                iv_icon.setImageResource(R.drawable.mytravel);
             }
         }else {
             tv_username.setVisibility(View.GONE);

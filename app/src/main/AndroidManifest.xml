@@ -26,7 +26,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/road"
+        android:icon="@drawable/mytravel"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -38,13 +38,12 @@
 
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTask"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+            android:launchMode="singleTask">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
         </activity>
         <activity android:name=".NearbyD1Activity">
         </activity>
@@ -144,6 +143,13 @@
         </provider>
 
         <activity android:name=".ImageActivity">
+        </activity>
+        <activity android:name=".Launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

@@ -106,7 +106,7 @@ public class FolderShareAdapter extends BaseAdapter implements Filterable {
                 holder.icon.setImageResource(R.drawable.com_facebook_button_icon_blue);
             }else{
                 // set default app icon
-                holder.icon.setImageResource(R.drawable.road);
+                holder.icon.setImageResource(R.drawable.mytravel);
             }
         }
 

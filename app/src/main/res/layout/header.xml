@@ -9,7 +9,7 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:id="@+id/profile_image"
-        android:src="@drawable/road"
+        android:src="@drawable/mytravel"
         android:scaleType="fitXY"
         android:visibility="visible"
         android:padding="2dp"

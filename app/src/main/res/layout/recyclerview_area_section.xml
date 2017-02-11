@@ -18,14 +18,15 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="10dp"
             android:paddingStart="10dp"
             android:background="@color/colorPrimary"
             android:id="@+id/text_section"
             android:layout_weight="0.12"
-            android:paddingTop="4dp"
             android:text="ghj"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="@color/colorFontPrimary"
+            android:gravity="center_vertical"
+            android:textSize="18sp"/>
 
         <ToggleButton
             android:layout_width="match_parent"

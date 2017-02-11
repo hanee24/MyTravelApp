@@ -80,7 +80,7 @@ public class ShareListAdapter  extends BaseAdapter {
         }else{
             Log.d(TAG, "getView: FB==false"+String.valueOf(i));
             // set default app icon
-            holder.icon.setImageResource(R.drawable.road);
+            holder.icon.setImageResource(R.drawable.mytravel);
         }
 
         return v;
