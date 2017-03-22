@@ -162,11 +162,11 @@ public class MainContentFragment extends Fragment implements
 
 
         // case 1 : 권한승인 필요없는 경우 (api 23 이하) 또는 이전에 권한 승인 한 경우 (api 23 이상)
-        //          onConnected메소드가 끝까지 실행 됨
+        //          onConnected() --> onPermissionGranted()
         // case 2 : 권한승인여부 물어봐서 승인 된 경우
-        //          onRequestPermissionResult 에서 onPermissionGranted가 실행됨
+        //          onRequestPermissionResult() --> onPermissionGranted()
         // case 3 : 권한승인여부 물어봐서 거절 된 경우
-        //          onRequestPermissionResult 에서 onPermissionDenied가 실행됨
+        //          onRequestPermissionResult --> onPermissionDenied()
 
 
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -351,9 +351,20 @@ public class MainContentFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(String s) {
+            Log.d(TAG, "onPostExecute: geocode result : "+s);
             //split "s" , get second, third, forth words
             String[] str = s.split(" ");
-            String ss = str[1]+" "+str[2]+" "+str[3];
+            String ss;
+            if (str.length>=4){
+                ss = str[1]+" "+str[2]+" "+str[3];
+            }else if (str.length==3){
+                ss = str[1]+" "+str[2];
+            }else if (str.length==2){
+                ss = str[0]+" "+str[1];
+            }else {
+                ss = " ";
+            }
+
             location.setText(ss);
             MainActivity.geoCode = ss;
         }
