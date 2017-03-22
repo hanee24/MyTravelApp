@@ -38,7 +38,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:9.4.0'
 
     // 2017.02.11 fixme 여기에 적혀있는 페북 sdk버전(현 4.19.0)은 그대로인데 여기서 참조하는 실제 파일의 버전이 자동 업데이트 되서 빌드에러 발생.
-    compile files('build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.19.0/jars/classes.jar')
+    compile files('build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.20.0/jars/classes.jar')
 
     compile 'com.android.support:recyclerview-v7:24.2.1';
     compile 'com.android.support:cardview-v7:24.2.1';

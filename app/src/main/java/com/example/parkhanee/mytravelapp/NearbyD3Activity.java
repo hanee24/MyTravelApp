@@ -1,20 +1,26 @@
 package com.example.parkhanee.mytravelapp;
 
+import android.*;
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -82,6 +88,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
     Posting posting;
     DBHelper dbHelper;
     private String TAG = "NearbyD3Activity";
+
+    final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 114;
 
 
     @Override
@@ -429,13 +437,16 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
                             overview = overview.replace("&gt;", " ");
                             if (poi.has("tel")) {
                                 String tel = poi.getString("tel");
+                                // ACTION_DIAL : 전화번호를 전화걸기 화면에 띄워줌, CALL_PHONE 권한 필요없음 !
+                                // ACTION_CALL : 바로 전화가 걸림, CALL_PHONE 권한 필요
                                 callingIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+tel));
                                 tvTel.setText(tel);
                                 tvTel.setTextColor(Color.BLUE);
                                     tvTel.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            call();
+                                            makeCall();
+
                                         }
                                     });
                             } else {
@@ -586,11 +597,11 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             }
         }
 
-
-        private void call(){
+        private void makeCall(){
             // if calling intent has been initialized,
             startActivity(callingIntent);
         }
+
 
         private void SetArrowsVisibility(Boolean show){
             ImageButton previous = (ImageButton) findViewById(R.id.previous);
@@ -777,5 +788,8 @@ public class NearbyD3Activity extends FragmentActivity { //AppCompatActivity
             return result.toString();
         }
     }
+
+
+
 
 }

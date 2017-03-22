@@ -178,49 +178,9 @@ public class MainContentFragment extends Fragment implements
             return;
         }
 
-        // 이건 따로 필요 없는 것 같다
-//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-//            Log.d(TAG, "onConnected: ask fine location permission");
-//
-//            // 위치 권한 승인여부 사용자에게 물어보기
-//            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-//            return;
-//        }
-
-//        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                &&ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-//            return;
-//        }
-
-        //
         Log.d(TAG, "onConnected: permission CASE 1 ");
         onPermissionGranted();
 
-       /*  에뮬레이터 위치 바꿨을 때 새 위치 등록해주기 위해서 필요한 코드
-        LocationManager mLM = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        mLM.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                1000, 1, new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                    }
-
-                    @Override
-                    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String s) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String s) {
-
-                    }
-                });
-        */
     }
 
 
@@ -329,6 +289,7 @@ public class MainContentFragment extends Fragment implements
 
 
         } else {
+            // TODO: 2017. 2. 11.
             location.setText("위치 정보를 찾을 수 없습니다. 네트워크 연결을 확인 해 주세요.");
             Toast.makeText(getActivity(), "No network connection available.", Toast.LENGTH_SHORT).show();
         }
@@ -447,7 +408,9 @@ public class MainContentFragment extends Fragment implements
             }
             finally {
                 try { is.close(); } catch(Throwable t) {}
-                try { con.disconnect(); } catch(Throwable t) {}
+                try {
+                    assert con != null;
+                    con.disconnect(); } catch(Throwable t) {}
             }
 
             return null;
