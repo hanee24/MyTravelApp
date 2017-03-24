@@ -9,25 +9,34 @@
             android:checked="true"/>
     </group>
 
-    <group android:checkableBehavior="single"
-           android:id="@+id/search"
-           android:title="@string/string_search">
-        <item
-            android:id="@+id/nearby"
-            android:title="@string/string_nearby"/>
-        <item
-            android:id="@+id/area"
-            android:title="@string/string_area"/>
-    </group>
+    <item android:title="@string/string_folder">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:icon="@drawable/nav_folder"
+                    android:id="@+id/folder"
+                    android:title="@string/string_my_folder"/>
+                <item
+                    android:icon="@drawable/nav_share"
+                    android:id="@+id/share"
+                    android:title="@string/string_share"/>
+            </group>
+        </menu>
+    </item>
 
-    <group android:checkableBehavior="single"
-           android:id="@+id/my"
-           android:title="@string/string_my">
-        <item
-            android:id="@+id/folder"
-            android:title="@string/string_folder"/>
-        <item
-            android:id="@+id/share"
-            android:title="@string/string_share"/>
-    </group>
+    <item android:title="@string/string_search">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:icon="@drawable/nav_nearby2"
+                    android:id="@+id/nearby"
+                    android:title="@string/string_nearby"/>
+                <item
+                    android:icon="@drawable/nav_area"
+                    android:id="@+id/area"
+                    android:title="@string/string_area"/>
+            </group>
+        </menu>
+    </item>
+
 </menu>

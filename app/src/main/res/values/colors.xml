@@ -9,4 +9,5 @@
     <color name="myBlack">#FF000000</color>
     <color name="default_text_color">#ffffff</color>
     <color name="colorFontPrimary">#064175</color>
+    <color name="colorGray">#595959</color>
 </resources>

@@ -504,7 +504,7 @@ public class WriteActivity extends AppCompatActivity {
                     return readStream(conn.getInputStream());
                 }else {
                     Log.d(TAG, "[ImageUploadTask] doInBackground: connection error");
-                    return readStream(conn.getErrorStream());
+                    return readStream(conn.getInputStream());
                 }
 
 

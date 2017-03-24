@@ -128,13 +128,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                //TODO add code
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                //TODO add code
             }
         };
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
@@ -310,6 +308,9 @@ public class MainActivity extends AppCompatActivity {
 
         Class fragmentClass;
 
+        //Set action bar title
+        setTitle(menuItem.getTitle());
+
         // location data appending to nearbyFragment
         switch(menuItem.getItemId()) {
             case R.id.main:
@@ -372,8 +373,6 @@ public class MainActivity extends AppCompatActivity {
         //menuItem.setChecked(true);
         // TODO: 2016. 11. 11.
 
-        // Set action bar title
-//        setTitle(menuItem.getTitle());
     }
 
     public void loginDialog(){
