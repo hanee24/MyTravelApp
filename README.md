@@ -21,6 +21,6 @@ Server
 Client
 
 * Language : Java
-* OS : 안드로이드
+* OS : Android
 * DataBase : SQLite, Shared Preferences
 * Library : Korea Tourism Organization API, Mapbox API, Google play service location, Jsoup(HTML parser), RecyclerView, CardView, Picasso
